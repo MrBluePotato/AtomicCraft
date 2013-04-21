@@ -191,7 +191,7 @@ namespace fCraft {
                 return bmp; //return original image, I guess
             }
         }
-        //Measure the size of the string length using IDisposable. Backport from 800Craft Client
+        //Measure the size of the string length using IDisposable. Backport from AtomicCraft Client
         public static SizeF MeasureTextSize ( string text, Font font ) {
             using ( Bitmap bmp = new Bitmap( 1, 1 ) ) {
                 using ( Graphics g = Graphics.FromImage( bmp ) ) {

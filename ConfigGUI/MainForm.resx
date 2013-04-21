@@ -140,7 +140,7 @@
   </metadata>
   <data name="lCrashReportDisclaimer.Text" xml:space="preserve">
     <value>Error reports are created when serious unexpected errors occur. Being able to receive crash reports helps
-identify bugs and improve 800Craft Plus! The report consists of the error information, OS and runtime versions,
+identify bugs and improve AtomicCraft! The report consists of the error information, OS and runtime versions,
 a copy of config.xml, and last 25 lines of the log file. All submited reports are anonymous, and we never publicly release them</value>
   </data>
   <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

@@ -21,7 +21,7 @@ namespace fCraft.GUI {
         {
             try
             {
-                Process.Start("http://www.800craft.net");
+                Process.Start("http://www.AtomicCraft.net");
             }
             catch { }
         }

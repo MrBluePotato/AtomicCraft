@@ -1875,7 +1875,7 @@
             this.lUpdater.Name = "lUpdater";
             this.lUpdater.Size = new System.Drawing.Size(156, 15);
             this.lUpdater.TabIndex = 0;
-            this.lUpdater.Text = "800Craft Plus update check";
+            this.lUpdater.Text = "AtomicCraft update check";
             // 
             // groupBox2
             // 
@@ -1888,7 +1888,7 @@
             this.groupBox2.Size = new System.Drawing.Size(315, 55);
             this.groupBox2.TabIndex = 4;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "About 800Craft Plus";
+            this.groupBox2.Text = "About AtomicCraft";
             // 
             // bChangelog
             // 
@@ -3448,7 +3448,7 @@
             this.xSubmitCrashReports.Name = "xSubmitCrashReports";
             this.xSubmitCrashReports.Size = new System.Drawing.Size(422, 19);
             this.xSubmitCrashReports.TabIndex = 0;
-            this.xSubmitCrashReports.Text = "Automatically submit error reports to 800Craft Plus developers";
+            this.xSubmitCrashReports.Text = "Automatically submit error reports to AtomicCraft developers";
             this.xSubmitCrashReports.UseVisualStyleBackColor = true;
             // 
             // tabPage1
@@ -4452,7 +4452,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(700, 547);
             this.Name = "MainForm";
-            this.Text = "800Craft Config Tool";
+            this.Text = "AtomicCraft Configuration";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ConfigUI_FormClosing);
             this.tabSavingAndBackup.ResumeLayout(false);
             this.gDataBackup.ResumeLayout(false);

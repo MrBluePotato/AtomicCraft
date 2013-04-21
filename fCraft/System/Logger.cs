@@ -24,10 +24,10 @@ namespace fCraft
         public static readonly bool[] ConsoleOptions;
         public static readonly bool[] LogFileOptions;
 
-        const string DefaultLogFileName = "800Craft.log",
+        const string DefaultLogFileName = "AtomicCraft.log",
                      LongDateFormat = "yyyy'-'MM'-'dd'_'HH'-'mm'-'ss",
                      ShortDateFormat = "yyyy'-'MM'-'dd";
-        static readonly Uri CrashReportUri = new Uri("http://error.800craft.net/crashreport.php");
+        static readonly Uri CrashReportUri = new Uri("http://error.atomiccraft.net/crashreport.php");
         public static LogSplittingType SplittingType = LogSplittingType.OneFile;
 
         static readonly string SessionStart = DateTime.Now.ToString(LongDateFormat); // localized
@@ -283,7 +283,7 @@ namespace fCraft
 
                     if (responseString != null && responseString.StartsWith("ERROR"))
                     {
-                        Log(LogType.Error, "Crash report could not be processed by 800Craft.net.");
+                        Log(LogType.Error, "Crash report could not be processed by AtomicCraft.net.");
                     }
                     else
                     {
@@ -323,14 +323,14 @@ namespace fCraft
                 else if (ex.Message.Contains("libMonoPosixHelper") ||
                          ex is EntryPointNotFoundException && ex.Message.Contains("CreateZStream"))
                 {
-                    message = "800Craft could not locate Mono's compression functionality. " +
+                    message = "AtomicCraft could not locate Mono's compression functionality. " +
                               "Please make sure that you have zlib (sometimes called \"libz\" or just \"z\") installed. " +
                               "Some versions of Mono may also require \"libmono-posix-2.0-cil\" package to be installed.";
                     return true;
                 }
                 else if (ex is MissingMemberException || ex is TypeLoadException)
                 {
-                    message = "Something is incompatible with the current revision of 800Craft. " +
+                    message = "Something is incompatible with the current revision of AtomicCraft. " +
                               "If you installed third-party modifications, " +
                               "make sure to use the correct revision (as specified by mod developers). " +
                               "If your own modifications stopped working, your may need to make some updates.";
@@ -338,13 +338,13 @@ namespace fCraft
                 }
                 else if (ex is UnauthorizedAccessException)
                 {
-                    message = "800Craft was blocked from accessing a file or resource. " +
-                              "Make sure that correct permissions are set for the 800Craft files, folders, and processes.";
+                    message = "AtomicCraft was blocked from accessing a file or resource. " +
+                              "Make sure that correct permissions are set for the AtomicCraft files, folders, and processes.";
                     return true;
                 }
                 else if (ex is OutOfMemoryException)
                 {
-                    message = "800Craft ran out of memory. Make sure there is enough RAM to run.";
+                    message = "AtomicCraft ran out of memory. Make sure there is enough RAM to run.";
                     return true;
                 }
                 else if (ex is SystemException && ex.Message == "Can't find current process")
@@ -355,13 +355,13 @@ namespace fCraft
                 }
                 else if (ex is InvalidOperationException && ex.StackTrace.Contains("MD5CryptoServiceProvider"))
                 {
-                    message = "Some Windows settings are preventing 800Craft from doing player name verification. " +
+                    message = "Some Windows settings are preventing AtomicCraft from doing player name verification. " +
                               "See http://support.microsoft.com/kb/811833";
                     return true;
                 }
                 else if (ex.StackTrace.Contains("__Error.WinIOError"))
                 {
-                    message = "A filesystem-related error has occured. Make sure that only one instance of 800Craft is running, " +
+                    message = "A filesystem-related error has occured. Make sure that only one instance of AtomicCraft is running, " +
                               "and that no other processes are using server's files or directories.";
                     return true;
                 }

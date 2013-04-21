@@ -56,7 +56,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdWorldSet );
             CommandManager.RegisterCommand( CdMessageBlock );
         }
-        #region 800Craft
+        #region 800craft
 
         //Copyright (C) <2011 - 2013>  <Jon Baker, Glenn Mariën and Lao Tszy>
 
@@ -1548,7 +1548,7 @@ namespace fCraft {
                 }
                 return;
             }
-            #region 800Craft
+            #region 800craft
             //Copyright (C) <2011 - 2013> <Jon Baker> using open source texture packs from various sources
             if ( variable.ToLower() == "terrain" ) {
                 if ( valueText == null ) {

@@ -27,7 +27,7 @@ namespace fCraft
         {
             /*
              * NOTE: These commands are unfinished, under development and non-supported.
-             * If you are not using a dev build of 800Craft, please comment these the below out to ensure 
+             * If you are not using a dev build of AtomicCraft, please comment these the below out to ensure 
              * stability.
              * */
 

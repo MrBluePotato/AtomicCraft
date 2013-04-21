@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("800Craft Plus Configuration")]
-[assembly: AssemblyDescription("800Craft Plus Configuration Tool")]
+[assembly: AssemblyTitle("AtomicCraft Configuration")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration( "" )]
-[assembly: AssemblyCompany("800craft Dev-Team")]
-[assembly: AssemblyProduct("800Craft Plus Config")]
+[assembly: AssemblyCompany("AtomicCraft Team")]
+[assembly: AssemblyProduct("")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]

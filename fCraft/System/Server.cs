@@ -120,7 +120,7 @@ namespace fCraft {
         public static void InitLibrary( [NotNull] IEnumerable<string> rawArgs ) {
             if( rawArgs == null ) throw new ArgumentNullException( "rawArgs" );
             if( libraryInitialized ) {
-                throw new InvalidOperationException( "800Craft library is already initialized" );
+                throw new InvalidOperationException( "AtomicCraft library is already initialized" );
             }
 
             ServicePointManager.Expect100Continue = false;
@@ -244,9 +244,9 @@ namespace fCraft {
             // warnings/disclaimers
             if( Updater.CurrentRelease.IsFlagged( ReleaseFlags.Dev ) ) {
                 Logger.Log( LogType.Warning,
-                            "You are using an unreleased developer version of 800Craft. " +
+                            "You are using an unreleased developer version of AtomicCraft. " +
                             "Do not use this version unless you are ready to deal with bugs and potential data loss. " +
-                            "Consider using the lastest stable version instead, available from http://github.com/glennmr/800craft" );
+                            "Consider using the lastest stable version instead, by switching your update mode to 'Public'." );
             }
 
             if( Updater.CurrentRelease.IsFlagged( ReleaseFlags.Unstable ) ) {
@@ -277,7 +277,7 @@ namespace fCraft {
 
             // try to load the config
             if( !Config.Load( false, false ) ) {
-                throw new Exception( "800Craft Config failed to initialize" );
+                throw new Exception( "AtomicCraft Config failed to initialize" );
             }
 
             if( ConfigKey.VerifyNames.GetEnum<NameVerificationMode>() == NameVerificationMode.Never ) {
@@ -292,7 +292,7 @@ namespace fCraft {
 
             // prepare the list of commands
             CommandManager.Init();
-            PluginManager.GetInstance(); //2nd means plugins crash and not 800Craft
+            PluginManager.GetInstance(); //2nd means plugins crash and not AtomicCraft
             // prepare the brushes
             BrushManager.Init();
 
@@ -523,7 +523,7 @@ namespace fCraft {
                 RaiseShutdownEndedEvent( shutdownParams );
 #if !DEBUG
             } catch( Exception ex ) {
-                Logger.LogAndReportCrash( "Error in Server.Shutdown", "800Craft", ex, true );
+                Logger.LogAndReportCrash( "Error in Server.Shutdown", "AtomicCraft", ex, true );
             }
 #endif
         }
@@ -845,7 +845,7 @@ namespace fCraft {
             {
                 try
                 {
-                    string fileComment = String.Format("Backup of 800Craft data for server \"{0}\", saved on {1}",
+                    string fileComment = String.Format("Backup of AtomicCraft data for server \"{0}\", saved on {1}",
                                                         ConfigKey.ServerName.GetString(),
                                                         DateTime.Now);
                     using (ZipStorer backupZip = ZipStorer.Create(fs, fileComment))
@@ -1266,7 +1266,7 @@ namespace fCraft {
         /// <summary> Delay before shutting down. </summary>
         public TimeSpan Delay { get; private set; }
 
-        /// <summary> Whether 800Craft should try to forcefully kill the current process. </summary>
+        /// <summary> Whether AtomicCraft should try to forcefully kill the current process. </summary>
         public bool KillProcess { get; private set; }
 
         /// <summary> Whether the server is expected to restart itself after shutting down. </summary>

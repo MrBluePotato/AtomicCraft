@@ -294,7 +294,7 @@ namespace fCraft
             catch (Exception ex)
             {
                 LeaveReason = LeaveReason.ServerError;
-                Logger.LogAndReportCrash("Error in Player.IoLoop", "800Craft", ex, false);
+                Logger.LogAndReportCrash("Error in Player.IoLoop", "AtomicCraft", ex, false);
 #endif
             }
             finally
@@ -345,7 +345,7 @@ namespace fCraft
             }
             catch (Exception ex)
             {
-                Logger.LogAndReportCrash("Error while parsing player's message", "800Craft", ex, false);
+                Logger.LogAndReportCrash("Error while parsing player's message", "AtomicCraft", ex, false);
                 MessageNow("&WError while handling your message ({0}: {1})." +
                             "It is recommended that you reconnect to the server.",
                             ex.GetType().Name, ex.Message);
@@ -1018,7 +1018,7 @@ namespace fCraft
 
                 Logger.Log(LogType.Warning,
                             "Player.LoginSequence: Player \"{0}\" tried connecting with Minecraft Beta client from {1}. " +
-                            "800Craft does not support Minecraft Beta.",
+                            "AtomicCraft does not support Minecraft Beta.",
                             smpPlayerName, IP);
 
                 // send SMP KICK packet

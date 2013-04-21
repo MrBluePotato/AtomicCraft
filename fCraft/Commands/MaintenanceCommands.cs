@@ -73,7 +73,7 @@ namespace fCraft {
             } );
 #endif
         }
-        #region 800Craft
+        #region 800craft
 
         //Copyright (C) <2011 - 2013>  <Jon Baker, Glenn Mariën and Lao Tszy>
 
@@ -1355,7 +1355,7 @@ namespace fCraft {
                     }
                     break;
                 default:
-                    player.Message( "800Craft does not support importing from {0}", serverName );
+                    player.Message( "AtomicCraft does not support importing from {0}", serverName );
                     return;
             }
 
@@ -1431,7 +1431,7 @@ namespace fCraft {
                     }
                     break;
                 default:
-                    player.Message( "800Craft does not support importing from {0}", serverName );
+                    player.Message( "AtomicCraft does not support importing from {0}", serverName );
                     return;
             }
 

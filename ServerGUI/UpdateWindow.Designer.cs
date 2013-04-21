@@ -43,7 +43,7 @@
             this.lHeader.Name = "lHeader";
             this.lHeader.Size = new System.Drawing.Size(204, 13);
             this.lHeader.TabIndex = 5;
-            this.lHeader.Text = "An update to 800Craft is available!";
+            this.lHeader.Text = "An update to AtomicCraft is available!";
             // 
             // bCancel
             // 
@@ -157,7 +157,7 @@
             this.ShowIcon = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "800Craft Updater";
+            this.Text = "AtomicCraft Updater";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.UpdateWindow_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();

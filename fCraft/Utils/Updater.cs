@@ -28,7 +28,7 @@ namespace fCraft {
  );
 
         public static string UserAgent {
-            get { return "800Craft Plus " + CurrentRelease.VersionString; }
+            get { return "AtomicCraft " + CurrentRelease.VersionString; }
         }
 
         public const string LatestStable = "0.202_r2";
@@ -48,7 +48,7 @@ namespace fCraft {
                 {
                     if (mode == ReleaseMode.Dev)
                     {
-                        using (Stream stream = client.OpenRead("http://dl.800craft.net/800craftPlus/dev/update.txt"))
+                        using (Stream stream = client.OpenRead("http://dl.atomiccraft.net/AtomicCraft/dev/update.txt"))
                         {
                             stream.ReadTimeout = 1000;
                             using (StreamReader reader = new StreamReader(stream))
@@ -68,7 +68,7 @@ namespace fCraft {
                     }
                     else if (mode == ReleaseMode.Public)
                     {
-                        using (Stream stream = client.OpenRead("http://dl.800craft.net/800craftPlus/public/update.txt"))
+                        using (Stream stream = client.OpenRead("http://dl.atomiccraft.net/AtomicCraft/public/update.txt"))
                         {
                             stream.ReadTimeout = 1000;
                             using (StreamReader reader = new StreamReader(stream))
@@ -91,7 +91,7 @@ namespace fCraft {
                     {
                         if (WebVersion > Updater.CurrentRelease.Version)
                         {
-                            Logger.Log(LogType.Warning, "An update of 800Craft is available, you can get it at: " + DownloadLocation);
+                            Logger.Log(LogType.Warning, "An update of AtomicCraft is available, you can get it at: " + DownloadLocation);
                             return true;
                         }
                     }
@@ -113,12 +113,12 @@ namespace fCraft {
             string url = String.Format( UpdateUrl, CurrentRelease.Revision );
             if ( RaiseCheckingForUpdatesEvent( ref url ) ) return UpdaterResult.NoUpdate;
 
-            Logger.Log( LogType.SystemActivity, "Checking for 800Craft updates..." );
+            Logger.Log( LogType.SystemActivity, "Checking for AtomicCraft updates..." );
             try {
                 HttpWebRequest request = ( HttpWebRequest )WebRequest.Create( url );
 
                 request.Method = "GET";
-                request.UserAgent = "800Craft";
+                request.UserAgent = "AtomicCraft";
                 request.Timeout = UpdateCheckTimeout;
                 request.ReadWriteTimeout = UpdateCheckTimeout;
                 request.CachePolicy = new HttpRequestCachePolicy( HttpRequestCacheLevel.BypassCache );

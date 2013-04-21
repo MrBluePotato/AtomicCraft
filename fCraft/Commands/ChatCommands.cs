@@ -41,7 +41,7 @@ namespace fCraft
 
             Player.Moved += new EventHandler<Events.PlayerMovedEventArgs>(Player_IsBack);
         }
-        #region 800Craft
+        #region AtomicCraft
 
         //Copyright (C) <2011 - 2013>  <Jon Baker, Glenn Mariën and Lao Tszy>
 
@@ -880,7 +880,7 @@ namespace fCraft
                     IsConsoleSafe = true,
                     Permissions = new[] { Permission.Chat },
                     Usage = "&a/Global [<message to send>/help/rules/accept/ignore/reconnect]",
-                    Help = "Sends a global message to other 800Craft servers",
+                    Help = "Sends a global message to other AtomicCraft servers",
                     Handler = GHandler
                 };
 

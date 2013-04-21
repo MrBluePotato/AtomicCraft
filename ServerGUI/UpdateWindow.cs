@@ -75,7 +75,7 @@ namespace fCraft.ServerGUI {
         private void bUpdateLater_Click( object sender, EventArgs e ) {
             Updater.RunAtShutdown = true;
             Logger.Log( LogType.SystemActivity,
-                        "An 800Craft update will be applied next time the server is shut down or restarted." );
+                        "An AtomicCraft update will be applied next time the server is shut down or restarted." );
             Close();
         }
 

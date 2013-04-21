@@ -120,7 +120,7 @@ namespace fCraft.UpdateInstaller
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("Error reading 800craft Plus config: {0}", ex);
+                Console.Error.WriteLine("Error reading AtomicCraft config: {0}", ex);
             }
 
             // Backup data files (if requested)
@@ -151,7 +151,7 @@ namespace fCraft.UpdateInstaller
 
                     var allFiles = zs.ReadCentralDir().Select(entry => entry.FilenameInZip).Union(LegacyFiles);
 
-                    // ensure that 800craft Plus files are writable
+                    // ensure that AtomicCraft files are writable
                     bool allPassed;
                     do
                     {
@@ -169,7 +169,7 @@ namespace fCraft.UpdateInstaller
                             {
                                 if (ex is IOException)
                                 {
-                                    Console.WriteLine("Waiting for 800craft Plus-related applications to close...");
+                                    Console.WriteLine("Waiting for AtomicCraft-related applications to close...");
                                 }
                                 else
                                 {
@@ -232,9 +232,9 @@ namespace fCraft.UpdateInstaller
                 }
             }
 
-            Console.WriteLine("800craft Plus update complete.");
+            Console.WriteLine("AtomicCraft update complete.");
 
-            // Restart 800craft Plus (if requested)
+            // Restart AtomicCraft (if requested)
             if (restartTarget != null)
             {
                 if (restartTarget == "fCraftConsole.exe")

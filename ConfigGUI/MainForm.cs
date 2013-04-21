@@ -33,7 +33,7 @@ namespace fCraft.ConfigGUI {
             dgvcBlockDB.IndeterminateValue = YesNoAuto.Auto;
             bold = new Font( Font, FontStyle.Bold );
             Shown += Init;
-            Text = "800Craft Configuration (" + Updater.CurrentRelease.VersionString + ")";
+            Text = "AtomicCraft Configuration (" + Updater.CurrentRelease.VersionString + ")";
         }
 
 
@@ -188,11 +188,11 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
         }
 
         private void bOpenWiki_Click( object sender, EventArgs e ) {
-            Process.Start("http://www.minecraftwiki.net/wiki/Custom_servers/800Craft");
+            Process.Start("http://www.minecraftwiki.net/wiki/Custom_servers/AtomicCraft");
         }
 
         private void bReportABug_Click( object sender, EventArgs e ) {
-            Process.Start("http://800craft.net/community/index.php?/tracker/");
+            Process.Start("http://atomiccraft.net/community/index.php?/tracker/");
         }
 
         private void nMaxPlayerPerWorld_Validating( object sender, CancelEventArgs e ) {

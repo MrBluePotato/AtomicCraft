@@ -112,7 +112,7 @@ namespace fCraft {
         }
         #endregion
 
-        #region 800Craft
+        #region 800craft
 
         //Copyright (C) <2011 - 2013> <Jon Baker, Glenn Mariën and Lao Tszy>
 

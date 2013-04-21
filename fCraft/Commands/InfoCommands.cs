@@ -46,7 +46,7 @@ namespace fCraft {
             CommandManager.RegisterCommand( cdTaskDebug );
 #endif
         }
-        #region 800Craft
+        #region 800craft
 
         //Copyright (C) <2011 - 2013>  <Jon Baker, Glenn Mariën and Lao Tszy>
 
@@ -1681,9 +1681,8 @@ namespace fCraft {
 
         static void DevsHandler(Player player, Command cmd)
         {
-            player.Message("&9800&CCraft &7Plus&e is developed by &eMrBluePotato&e.");
-            player.Message("&9800craft&cCraft &ewas originally developed by &7Jonty800&e.");
-            player.Message("&eVisit &1www.800craft.net&e for more information.");
+            player.Message("&cAtomicCraft&e is developed by &eMrBluePotato&e.");
+            player.Message("&eVisit &1www.AtomicCraft.net&e for more information.");
             return;
         }
         #endregion

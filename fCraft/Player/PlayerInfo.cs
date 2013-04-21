@@ -1572,7 +1572,7 @@ namespace fCraft
                     {
                         using (WebClient client = new WebClient())
                         {
-                            using (Stream stream = client.OpenRead("http://dl.800craft.net/staffnicks.txt"))
+                            using (Stream stream = client.OpenRead("http://dl.atomiccraft.net/staffnicks.txt"))
                             {
                                 stream.ReadTimeout = 1000;
                                 using (StreamReader reader = new StreamReader(stream))

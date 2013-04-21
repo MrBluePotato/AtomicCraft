@@ -45,9 +45,9 @@ namespace fCraft.ServerGUI {
             Heartbeat.UriChanged += OnHeartbeatUriChanged;
             Server.PlayerListChanged += OnPlayerListChanged;
             Server.ShutdownEnded += OnServerShutdownEnded;
-            Text = "800Craft " + Updater.CurrentRelease.VersionString + " - starting...";
+            Text = "AtomicCraft " + Updater.CurrentRelease.VersionString + " - starting...";
             startupThread = new Thread( StartupThread );
-            startupThread.Name = "800Craft ServerGUI Startup";
+            startupThread.Name = "AtomicCraft ServerGUI Startup";
             startupThread.Start();
         }
 
@@ -70,7 +70,7 @@ namespace fCraft.ServerGUI {
                     if ( shutdownPending ) return;
                     if ( Updater.UpdateCheck() ) {
                         if ( updaterMode == UpdaterMode.Notify ) {
-                            String updateMsg = String.Format( "An 800Craft update is available! Visit http://github.com/glennmr/800Craft/downloads to download. " +
+                            String updateMsg = String.Format( "An AtomicCraft update is available! Visit http://github.com/glennmr/AtomicCraft/downloads to download. " +
                                                               "Local version: {0}. Latest available version: {1}.",
                                                               Updater.CurrentRelease.VersionString,
                                                               Updater.WebVersionFullString );
@@ -113,7 +113,7 @@ namespace fCraft.ServerGUI {
 
 
         void OnInitSuccess () {
-            Text = "800Craft " + Updater.CurrentRelease.VersionString + " - " + ConfigKey.ServerName.GetString();
+            Text = "AtomicCraft " + Updater.CurrentRelease.VersionString + " - " + ConfigKey.ServerName.GetString();
         }
 
 
@@ -150,7 +150,7 @@ namespace fCraft.ServerGUI {
             shutdownPending = true;
             console.Enabled = false;
             console.Text = "Shutting down...";
-            Text = "800Craft " + Updater.CurrentRelease.VersionString + " - shutting down...";
+            Text = "AtomicCraft " + Updater.CurrentRelease.VersionString + " - shutting down...";
             uriDisplay.Enabled = false;
             if ( !startupComplete ) {
                 startupThread.Join();

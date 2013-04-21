@@ -76,7 +76,7 @@ namespace fCraft
                     // start the machinery!
                     thread = new Thread(IoThread)
                     {
-                        Name = "800Craft.GlobalChat",
+                        Name = "AtomicCraft.GlobalChat",
                         IsBackground = true
                     };
                     thread.Start();
@@ -159,9 +159,9 @@ namespace fCraft
                         ActualBotNick = desiredBotNick;
                         reconnect = false;
                         Logger.Log(LogType.SystemActivity,
-                                    "Connecting to 800Craft Global Chat as {2}",
+                                    "Connecting to AtomicCraft Global Chat as {2}",
                                     hostName, port, ActualBotNick);
-                        if (ActualBotNick == "[800craftPlusDefaultServer]")
+                        if (ActualBotNick == "[AtomicCraftDefaultServer]")
                         {
                             Logger.Log(LogType.Error, "You must set a server name to connect to global chat.");
                             reconnect = false;
@@ -313,12 +313,12 @@ namespace fCraft
                         if (!ResponsibleForInputParsing) return;
                         if (msg.Nick.StartsWith("("))
                         {
-                            SendList.Message("&i[Global] Server {0} joined the 800Craft Global Chat",
+                            SendList.Message("&i[Global] Server {0} joined Global Chat",
                                             msg.Nick);
                         }
                         else
                         {
-                            SendList.Message("&i[Global] {0} joined the 800Craft Global Chat",
+                            SendList.Message("&i[Global] {0} joined Global Chat",
                                             msg.Nick);
                         }
                         return;
@@ -346,7 +346,7 @@ namespace fCraft
                     case IRCMessageType.Part:
                     case IRCMessageType.Quit:
                         if (!ResponsibleForInputParsing) return;
-                        SendList.Message("&i[Global] Server {0} left the 800Craft Global Chat",
+                        SendList.Message("&i[Global] Server {0} left Global Chat",
                                         msg.Nick);
                         return;
 
@@ -383,7 +383,7 @@ namespace fCraft
                             //wont happen
                             case IRCReplyCode.ErrorBadChannelKey:
                                 Logger.Log(LogType.SystemActivity,
-                                            "Error: Channel password required for {0}. 800Craft does not currently support passworded channels.",
+                                            "Error: Channel password required for {0}. AtomicCraft does not currently support passworded channels.",
                                             msg.Channel);
                                 die = true;
                                 GCReady = false;
@@ -534,9 +534,9 @@ namespace fCraft
 
         public static void Init()
         {
-            hostName = "irc.geekshed.net";
+            hostName = "irc.dal.net";
             port = 6667;
-            channelNames = new[] { "#800craft" };
+            channelNames = new[] { "#ClassicGlobal" };
             for (int i = 0; i < channelNames.Length; i++)
             {
                 channelNames[i] = channelNames[i].Trim();

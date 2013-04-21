@@ -111,7 +111,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(500, 150);
             this.Name = "MainForm";
-            this.Text = "800Craft Server";
+            this.Text = "AtomicCraft Server";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

@@ -1,4 +1,4 @@
-﻿//This game was created by DingusBungus 2013. Permission was granted by LeChosenOne for MrBluePotato to modify and include this in 800craft Plus.
+﻿//This game was created by DingusBungus 2013. Permission was granted by LeChosenOne for MrBluePotato to modify and include this in AtomicCraft.
 
 using System;
 using System.Collections.Generic;
