@@ -1,0 +1,9 @@
+/bin
+/ConfigGUI/obj
+/fCraftGUI/obj
+/ServerCLI/obj
+/ServerGUI/obj
+/fCraft/obj
+/UpdateInstaller/obj
+/UpdaterBuilder/obj
+/Icons/Thumbs.db
