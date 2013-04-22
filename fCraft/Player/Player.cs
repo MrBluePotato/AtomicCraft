@@ -57,6 +57,9 @@ namespace fCraft {
             }
         }
 
+        //Zombie head thingy
+        public bool ZombieHead { get; set; }
+
         /// <summary> Whether the player name was verified at login. </summary>
         public bool IsVerified { get; private set; }
 
@@ -229,7 +232,8 @@ namespace fCraft {
         #region Game
         //List of weapons usable in game modes
         //byte ID will be used for gungame
-        public enum GameWeapon : byte {
+        public enum GameWeapon : byte
+        {
             Bat = 1,
             DelayedGun = 2,
             FreezeGun = 3,
@@ -246,6 +250,7 @@ namespace fCraft {
         public string iName = null;
         public bool entityChanged = false;
         #endregion
+
 
         // This constructor is used to create pseudoplayers (such as Console and /dummy).
         // Such players have unlimited permissions, but no world.

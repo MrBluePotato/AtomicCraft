@@ -21,7 +21,7 @@ namespace fCraft {
             2,
             new DateTime( 2013, 01, 02, 1, 0, 0, DateTimeKind.Utc ),
             "", "",
-            ReleaseFlags.Dev
+            ReleaseFlags.Bugfix
 #if DEBUG
             | ReleaseFlags.Dev
 #endif

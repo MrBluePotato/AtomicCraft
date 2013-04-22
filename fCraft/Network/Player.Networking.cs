@@ -318,6 +318,10 @@ namespace fCraft
                 IsUsingWoM = true;
                 return true;
             }
+            if (this.ZombieHead)
+            {
+                this.Position.L = 128;
+            }
 
             if (Chat.ContainsInvalidChars(message))
             {

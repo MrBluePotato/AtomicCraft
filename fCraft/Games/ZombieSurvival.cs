@@ -41,17 +41,20 @@ namespace fCraft
         public static List<Player> ZombiePlayers = new List<Player>();
         public ZombieSurvival (World world)
         {
+            startTime = DateTime.UtcNow;
         _world = world;
         task_ = new SchedulerTask(Interval, true).RunForever(TimeSpan.FromSeconds(1));
         }
 
         public void Start()
         {
+            startTime = DateTime.UtcNow;
             if (!ConfigKey.IsNormal.Enabled())
             {
                 var files = Directory.GetFiles("maps", "*.*").Where(name => !name.EndsWith(".lvlqonly")).ToArray();
                 string zombieLevel = Path.GetFileNameWithoutExtension(files[rand.Next(files.Length - 1)]);
                 Player.Console.ParseMessage(String.Format("/WLoad {0} {0}", zombieLevel), true);
+                Player.Console.ParseMessage(String.Format("/Ok"), true);
                 WorldManager.MainWorld = WorldManager.FindWorldExact(zombieLevel);
                 WorldManager.MainWorld.BlockDB.Clear();
                 WorldManager.MainWorld.gameMode = GameMode.ZombieSurvival; //set the game mode
@@ -73,6 +76,18 @@ namespace fCraft
                 _world.Players.Message("{0}&S stopped the Zombie Survival on world {1}",
                 p.ClassyName, _world.ClassyName);
             }
+            RevertGame();
+            return;
+        }
+        public static void HumansWin()
+        {
+            _world.Players.Message("&cThe humans have won the game!");
+            RevertGame();
+            return;
+        }
+        public static void ZombiesWin() //
+        {
+            _world.Players.Message("&cThe zombies have won the game!");
             RevertGame();
             return;
         }
@@ -144,24 +159,22 @@ namespace fCraft
             {
                 if (_world.Players.Count(player => player.Info.isInfected) == _world.Players.Count())
                 {
-                    _world.Players.Message("The zombies win the game!");
-                    Stop(null);
+                    ZombiesWin();
                     return;
                 }
                 if (_world.Players.Count(player => player.Info.isInfected) == 0 && _world.Players.Count() > 0)
                 {
-                    _world.Players.Message("The humans win the game!!");
-                    Stop(null);
+                    HumansWin();
                     return;
                 }
 
             }
-            /*timeLeft = Convert.ToInt16(((timeDelay + timeLimit) - (DateTime.UtcNow - startTime).TotalSeconds));
+            timeLeft = Convert.ToInt16(((timeDelay + timeLimit) - (DateTime.Now - startTime).TotalSeconds));
 
             if (lastChecked != null && (DateTime.UtcNow - lastChecked).TotalSeconds > 29.9 && timeLeft <= timeLimit)
             {
                 _world.Players.Message("There are currently {0} human(s) and {1} zombie(s) left on {2}", _world.Players.Count() - _world.Players.Count(player => player.Info.isInfected), _world.Players.Count(player => player.Info.isInfected), _world.ClassyName);
-            }*/
+            }
         }
 
         public static void beginGame(Player player)
@@ -200,15 +213,16 @@ namespace fCraft
         {
             if (infector == null)
             {
-                _world.Players.Message("{0}&S has been the first to get &cInfected. &9Panic!",
-                        target.ClassyName);
+                _world.Players.Message("{0}&S has been the first to get &cInfected. &9Panic!", target.ClassyName);
                 target.iName = _zomb;
+                target.ZombieHead = true;
                 target.entityChanged = true;
                 return;
             }
             if (infector.iName == _zomb && target.iName != _zomb)
             {
                 target.iName = _zomb;
+                target.ZombieHead = true;
                 target.entityChanged = true;
                 _world.Players.Message("{0}&S was &cInfected&S by {1}",
                     target.ClassyName, infector.ClassyName);
@@ -218,6 +232,7 @@ namespace fCraft
             else if (infector.iName != _zomb && target.iName == _zomb)
             {
                 infector.iName = _zomb;
+                infector.ZombieHead = true;
                 infector.entityChanged = true;
                 _world.Players.Message("{0}&S was &cInfected&S by {1}",
                     infector.ClassyName, target.ClassyName);
@@ -234,10 +249,12 @@ namespace fCraft
 
             foreach (Player p in ZombiePlayers)
             {
+                p.iName = p.Name;
+                p.ZombieHead = false;
                 p.Info.isInfected = false;
                 p.Info.DisplayedName = p.Info.oldname;
                 p.Info.isPlayingZombieSurvival = false;
-                p.Message("Your status has been reverted!");
+                p.Message("You are no longer playing zombie survival.");
             }
 
         }
