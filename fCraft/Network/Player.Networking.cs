@@ -29,7 +29,7 @@ namespace fCraft
         const int SocketPollInterval = 200; // multiples of SleepDelay, approx. 1 second
         const int PingInterval = 3; // multiples of SocketPollInterval, approx. 3 seconds
 
-        const string NoSmpMessage = "This server is for Minecraft Classic only.";
+        const string NoSmpMessage = "This is a custom Minecraft classic server called AtomicCraft.";
 
         static Player()
         {

@@ -35,6 +35,7 @@ namespace fCraft
          * Version 3 - 0.600 dev - same as v2, but sorting by ID is enforced
          * Version 4 - 0.600 dev - added LastModified column, forced banned players to be unfrozen/unmuted/unhidden.
          * Version 5 - 0.600+ - removed FailedLoginCount column
+         * Version 6 - Econ support
          */
         public const int FormatVersion = 5;
 
