@@ -1,4 +1,4 @@
-﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2013 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -14,13 +14,10 @@ namespace fCraft
     public sealed partial class PlayerInfo : IClassy
     {
         public const int MinFieldCount = 24;
-        ///<summary> Mojang support number (added on to end of player.Name for mojang accounts).</summary>
-        [CanBeNull]
-        public int mojang = 0;
 
         ///<summary> Player's amount of bits.</summary>
         [CanBeNull]
-        public int Money = ConfigKey.StartAmountKey.GetInt(); 
+        public int Money = ConfigKey.StartAmountKey.GetInt();
 
         /// <summary> Player's Minecraft account name. </summary>
         [NotNull]
@@ -53,7 +50,6 @@ namespace fCraft
         public LeaveReason LeaveReason;
 
         public int PromoCount;
-        //dummy
 
         public int DummyID;
         public string DummyName;
@@ -63,14 +59,6 @@ namespace fCraft
         public int followingCount = 0;
         public bool Static = true;
         public string LeaveMsg = "left the server";
-
-        //Staff Nicks
-        public static string Nick1;
-        public static string Nick2;
-        public static string Nick3;
-        public static string Nick1Color;
-        public static string Nick2Color;
-        public static string Nick3Color;
 
         //Games
         public bool ArrivedLate = false;
@@ -98,12 +86,11 @@ namespace fCraft
         public int totalDeathsTDM = 0;
         public int gameKills = 0;
         public int gameDeaths = 0;
-        public bool needsReversion = false; 
+        public bool needsReversion = false;
 
         //Zombie survival
         public bool isInfected = false;
         public bool isPlayingZombieSurvival = false;
-
 
 
         #region Rank
@@ -266,7 +253,6 @@ namespace fCraft
 
         /// <summary> Total amount of time the player spent on this server. </summary>
         public TimeSpan TotalTime;
-
 
         /// <summary> Total number of blocks manually built or painted by the player. </summary>
         public int BlocksBuilt;
@@ -506,7 +492,7 @@ namespace fCraft
             { // LEGACY
                 info.LastFailedLoginIP = IPAddress.None;
             }
-            if( fields[14].Length > 0 ) Int32.TryParse( fields[14], out info.Money);
+            // skip 14
 
             fields[15].ToDateTime(ref info.FirstLoginDate);
 
@@ -519,9 +505,9 @@ namespace fCraft
             if (fields[19].Length > 0) Int32.TryParse(fields[19], out info.BlocksDeleted);
             Int32.TryParse(fields[20], out info.TimesVisited);
             if (fields[20].Length > 0) Int32.TryParse(fields[21], out info.MessagesWritten);
-            
-            Int32.TryParse(fields[22], out info.PromoCount);
-            if (fields[23].Length > 0) Int32.TryParse(fields[23], out info.mojang);
+            // field 23 are no longer in use
+            Int32.TryParse(fields[22], out info.PromoCount); //promocount
+            if (fields[23].Length > 0) info.TitleName = fields[23].ToString(); //titlename
 
             if (fields[24].Length > 0) info.PreviousRank = Rank.Parse(fields[24]);
             if (fields[25].Length > 0) info.RankChangeReason = Unescape(fields[25]);
@@ -607,13 +593,6 @@ namespace fCraft
             {
                 info.LastLoginDate = info.FirstLoginDate;
             }
-
-            //Will be for leaderboard soon
-            /*if (fields.Length > 48)
-            {
-                if (fields[48].Length > 0) Int32.TryParse(fields[48], out info.totalKillsTDM);
-                if (fields[49].Length > 0) Int32.TryParse(fields[49], out info.totalDeathsTDM);
-            }*/
 
             return info;
         }
@@ -1145,9 +1124,7 @@ namespace fCraft
             LastFailedLoginDate.ToUnixTimeString(sb).Append(','); // 12
 
             if (!LastFailedLoginIP.Equals(IPAddress.None)) sb.Append(LastFailedLoginIP.ToString()); // 13
-            sb.Append(',');
-            if (Money > 0) sb.Digits(Money); // 14
-            sb.Append(',');
+            sb.Append(',', 2); // skip 14
 
             FirstLoginDate.ToUnixTimeString(sb).Append(','); // 15
             LastLoginDate.ToUnixTimeString(sb).Append(','); // 16
@@ -1175,9 +1152,11 @@ namespace fCraft
             sb.Append(',');
 
             if (PromoCount > 0) sb.Digits(PromoCount); //22
+            sb.Append(','); //23 is now titlename
 
-            if (mojang > 0) sb.Digits(mojang); // 23
-            sb.Append(','); 
+            sb.Append(TitleName); //23
+            sb.Append(',');
+
 
             if (PreviousRank != null) sb.Append(PreviousRank.FullName); // 24
             sb.Append(',');
@@ -1316,7 +1295,6 @@ namespace fCraft
             {
                 writer.Write((uint)TotalTime.ToSeconds()); // 22
             }
-            Write7BitEncodedInt(writer, Money); // field 14
             Write7BitEncodedInt(writer, BlocksBuilt); // 23
             Write7BitEncodedInt(writer, BlocksDeleted); // 24
             writer.Write(BlocksDrawn > 0);
@@ -1324,6 +1302,7 @@ namespace fCraft
             Write7BitEncodedInt(writer, TimesVisited); // 26
             Write7BitEncodedInt(writer, MessagesWritten); // 27
             Write7BitEncodedInt(writer, PromoCount); //22 (?)
+            WriteString(writer, TitleName); //23 (?)
             Write7BitEncodedInt(writer, TimesKickedOthers); // 28
             Write7BitEncodedInt(writer, TimesBannedOthers); // 29
 
@@ -1436,15 +1415,6 @@ namespace fCraft
             PlayerObject = null;
             LeaveReason = player.LeaveReason;
             LastModified = DateTime.UtcNow;
-            if (player.Info.isPlayingTD)
-            {
-                player.iName = null;
-                DisplayedName = oldname;
-                isOnRedTeam = false;
-                isOnBlueTeam = false;
-                isPlayingTD = false;
-                player.entityChanged = true;
-            }
         }
 
 
@@ -1563,51 +1533,26 @@ namespace fCraft
                 StringBuilder sb = new StringBuilder();
                 if (TitleName != null)
                 {
-
-                sb.Append(TitleName);
+                    if (ConfigKey.RankPrefixesInList.Enabled())
+                    {
+                        sb.Append(Rank.Prefix + TitleName);
+                    }
+                    if (ConfigKey.RankColorsInChat.Enabled())
+                    {
+                        sb.Append(Rank.Color + TitleName);
+                    }
                 }
                 if (ConfigKey.RankColorsInChat.Enabled())
                 {
-                    try
-                    {
-                        using (WebClient client = new WebClient())
-                        {
-                            using (Stream stream = client.OpenRead("http://dl.atomiccraft.net/staffnicks.txt"))
-                            {
-                                stream.ReadTimeout = 1000;
-                                using (StreamReader reader = new StreamReader(stream))
-                                {
-                                    Nick1 = reader.ReadLine();
-                                    Nick1Color = reader.ReadLine();
-                                    Nick2 = reader.ReadLine();
-                                    Nick2Color = reader.ReadLine();
-                                    Nick2 = reader.ReadLine();
-                                    Nick3Color = reader.ReadLine();
-
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        Logger.Log(LogType.Warning,
-                                    "Uhoh...");
-                    }
-                    if (Name == "MrBluePotato") return "&cM&er&aB&1l&du&ce&eP&ao&1t&da&ct&eo";
-                    if (Name == "Jonty800") return "&9Jonty&c800";
-                    if (Name == Nick1) return Nick1Color;
-                    if (Name == Nick2) return Nick2Color;
-                    if (Name == Nick3) return Nick3Color;
                     sb.Append(Rank.Color);
                 }
-
                 if (DisplayedName != null)
                 {
                     sb.Append(DisplayedName);
                 }
                 else
                 {
-                    if (ConfigKey.RankPrefixesInChat.Enabled())
+                    if (ConfigKey.RankPrefixesInChat.Enabled() && TitleName != null)
                     {
                         sb.Append(Rank.Prefix);
                     }
