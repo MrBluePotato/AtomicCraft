@@ -712,10 +712,19 @@ namespace fCraft {
             string reason = cmd.NextAll();
             try
             {
-                Player targetPlayer = target.PlayerObject;
-                target.Ban(player, reason, true, true);
-                WarnIfOtherPlayersOnIP(player, target, targetPlayer);
-                Reports.Remove(target.Name);
+                if (Reports.Contains(target.Name))
+                {
+                    Player targetPlayer = target.PlayerObject;
+                    target.Ban(player, reason, true, true);
+                    WarnIfOtherPlayersOnIP(player, target, targetPlayer);
+                    Reports.Remove(target.Name);
+                }
+                else
+                {
+                    Player targetPlayer = target.PlayerObject;
+                    target.Ban(player, reason, true, true);
+                    WarnIfOtherPlayersOnIP(player, target, targetPlayer);
+                }
             }
             catch (PlayerOpException ex)
             {

@@ -836,9 +836,17 @@ namespace fCraft {
                 if ( reason.Length < 1 || string.IsNullOrEmpty(reason) )
                     reason = "Reason Undefined: BanX";
                 try {
+                    if (ModerationCommands.Reports.Contains(ban))
+                    {
                     Player targetPlayer = target.PlayerObject;
                     target.Ban( player, reason, false, true );
                     ModerationCommands.Reports.Remove(ban);
+                    }
+                    else
+                    {
+                    Player targetPlayer = target.PlayerObject;
+                    target.Ban( player, reason, false, true );
+                    }
                 } catch ( PlayerOpException ex ) {
                     player.Message( ex.MessageColored );
                     return;
