@@ -29,7 +29,7 @@ namespace fCraft
         const int SocketPollInterval = 200; // multiples of SleepDelay, approx. 1 second
         const int PingInterval = 3; // multiples of SocketPollInterval, approx. 3 seconds
 
-        const string NoSmpMessage = "This is a custom Minecraft classic server called AtomicCraft.";
+        const string NoSmpMessage = "This server is for Minecraft Classic only.";
 
         static Player()
         {
@@ -294,7 +294,7 @@ namespace fCraft
             catch (Exception ex)
             {
                 LeaveReason = LeaveReason.ServerError;
-                Logger.LogAndReportCrash("Error in Player.IoLoop", "AtomicCraft", ex, false);
+                Logger.LogAndReportCrash("Error in Player.IoLoop", "800Craft", ex, false);
 #endif
             }
             finally
@@ -317,10 +317,6 @@ namespace fCraft
             {
                 IsUsingWoM = true;
                 return true;
-            }
-            if (this.ZombieHead)
-            {
-                this.Position.L = 128;
             }
 
             if (Chat.ContainsInvalidChars(message))
@@ -349,7 +345,7 @@ namespace fCraft
             }
             catch (Exception ex)
             {
-                Logger.LogAndReportCrash("Error while parsing player's message", "AtomicCraft", ex, false);
+                Logger.LogAndReportCrash("Error while parsing player's message", "800Craft", ex, false);
                 MessageNow("&WError while handling your message ({0}: {1})." +
                             "It is recommended that you reconnect to the server.",
                             ex.GetType().Name, ex.Message);
@@ -616,19 +612,16 @@ namespace fCraft
             }
 
             string givenName = ReadString();
-            string[] splitGivenName = givenName.Split('@');
 
             // Check name for nonstandard characters
             if (!IsValidName(givenName))
             {
-                if (!IsValidName(splitGivenName[0]))
-                {
-                    Logger.Log(LogType.SuspiciousActivity,
-                                "Player.LoginSequence: Unacceptable player name: {0} ({1})",
-                                givenName, IP);
-                    KickNow("Invalid characters in player name!", LeaveReason.ProtocolViolation);
+                Logger.Log(LogType.SuspiciousActivity,
+                            "Player.LoginSequence: Unacceptable player name: {0} ({1})",
+                            givenName, IP);
+                KickNow("Invalid characters in player name!", LeaveReason.ProtocolViolation);
 
-                }
+
             }
 
 
@@ -642,29 +635,12 @@ namespace fCraft
             Info = PlayerDB.FindOrCreateInfoForPlayer(givenName, IP);
             ResetAllBinds();
 
-            if (givenName.Contains('@'))
-            {
-                Info.Name = splitGivenName[0] + "@" + Info.mojang;
-                Info.DisplayedName = splitGivenName[0];
-            }
-            else
-            {
-                Info.Name = givenName;
-            }
             if (Server.VerifyName(givenName, verificationCode, Heartbeat.Salt))
             {
                 // update capitalization of player's name
                 if (!Info.Name.Equals(givenName, StringComparison.Ordinal))
                 {
-                    if (givenName.Contains('@'))
-                    {
-                        Info.Name = splitGivenName[0] + "@" + Info.mojang;
-                        Info.DisplayedName = splitGivenName[0];
-                    }
-                    else
-                    {
-                        Info.Name = givenName;
-                    }
+                    Info.Name = givenName;
                 }
 
             }
@@ -1022,7 +998,7 @@ namespace fCraft
 
                 Logger.Log(LogType.Warning,
                             "Player.LoginSequence: Player \"{0}\" tried connecting with Minecraft Beta client from {1}. " +
-                            "AtomicCraft does not support Minecraft Beta.",
+                            "800Craft does not support Minecraft Beta.",
                             smpPlayerName, IP);
 
                 // send SMP KICK packet
