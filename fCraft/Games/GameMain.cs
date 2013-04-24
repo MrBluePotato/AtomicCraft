@@ -30,10 +30,10 @@ namespace fCraft
         static readonly CommandDescriptor CdGame = new CommandDescriptor
         {
             Name = "Game",
-            Category = CommandCategory.World,
+            Category = CommandCategory.Game,
             Permissions = new Permission[] { Permission.ManageGame },
             IsConsoleSafe = false,
-            Usage = "/Game [tdm](minefield) [start/stop] ()=dev",
+            Usage = "/Game [tdm] [start/stop]",
             Handler = GameHandler
         };
         private static void GameHandler(Player player, Command cmd)
@@ -47,7 +47,7 @@ namespace fCraft
                 CdGame.PrintUsage(player);
                 return;
             }
-            if (GameMode.ToLower() == "zombie")
+            /*if (GameMode.ToLower() == "zombie")
             {
                 if (Option.ToLower() == "start")
                 {
@@ -61,7 +61,7 @@ namespace fCraft
                     Server.Message("{0} &cended the game of zombie survival in the world {1}", player.ClassyName, world.ClassyName);
                     return;
                 }
-            }
+            }*/
             if (GameMode.ToLower() == "tdm")
             {
                 if (Option == null)

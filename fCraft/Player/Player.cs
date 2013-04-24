@@ -36,6 +36,9 @@ namespace fCraft {
         public static Player Console, AutoRank;
         public bool IsAway;
 
+        //Team death match
+        public bool isOnTDMTeam = false;
+
         #region Properties
 
         public readonly bool IsSuper;
