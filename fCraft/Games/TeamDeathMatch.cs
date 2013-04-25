@@ -36,14 +36,13 @@ namespace fCraft
         public static bool isOn = false;
         private static bool started = false;
 
-        private static World world_;
         public static World TDMworld_;
 
         public static TeamDeathMatch GetInstance(World world)
         {
             if (instance == null)
             {
-                world_ = world;
+                TDMworld_ = world;
                 instance = new TeamDeathMatch();
                 startTime = DateTime.UtcNow;
                 task_ = new SchedulerTask(Interval, true).RunForever(TimeSpan.FromSeconds(1));
@@ -53,18 +52,22 @@ namespace fCraft
 
         public static void Start()
         {
-            world_.gameMode = GameMode.TeamDeathMatch; //set the game mode
-            Scheduler.NewTask(t => world_.Players.Message("&WTeam Death Match will be starting in {0} seconds. &WGet ready!", timeDelay))
+            TDMworld_.gameMode = GameMode.TeamDeathMatch; //set the game mode
+            Player.Console.ParseMessage(String.Format("/WSave {0} TDMbackup", TDMworld_), true);
+            Player.Console.ParseMessage(String.Format("/ok"), true);
+            Scheduler.NewTask(t => TDMworld_.Players.Message("&WTeam Death Match will be starting in {0} seconds. &WGet ready!", timeDelay))
             .RunRepeating(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(10), 1);
-            Server.Players.Except(world_.Players).Message("&WTeam Death Matchi &fwill be starting in {0} seconds in the world {1} &WGet ready!", timeDelay, world_.ClassyName);
+            Server.Players.Except(TDMworld_.Players).Message("&WTeam Death Matchi &fwill be starting in {0} seconds in the world {1} &WGet ready!", timeDelay, TDMworld_.ClassyName);
         }
 
         public static void Stop(Player p) //for stopping the game early
         {
-            if (p != null && world_ != null)
+            if (p != null && TDMworld_ != null)
             {
-                Server.Players.Except(world_.Players).Message("{0} ended Team Death Match on {1}.", p.ClassyName, world_.ClassyName);
-                world_.Players.Message("{0}&S stopped Team Death Match.", p.ClassyName);
+                Player.Console.ParseMessage(String.Format("/WLoad TDMbackup {0}", TDMworld_), true);
+                Player.Console.ParseMessage(String.Format("/ok"), true);
+                Server.Players.Except(TDMworld_.Players).Message("{0} ended Team Death Match on {1}.", p.ClassyName, TDMworld_.ClassyName);
+                TDMworld_.Players.Message("{0}&S stopped Team Death Match.", p.ClassyName);
             }
             RevertGame();
             return;
@@ -74,27 +77,27 @@ namespace fCraft
         public static void Interval(SchedulerTask task)
         {
             //check to stop Interval
-            if (world_.gameMode != GameMode.TeamDeathMatch || world_ == null)
+            if (TDMworld_.gameMode != GameMode.TeamDeathMatch || TDMworld_ == null)
             {
-                world_ = null;
+                TDMworld_ = null;
                 task.Stop();
                 return;
             }
             if (!started)
             {
-                if (world_.Players.Count() < 2) //in case players leave the world or disconnect during the start delay
+                if (TDMworld_.Players.Count() < 2) //in case players leave the world or disconnect during the start delay
                 {
-                    world_.Players.Message("&WTeam Death Match&s requires at least 2 people to play.");
+                    TDMworld_.Players.Message("&WTeam Death Match&s requires at least 2 people to play.");
                     return;
                 }
                 if (startTime != null && (DateTime.UtcNow - startTime).TotalSeconds > timeDelay)
                 {
-                    world_.Players.Message("&WType &a/Team [red/blue]&w to join a team and begin!");
+                    TDMworld_.Players.Message("&WType &a/Team [red/blue]&w to join a team and begin!");
                     started = true;   //the game has officially started
                     isOn = true;
-                    if (!world_.gunPhysics)
+                    if (!TDMworld_.gunPhysics)
                     {
-                        world_.EnableGunPhysics(Player.Console, true); //enables gun physics if they are not already on
+                        TDMworld_.EnableGunPhysics(Player.Console, true); //enables gun physics if they are not already on
                     }
                     lastChecked = DateTime.UtcNow;     //used for intervals
                     return;
@@ -103,19 +106,19 @@ namespace fCraft
                 //check if one of the teams have won
                 if (redScore >= scoreLimit)
                 {
-                    world_.Players.Message("&fThe &cRed Team&f has won {1} to {0}!", blueScore, redScore);
+                    TDMworld_.Players.Message("&fThe &cRed Team&f has won {1} to {0}!", blueScore, redScore);
                     Stop(null);
                     return;
                 }
                 if (blueScore >= scoreLimit)
                 {
-                    world_.Players.Message("&fThe &1Blue Team&f has won {1} to {0}!", redScore, blueScore);
+                    TDMworld_.Players.Message("&fThe &1Blue Team&f has won {1} to {0}!", redScore, blueScore);
                     Stop(null);
                     return;
                 }
                 if (blueScore == scoreLimit && redScore == scoreLimit) //if they somehow manage to tie which I am pretty sure is impossible
                 {
-                    world_.Players.Message("&fThe teams have tied!");
+                    TDMworld_.Players.Message("&fThe teams have tied!");
                     Stop(null);
                     return;
                 }
@@ -125,23 +128,23 @@ namespace fCraft
                 {
                     if (redScore > blueScore)
                     {
-                        world_.Players.Message("&fThe &cRed Team&f has won {0} to {1}.", redScore, blueScore);
+                        TDMworld_.Players.Message("&fThe &cRed Team&f has won {0} to {1}.", redScore, blueScore);
                         Stop(null);
                         return;
                     }
                     if (redScore < blueScore)
                     {
-                        world_.Players.Message("&fThe &1Blue Team&f has won {0} to {1}.", blueScore, redScore);
+                        TDMworld_.Players.Message("&fThe &1Blue Team&f has won {0} to {1}.", blueScore, redScore);
                         Stop(null);
                         return;
                     }
                     if (redScore == blueScore)
                     {
-                        world_.Players.Message("&fThe teams tied {0} to {1}!", blueScore, redScore);
+                        TDMworld_.Players.Message("&fThe teams tied {0} to {1}!", blueScore, redScore);
                         Stop(null);
                         return;
                     }
-                    if (world_.Players.Count() <= 1)
+                    if (TDMworld_.Players.Count() <= 1)
                     {
                         Stop(null);
                         return;
@@ -150,24 +153,24 @@ namespace fCraft
 
                 if (started && (DateTime.UtcNow - lastChecked).TotalSeconds > 10) //check if players left the world, forfeits if no players of that team left
                 {
-                    int redCount = world_.Players.Where(p => p.Info.isOnRedTeam).ToArray().Count();
-                    int blueCount = world_.Players.Where(p => p.Info.isOnBlueTeam).ToArray().Count();
+                    int redCount = TDMworld_.Players.Where(p => p.Info.isOnRedTeam).ToArray().Count();
+                    int blueCount = TDMworld_.Players.Where(p => p.Info.isOnBlueTeam).ToArray().Count();
                     if (blueCount < 1 || redCount < 1)
                     {
                         if (blueTeamCount == 0)
                         {
-                            if (world_.Players.Count() >= 1)
+                            if (TDMworld_.Players.Count() >= 1)
                             {
-                                world_.Players.Message("&1Blue Team &fhas forfeited the game. &cRed Team &fwins!");
+                                TDMworld_.Players.Message("&1Blue Team &fhas forfeited the game. &cRed Team &fwins!");
                             }
                             Stop(null);
                             return;
                         }
                         if (redTeamCount == 0)
                         {
-                            if (world_.Players.Count() >= 1)
+                            if (TDMworld_.Players.Count() >= 1)
                             {
-                                world_.Players.Message("&cRed Team &fhas forfeited the game. &1Blue Team &fwins!");
+                                TDMworld_.Players.Message("&cRed Team &fhas forfeited the game. &1Blue Team &fwins!");
                             }
                             Stop(null);
                             return;
@@ -185,24 +188,24 @@ namespace fCraft
                 {
                     if (redScore > blueScore)
                     {
-                        world_.Players.Message("&fThe &cRed Team&f is winning {0} to {1}.", redScore, blueScore);
-                        world_.Players.Message("&fThere are &W{0}&f seconds left in the game.", timeLeft);
+                        TDMworld_.Players.Message("&fThe &cRed Team&f is winning {0} to {1}.", redScore, blueScore);
+                        TDMworld_.Players.Message("&fThere are &W{0}&f seconds left in the game.", timeLeft);
                     }
                     if (redScore < blueScore)
                     {
-                        world_.Players.Message("&fThe &1Blue Team&f is winning {0} to {1}.", blueScore, redScore);
-                        world_.Players.Message("&fThere are &W{0}&f seconds left in the game.", timeLeft);
+                        TDMworld_.Players.Message("&fThe &1Blue Team&f is winning {0} to {1}.", blueScore, redScore);
+                        TDMworld_.Players.Message("&fThere are &W{0}&f seconds left in the game.", timeLeft);
                     }
                     if (redScore == blueScore)
                     {
-                        world_.Players.Message("&fThe teams are tied at {0}!", blueScore);
-                        world_.Players.Message("&fThere are &W{0}&f seconds left in the game.", timeLeft);
+                        TDMworld_.Players.Message("&fThe teams are tied at {0}!", blueScore);
+                        TDMworld_.Players.Message("&fThere are &W{0}&f seconds left in the game.", timeLeft);
                     }
                     lastChecked = DateTime.UtcNow;
                 }
                 if (timeLeft == 10)
                 {
-                    world_.Players.Message("&WOnly 10 seconds left!");
+                    TDMworld_.Players.Message("&WOnly 10 seconds left!");
                 }
             }
         }
@@ -210,16 +213,16 @@ namespace fCraft
 
         public static void RevertGame() //Reset game bools/stats and stop timers
         {
-            world_.gameMode = GameMode.NULL;
-            if (world_.gunPhysics)
+            TDMworld_.gameMode = GameMode.NULL;
+            if (TDMworld_.gunPhysics)
             {
-                world_.DisableGunPhysics(Player.Console, true);
+                TDMworld_.DisableGunPhysics(Player.Console, true);
             }
             task_.Stop();
             isOn = false;
             instance = null;
             started = false;
-            world_ = null;
+            TDMworld_ = null;
             redScore = 0;
             blueScore = 0;
             redTeamCount = 0;
@@ -239,7 +242,7 @@ namespace fCraft
                 if (p != null)
                 {
                     p.iName = null;
-                    pI.DisplayedName = pI.oldname;
+                    pI.DisplayedName = pI.TDMoldname;
                     pI.isOnRedTeam = false;
                     pI.isOnBlueTeam = false;
                     pI.isPlayingTD = false;

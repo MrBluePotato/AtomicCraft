@@ -27,7 +27,7 @@ namespace fCraft
                     Category = CommandCategory.World,
                     Permissions = new Permission[] { Permission.Games },
                     IsConsoleSafe = false,
-                    Usage = "/TeamDeathMatch [time/score/scorelimit/timelimit/about/help]",
+                    Usage = "/TeamDeathMatch [time/score/scorelimit/timelimit/help]",
                     Handler = TDHandler
                 };
 
@@ -162,12 +162,6 @@ namespace fCraft
                         return;
                     }
                 }
-            }
-            if (Option.ToLower() == "about")    //td about
-            {
-                player.Message("&cTeam Deathmatch&S is a team game where all players are assigned to a red or blue team. Players cannot shoot players on their own team. The game will start the gun physics for you. The game keeps score and notifications come up about the score and time left every 30 seconds. The Score Limit, Time Delay and Time Limit are customizable. Detailed help is on &H/TD Help"
-                + "\n&SDeveloped for &5Legend&WCraft&S by &fDingus&0Bungus&S 2013 - Based on the template of ZombieGame.cs written by Jonty800.");
-                return;
             }
             if (Option.ToLower() == "settings") //shows the current settings for the game (time limit, time delay, score limit)
             {

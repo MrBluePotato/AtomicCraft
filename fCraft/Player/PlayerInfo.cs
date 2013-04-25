@@ -87,6 +87,7 @@ namespace fCraft
         public int gameKills = 0;
         public int gameDeaths = 0;
         public bool needsReversion = false;
+        public string TDMoldname;
 
         //Zombie survival
         public bool isInfected = false;
