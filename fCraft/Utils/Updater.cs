@@ -60,7 +60,6 @@ namespace fCraft {
                                     return false;
                                 }
                                 WebVersionFullString = reader.ReadLine();
-                                DownloadLocation = reader.ReadLine();
                                 UpdaterLocation = reader.ReadLine();
                                 Changelog = reader.ReadToEnd();
                             }
@@ -104,68 +103,6 @@ namespace fCraft {
                 return false;
             }
         }
-        public static int UpdateCheckTimeout { get; set; }
-
-        public static UpdaterResult CheckForUpdates () {
-            UpdaterMode mode = ConfigKey.UpdaterMode.GetEnum<UpdaterMode>();
-            if ( mode == UpdaterMode.Disabled ) return UpdaterResult.NoUpdate;
-
-            string url = String.Format( UpdateUrl, CurrentRelease.Revision );
-            if ( RaiseCheckingForUpdatesEvent( ref url ) ) return UpdaterResult.NoUpdate;
-
-            Logger.Log( LogType.SystemActivity, "Checking for AtomicCraft updates..." );
-            try {
-                HttpWebRequest request = ( HttpWebRequest )WebRequest.Create( url );
-
-                request.Method = "GET";
-                request.UserAgent = "AtomicCraft";
-                request.Timeout = UpdateCheckTimeout;
-                request.ReadWriteTimeout = UpdateCheckTimeout;
-                request.CachePolicy = new HttpRequestCachePolicy( HttpRequestCacheLevel.BypassCache );
-                request.UserAgent = UserAgent;
-
-                using ( WebResponse response = request.GetResponse() ) {
-                    // ReSharper disable AssignNullToNotNullAttribute
-                    // ReSharper disable PossibleNullReferenceException
-                    using ( XmlTextReader reader = new XmlTextReader( response.GetResponseStream() ) ) {
-                        // ReSharper restore AssignNullToNotNullAttribute
-                        XDocument doc = XDocument.Load( reader );
-                        XElement root = doc.Root;
-                        if ( root.Attribute( "result" ).Value == "update" ) {
-                            string downloadUrl = root.Attribute( "url" ).Value;
-                            var releases = new List<ReleaseInfo>();
-                            // ReSharper disable LoopCanBeConvertedToQuery
-                            foreach ( XElement el in root.Elements( "Release" ) ) {
-                                releases.Add(
-                                    new ReleaseInfo(
-                                        Int32.Parse( el.Attribute( "v" ).Value ),
-                                        Int32.Parse( el.Attribute( "r" ).Value ),
-                                        Int64.Parse( el.Attribute( "date" ).Value ).ToDateTime(),
-                                        el.Element( "Summary" ).Value,
-                                        el.Element( "ChangeLog" ).Value,
-                                        ReleaseInfo.StringToReleaseFlags( el.Attribute( "flags" ).Value )
-                                    )
-                                );
-                            }
-                            // ReSharper restore LoopCanBeConvertedToQuery
-                            // ReSharper restore PossibleNullReferenceException
-                            UpdaterResult result = new UpdaterResult( ( releases.Count > 0 ), new Uri( downloadUrl ),
-                                                                      releases.ToArray() );
-                            RaiseCheckedForUpdatesEvent( UpdateUrl, result );
-                            return result;
-                        } else {
-                            return UpdaterResult.NoUpdate;
-                        }
-                    }
-                }
-            } catch ( Exception ex ) {
-                Logger.Log( LogType.Error,
-                            "An error occured while trying to check for updates: {0}: {1}",
-                            ex.GetType(), ex.Message );
-                return UpdaterResult.NoUpdate;
-            }
-        }
-
 
         public static bool RunAtShutdown { get; set; }
 
