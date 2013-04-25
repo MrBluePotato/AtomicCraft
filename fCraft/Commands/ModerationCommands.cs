@@ -1501,6 +1501,13 @@ namespace fCraft {
             Player target = Server.FindPlayerOrPrintMatches( player, name, false, true );
             if ( target == null ) return;
 
+             if (target == player)
+             {
+                 player.Message("&WYou cannot bring yourself!");
+                 return;
+             }
+
+
             if ( !player.Can( Permission.Bring, target.Info.Rank ) ) {
                 player.Message( "You may only bring players ranked {0}&S or lower.",
                                 player.Info.Rank.GetLimit( Permission.Bring ).ClassyName );
