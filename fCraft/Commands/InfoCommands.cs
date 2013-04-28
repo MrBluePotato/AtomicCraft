@@ -1085,11 +1085,11 @@ namespace fCraft {
             }
 
             if ( MonoCompat.IsMono ) {
-                player.Message( "  Running &9800&CCraft &7Plus&S {0}, under Mono {1}",
+                player.Message( "  Running &cAtomicCraft&S {0}, under Mono {1}",
                                 Updater.CurrentRelease.VersionString,
                                 MonoCompat.MonoVersionString );
             } else {
-                player.Message("  Running &9800&CCraft &7Plus&S {0}, under .NET {1}",
+                player.Message("  Running &cAtomicCraft&S {0}, under .NET {1}",
                                 Updater.CurrentRelease.VersionString,
                                 Environment.Version );
             }

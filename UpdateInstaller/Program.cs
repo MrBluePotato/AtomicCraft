@@ -37,7 +37,7 @@ namespace fCraft.UpdateInstaller
     static class Program
     {
         const string ConfigFileNameDefault = "config.xml",
-                     BackupFileNameFormat = "800CraftData_{0:yyyyMMdd'_'HH'-'mm'-'ss}_BeforeUpdate.zip";
+                     BackupFileNameFormat = "AtomicCraftData_{0:yyyyMMdd'_'HH'-'mm'-'ss}_BeforeUpdate.zip";
 
         public const string DataBackupDirectory = "databackups";
 
