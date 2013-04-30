@@ -18,7 +18,7 @@ namespace fCraft {
     public static class Updater {
 
         public static readonly ReleaseInfo CurrentRelease = new ReleaseInfo(
-            200,
+            301,
             1,
             new DateTime( 2013, 01, 02, 1, 0, 0, DateTimeKind.Utc ),
             "", "",
@@ -32,7 +32,7 @@ namespace fCraft {
             get { return "AtomicCraft " + CurrentRelease.VersionString; }
         }
 
-        public const string LatestStable = "0.300_r1";
+        public const string LatestStable = "0.301_r1";
         public static string UpdateUrl { get; set; }
         public static int WebVersion;
         public static string WebVersionFullString;
@@ -59,34 +59,29 @@ namespace fCraft {
                             {
                                 DevVersion = reader.ReadLine();
                             }
-                            Logger.Log(LogType.Warning, "({0})", DevVersion);
+                        }
+                        if (!File.Exists("dev.txt"))
+                        {
+                            File.WriteAllText("dev.txt", DevVersion);
+
                         }
                         using (StreamReader reader = new StreamReader("dev.txt"))
                         {
-                            if (!File.Exists("dev.txt"))
-                            {
-                                using (FileStream fs = File.Create("dev.txt"))
-                                {
-                                    Byte[] info = new UTF8Encoding(true).GetBytes(DevVersion);
-                                    fs.Write(info, 0, info.Length);
-                                }
-                            }
                             if (File.Exists("dev.txt"))
                             {
                                 CurrentDevVersion = reader.ReadLine();
-                                Logger.Log(LogType.Warning, "({0})", CurrentDevVersion);
                             }
+                        }
                             if (CurrentDevVersion == DevVersion)
                             {
                                 return false;
                             }
                             if (CurrentDevVersion != DevVersion)
                             {
-                                DevUpdaterLocation = String.Format("http://build.AtomicCraft.net/guestAuth/repository/download/bt34/.lastSuccessful/AtomicCraft+-+Build+{0}.zip!UpdateInstaller.exe", DevVersion);
-                                Logger.Log(LogType.Warning, "({0})", DevUpdaterLocation);
-                                DevVersion = WebVersionFullString;
+                                DevUpdaterLocation = ("http://build.AtomicCraft.net/guestAuth/repository/download/bt34/.lastSuccessful/AtomicCraft+-+Build+" + Updater.DevVersion + ".zip!UpdateInstaller.exe");
+                                File.Delete("dev.txt");
+                                File.WriteAllText("dev.txt", DevVersion);
                                 return true;
-                            }
                         }
                     }
 
