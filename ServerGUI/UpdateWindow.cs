@@ -29,7 +29,15 @@ namespace fCraft.ServerGUI {
             xShowDetails.Focus();
             downloader.DownloadProgressChanged += DownloadProgress;
             downloader.DownloadFileCompleted += DownloadComplete;
-            downloader.DownloadFileAsync( new Uri(Updater.UpdaterLocation), updaterFullPath );
+            ReleaseMode mode = ConfigKey.ReleaseMode.GetEnum<ReleaseMode>();
+            if (mode == ReleaseMode.Public)
+            {
+                downloader.DownloadFileAsync(new Uri(Updater.PublicUpdaterLocation), updaterFullPath);
+            }
+            else if (mode == ReleaseMode.Dev)
+            {
+                downloader.DownloadFileAsync(new Uri(Updater.DevUpdaterLocation), updaterFullPath);
+            }
         }
 
 
@@ -64,7 +72,7 @@ namespace fCraft.ServerGUI {
 
         private void bUpdateNow_Click( object sender, EventArgs e ) {
             string args = Server.GetArgString() +
-                          String.Format( "--restart=\"{0}\"", MonoCompat.PrependMono( "ServerGUI.exe" ) );
+                          String.Format( "--restart=\"{0}\"", MonoCompat.PrependMono( "Server (Graphical).exe" ) );
             MonoCompat.StartDotNetProcess( updaterFullPath, args, true );
             Server.Shutdown( new ShutdownParams( ShutdownReason.Restarting, TimeSpan.Zero, true, false ), false );
         }

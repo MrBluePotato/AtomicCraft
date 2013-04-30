@@ -115,6 +115,8 @@ namespace fCraft {
         public const string PortalDBFileName = "PortalDB.txt";
         public const string SwearWordsFileName = "SwearWords.txt";
 
+        public const string DevFileName = "dev.txt";
+
 
         public static string BlockDBPath {
             get { return Path.Combine( WorkingPath, BlockDBDirectory ); }

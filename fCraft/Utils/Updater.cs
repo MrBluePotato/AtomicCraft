@@ -11,13 +11,14 @@ using System.Xml.Linq;
 using fCraft.Events;
 using JetBrains.Annotations;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace fCraft {
     /// <summary> Checks for updates, and keeps track of current version/revision. </summary>
     public static class Updater {
 
         public static readonly ReleaseInfo CurrentRelease = new ReleaseInfo(
-            300,
+            200,
             1,
             new DateTime( 2013, 01, 02, 1, 0, 0, DateTimeKind.Utc ),
             "", "",
@@ -36,8 +37,11 @@ namespace fCraft {
         public static int WebVersion;
         public static string WebVersionFullString;
         public static string DownloadLocation;
-        public static string UpdaterLocation;
+        public static string PublicUpdaterLocation;
+        public static string DevUpdaterLocation;
         public static string Changelog;
+        public static string DevVersion;
+        public static string CurrentDevVersion;
 
         public static bool UpdateCheck()
         {
@@ -48,23 +52,44 @@ namespace fCraft {
                 {
                     if (mode == ReleaseMode.Dev)
                     {
-                        using (Stream stream = client.OpenRead("http://dl.atomiccraft.net/AtomicCraft/dev/update.txt"))
+                        using (Stream stream = client.OpenRead("http://build.atomiccraft.net/guestAuth/app/rest/buildTypes/id:bt34/builds/status:SUCCESS/number"))
                         {
                             stream.ReadTimeout = 1000;
                             using (StreamReader reader = new StreamReader(stream))
                             {
-                                string s = reader.ReadLine();
-                                if (!int.TryParse(s.Replace(".", ""), out WebVersion))
+                                DevVersion = reader.ReadLine();
+                            }
+                            Logger.Log(LogType.Warning, "({0})", DevVersion);
+                        }
+                        using (StreamReader reader = new StreamReader("dev.txt"))
+                        {
+                            if (!File.Exists("dev.txt"))
+                            {
+                                using (FileStream fs = File.Create("dev.txt"))
                                 {
-                                    Logger.Log(LogType.Warning, "Could not parse version value in updater ({0})", s);
-                                    return false;
+                                    Byte[] info = new UTF8Encoding(true).GetBytes(DevVersion);
+                                    fs.Write(info, 0, info.Length);
                                 }
-                                WebVersionFullString = reader.ReadLine();
-                                UpdaterLocation = reader.ReadLine();
-                                Changelog = reader.ReadToEnd();
+                            }
+                            if (File.Exists("dev.txt"))
+                            {
+                                CurrentDevVersion = reader.ReadLine();
+                                Logger.Log(LogType.Warning, "({0})", CurrentDevVersion);
+                            }
+                            if (CurrentDevVersion == DevVersion)
+                            {
+                                return false;
+                            }
+                            if (CurrentDevVersion != DevVersion)
+                            {
+                                DevUpdaterLocation = String.Format("http://build.AtomicCraft.net/guestAuth/repository/download/bt34/.lastSuccessful/AtomicCraft+-+Build+{0}.zip!UpdateInstaller.exe", DevVersion);
+                                Logger.Log(LogType.Warning, "({0})", DevUpdaterLocation);
+                                DevVersion = WebVersionFullString;
+                                return true;
                             }
                         }
                     }
+
                     else if (mode == ReleaseMode.Public)
                     {
                         using (Stream stream = client.OpenRead("http://dl.atomiccraft.net/AtomicCraft/public/update.txt"))
@@ -80,13 +105,13 @@ namespace fCraft {
                                 }
                                 WebVersionFullString = reader.ReadLine();
                                 DownloadLocation = reader.ReadLine();
-                                UpdaterLocation = reader.ReadLine();
+                                PublicUpdaterLocation = reader.ReadLine();
                                 Changelog = reader.ReadToEnd();
                             }
                         }
                     }
 
-                    if (WebVersion != 0 && DownloadLocation != null && UpdaterLocation != null)
+                    if (WebVersion != 0 && DownloadLocation != null && PublicUpdaterLocation != null)
                     {
                         if (WebVersion > Updater.CurrentRelease.Version)
                         {
