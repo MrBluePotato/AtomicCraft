@@ -53,18 +53,20 @@ namespace fCraft
         public static void Start()
         {
             TDMworld_.gameMode = GameMode.TeamDeathMatch; //set the game mode
-            Player.Console.ParseMessage(String.Format("/WSave {0} TDMbackup", TDMworld_), true);
+            Player.Console.ParseMessage(String.Format("/WSave {0} TDMbackup", TDMworld_.ToString()), true);
             Player.Console.ParseMessage(String.Format("/ok"), true);
             Scheduler.NewTask(t => TDMworld_.Players.Message("&WTeam Death Match will be starting in {0} seconds. &WGet ready!", timeDelay))
             .RunRepeating(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(10), 1);
             Server.Players.Except(TDMworld_.Players).Message("&WTeam Death Matchi &fwill be starting in {0} seconds in the world {1} &WGet ready!", timeDelay, TDMworld_.ClassyName);
+            Player.Disconnected += PlayerLeftServer;
+            Player.Disconnected += PlayerLeftWorld;
         }
 
         public static void Stop(Player p) //for stopping the game early
         {
             if (p != null && TDMworld_ != null)
             {
-                Player.Console.ParseMessage(String.Format("/WLoad TDMbackup {0}", TDMworld_), true);
+                Player.Console.ParseMessage(String.Format("/WLoad TDMbackup {0}", TDMworld_.ToString()), true);
                 Player.Console.ParseMessage(String.Format("/ok"), true);
                 Server.Players.Except(TDMworld_.Players).Message("{0} ended Team Death Match on {1}.", p.ClassyName, TDMworld_.ClassyName);
                 TDMworld_.Players.Message("{0}&S stopped Team Death Match.", p.ClassyName);
@@ -210,9 +212,12 @@ namespace fCraft
             }
         }
 
+        
 
         public static void RevertGame() //Reset game bools/stats and stop timers
         {
+            Player.Disconnected += PlayerLeftServer;
+            Player.Disconnected += PlayerLeftWorld;
             TDMworld_.gameMode = GameMode.NULL;
             if (TDMworld_.gunPhysics)
             {
@@ -230,6 +235,37 @@ namespace fCraft
             RevertPlayer();
         }
 
+        static void PlayerLeftServer(object sender, Events.PlayerDisconnectedEventArgs e)
+        {
+            if ((TeamDeathMatch.isOn) && (e.Player.isOnTDMTeam))
+            {
+                e.Player.iName = null;
+                e.Player.Info.DisplayedName = e.Player.Info.TDMoldname;
+                e.Player.Info.isOnRedTeam = false;
+                e.Player.Info.isOnBlueTeam = false;
+                e.Player.Info.isPlayingTD = false;
+                e.Player.entityChanged = true;
+                e.Player.isOnTDMTeam = false;
+                return;
+            }
+        }
+        static void PlayerLeftWorld(object sender, Events.PlayerDisconnectedEventArgs e)
+        {
+            if ((TeamDeathMatch.isOn) && (e.Player.isOnTDMTeam))
+            {
+                if (e.Player.World.Name != TDMworld_.ToString())
+                {
+                    e.Player.iName = null;
+                    e.Player.Info.DisplayedName = e.Player.Info.TDMoldname;
+                    e.Player.Info.isOnRedTeam = false;
+                    e.Player.Info.isOnBlueTeam = false;
+                    e.Player.Info.isPlayingTD = false;
+                    e.Player.entityChanged = true;
+                    e.Player.isOnTDMTeam = false;
+                    return;
+                }
+            }
+        }
         public static void RevertPlayer()    //reverts names for online players. offline players get reverted upon leaving the game
         {
             List<PlayerInfo> TDPlayers = new List<PlayerInfo>(PlayerDB.PlayerInfoList.Where(r => (r.isOnBlueTeam || r.isOnRedTeam) && r.IsOnline).ToArray());
