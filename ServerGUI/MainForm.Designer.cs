@@ -56,7 +56,7 @@
             this.uriDisplay.Name = "uriDisplay";
             this.uriDisplay.Size = new System.Drawing.Size(519, 20);
             this.uriDisplay.TabIndex = 7;
-            this.uriDisplay.Text = "https://minecraft.net/classic/play/76bafebaedefdb169acb05af350017a7";
+            this.uriDisplay.Text = "https://classicube.net/server/play76bafebaedefdb169acb05af350017a7";
             // 
             // playerList
             // 

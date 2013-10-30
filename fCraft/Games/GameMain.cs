@@ -25,7 +25,7 @@ namespace fCraft
 
         public static void Init()
         {
-            CommandManager.RegisterCommand(CdGame);
+            //CommandManager.RegisterCommand(CdGame);
         }
         static readonly CommandDescriptor CdGame = new CommandDescriptor
         {

@@ -11,7 +11,7 @@ namespace fCraft
 
         public static void Init()
         {
-            CommandManager.RegisterCommand(CdTeam);
+            //CommandManager.RegisterCommand(CdTeam);
         }
         static readonly CommandDescriptor CdTeam = new CommandDescriptor
         {
@@ -22,6 +22,7 @@ namespace fCraft
             Usage = "/Team [red/blue]",
             Handler = TeamHandler
         };
+        ReleaseMode mode = ConfigKey.ReleaseMode.GetEnum<ReleaseMode>();
         private static void TeamHandler(Player player, Command cmd)
         {
             string teamColor = cmd.Next();

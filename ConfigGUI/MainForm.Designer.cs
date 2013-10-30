@@ -25,8 +25,8 @@
         /// </summary>
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.tabSavingAndBackup = new System.Windows.Forms.TabPage();
             this.gDataBackup = new System.Windows.Forms.GroupBox();
@@ -146,7 +146,6 @@
             this.chatPreview = new fCraft.ConfigGUI.ChatPreview();
             this.tabs = new System.Windows.Forms.TabControl();
             this.tabGeneral = new System.Windows.Forms.TabPage();
-            this.groupBox9 = new System.Windows.Forms.GroupBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.GCcheckBox = new System.Windows.Forms.CheckBox();
             this.gUpdaterSettings = new System.Windows.Forms.GroupBox();
@@ -169,7 +168,6 @@
             this.gBasic = new System.Windows.Forms.GroupBox();
             this.nMaxPlayersPerWorld = new System.Windows.Forms.NumericUpDown();
             this.lMaxPlayersPerWorld = new System.Windows.Forms.Label();
-            this.bPortCheck = new System.Windows.Forms.Button();
             this.lPort = new System.Windows.Forms.Label();
             this.nPort = new System.Windows.Forms.NumericUpDown();
             this.cDefaultRank = new System.Windows.Forms.ComboBox();
@@ -349,13 +347,13 @@
             this.label6 = new System.Windows.Forms.Label();
             this.CurrencyBoxSl = new System.Windows.Forms.TextBox();
             this.CurrencyBoxPl = new System.Windows.Forms.TextBox();
+            this.sMode = new System.Windows.Forms.ComboBox();
             this.bOK = new System.Windows.Forms.Button();
             this.bCancel = new System.Windows.Forms.Button();
             this.bResetTab = new System.Windows.Forms.Button();
             this.bResetAll = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.bApply = new System.Windows.Forms.Button();
-            this.sMode = new System.Windows.Forms.ComboBox();
             this.tabSavingAndBackup.SuspendLayout();
             this.gDataBackup.SuspendLayout();
             this.gSaving.SuspendLayout();
@@ -388,7 +386,6 @@
             this.gAppearence.SuspendLayout();
             this.tabs.SuspendLayout();
             this.tabGeneral.SuspendLayout();
-            this.groupBox9.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.gUpdaterSettings.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -1787,7 +1784,6 @@
             // tabGeneral
             // 
             this.tabGeneral.BackColor = System.Drawing.SystemColors.Control;
-            this.tabGeneral.Controls.Add(this.groupBox9);
             this.tabGeneral.Controls.Add(this.groupBox5);
             this.tabGeneral.Controls.Add(this.gUpdaterSettings);
             this.tabGeneral.Controls.Add(this.groupBox2);
@@ -1801,20 +1797,10 @@
             this.tabGeneral.TabIndex = 0;
             this.tabGeneral.Text = "General";
             // 
-            // groupBox9
-            // 
-            this.groupBox9.Controls.Add(this.sMode);
-            this.groupBox9.Location = new System.Drawing.Point(8, 307);
-            this.groupBox9.Name = "groupBox9";
-            this.groupBox9.Size = new System.Drawing.Size(636, 50);
-            this.groupBox9.TabIndex = 4;
-            this.groupBox9.TabStop = false;
-            this.groupBox9.Text = "Server Mode";
-            // 
             // groupBox5
             // 
             this.groupBox5.Controls.Add(this.GCcheckBox);
-            this.groupBox5.Location = new System.Drawing.Point(8, 363);
+            this.groupBox5.Location = new System.Drawing.Point(13, 307);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(636, 50);
             this.groupBox5.TabIndex = 3;
@@ -1873,7 +1859,7 @@
             this.lUpdater.AutoSize = true;
             this.lUpdater.Location = new System.Drawing.Point(6, 25);
             this.lUpdater.Name = "lUpdater";
-            this.lUpdater.Size = new System.Drawing.Size(156, 15);
+            this.lUpdater.Size = new System.Drawing.Size(145, 15);
             this.lUpdater.TabIndex = 0;
             this.lUpdater.Text = "AtomicCraft update check";
             // 
@@ -1883,7 +1869,7 @@
             this.groupBox2.Controls.Add(this.bChangelog);
             this.groupBox2.Controls.Add(this.bCredits);
             this.groupBox2.Controls.Add(this.bReadme);
-            this.groupBox2.Location = new System.Drawing.Point(329, 414);
+            this.groupBox2.Location = new System.Drawing.Point(334, 363);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(315, 55);
             this.groupBox2.TabIndex = 4;
@@ -1925,7 +1911,7 @@
             // 
             this.gHelpAndSupport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.gHelpAndSupport.Controls.Add(this.bReportABug);
-            this.gHelpAndSupport.Location = new System.Drawing.Point(8, 413);
+            this.gHelpAndSupport.Location = new System.Drawing.Point(13, 363);
             this.gHelpAndSupport.Name = "gHelpAndSupport";
             this.gHelpAndSupport.Size = new System.Drawing.Size(315, 55);
             this.gHelpAndSupport.TabIndex = 3;
@@ -1934,7 +1920,7 @@
             // 
             // bReportABug
             // 
-            this.bReportABug.Location = new System.Drawing.Point(1, 20);
+            this.bReportABug.Location = new System.Drawing.Point(9, 21);
             this.bReportABug.Name = "bReportABug";
             this.bReportABug.Size = new System.Drawing.Size(140, 23);
             this.bReportABug.TabIndex = 1;
@@ -2041,7 +2027,6 @@
             // 
             this.gBasic.Controls.Add(this.nMaxPlayersPerWorld);
             this.gBasic.Controls.Add(this.lMaxPlayersPerWorld);
-            this.gBasic.Controls.Add(this.bPortCheck);
             this.gBasic.Controls.Add(this.lPort);
             this.gBasic.Controls.Add(this.nPort);
             this.gBasic.Controls.Add(this.cDefaultRank);
@@ -2096,16 +2081,6 @@
             this.lMaxPlayersPerWorld.Size = new System.Drawing.Size(135, 15);
             this.lMaxPlayersPerWorld.TabIndex = 11;
             this.lMaxPlayersPerWorld.Text = "Max players (per world)";
-            // 
-            // bPortCheck
-            // 
-            this.bPortCheck.Location = new System.Drawing.Point(204, 99);
-            this.bPortCheck.Name = "bPortCheck";
-            this.bPortCheck.Size = new System.Drawing.Size(68, 23);
-            this.bPortCheck.TabIndex = 8;
-            this.bPortCheck.Text = "Check";
-            this.bPortCheck.UseVisualStyleBackColor = true;
-            this.bPortCheck.Click += new System.EventHandler(this.bPortCheck_Click);
             // 
             // lPort
             // 
@@ -2470,8 +2445,8 @@
             this.dgvWorlds.MultiSelect = false;
             this.dgvWorlds.Name = "dgvWorlds";
             this.dgvWorlds.RowHeadersVisible = false;
-            dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(0, 1, 0, 1);
-            this.dgvWorlds.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle4.Padding = new System.Windows.Forms.Padding(0, 1, 0, 1);
+            this.dgvWorlds.RowsDefaultCellStyle = dataGridViewCellStyle4;
             this.dgvWorlds.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvWorlds.Size = new System.Drawing.Size(636, 325);
             this.dgvWorlds.TabIndex = 0;
@@ -2529,8 +2504,8 @@
             // dgvcBlockDB
             // 
             this.dgvcBlockDB.DataPropertyName = "BlockDBEnabled";
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.dgvcBlockDB.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.dgvcBlockDB.DefaultCellStyle = dataGridViewCellStyle3;
             this.dgvcBlockDB.HeaderText = "BlockDB";
             this.dgvcBlockDB.Name = "dgvcBlockDB";
             this.dgvcBlockDB.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
@@ -3446,7 +3421,7 @@
             this.xSubmitCrashReports.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.xSubmitCrashReports.Location = new System.Drawing.Point(6, 20);
             this.xSubmitCrashReports.Name = "xSubmitCrashReports";
-            this.xSubmitCrashReports.Size = new System.Drawing.Size(422, 19);
+            this.xSubmitCrashReports.Size = new System.Drawing.Size(409, 19);
             this.xSubmitCrashReports.TabIndex = 0;
             this.xSubmitCrashReports.Text = "Automatically submit error reports to AtomicCraft developers";
             this.xSubmitCrashReports.UseVisualStyleBackColor = true;
@@ -4359,6 +4334,19 @@
             this.CurrencyBoxPl.TabIndex = 19;
             this.CurrencyBoxPl.Text = "dollars";
             // 
+            // sMode
+            // 
+            this.sMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.sMode.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.sMode.FormattingEnabled = true;
+            this.sMode.Items.AddRange(new object[] {
+            "Normal",
+            "Zombie Survival"});
+            this.sMode.Location = new System.Drawing.Point(6, 20);
+            this.sMode.Name = "sMode";
+            this.sMode.Size = new System.Drawing.Size(152, 23);
+            this.sMode.TabIndex = 11;
+            // 
             // bOK
             // 
             this.bOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -4424,19 +4412,6 @@
             this.bApply.Text = "Apply";
             this.bApply.Click += new System.EventHandler(this.bApply_Click);
             // 
-            // sMode
-            // 
-            this.sMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.sMode.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.sMode.FormattingEnabled = true;
-            this.sMode.Items.AddRange(new object[] {
-            "Normal",
-            "Zombie Survival"});
-            this.sMode.Location = new System.Drawing.Point(6, 20);
-            this.sMode.Name = "sMode";
-            this.sMode.Size = new System.Drawing.Size(152, 23);
-            this.sMode.TabIndex = 11;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -4497,7 +4472,6 @@
             this.gAppearence.PerformLayout();
             this.tabs.ResumeLayout(false);
             this.tabGeneral.ResumeLayout(false);
-            this.groupBox9.ResumeLayout(false);
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
             this.gUpdaterSettings.ResumeLayout(false);
@@ -4713,7 +4687,6 @@
         private System.Windows.Forms.GroupBox gBasic;
         private System.Windows.Forms.NumericUpDown nMaxPlayersPerWorld;
         private System.Windows.Forms.Label lMaxPlayersPerWorld;
-        private System.Windows.Forms.Button bPortCheck;
         private System.Windows.Forms.Label lPort;
         private System.Windows.Forms.NumericUpDown nPort;
         private System.Windows.Forms.ComboBox cDefaultRank;
@@ -4899,7 +4872,6 @@
         private System.Windows.Forms.Button bResetAll;
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.Button bApply;
-        private System.Windows.Forms.GroupBox groupBox9;
         private System.Windows.Forms.ComboBox sMode;
 
     }

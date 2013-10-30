@@ -17,7 +17,7 @@ namespace fCraft
     {
         internal static void Init()
         {
-            CommandManager.RegisterCommand(CdTeamDeathMatch);
+            //CommandManager.RegisterCommand(CdTeamDeathMatch);
         }
 
         static readonly CommandDescriptor CdTeamDeathMatch = new CommandDescriptor
