@@ -26,7 +26,7 @@ namespace fCraft {
 
 
         static Heartbeat() {
-            MinecraftNetUri = new Uri( "https://minecraft.net/heartbeat.jsp" );
+            MinecraftNetUri = new Uri( "https://classicube.net/heartbeat.jsp" );
             Delay = TimeSpan.FromSeconds( 25 );
             Timeout = TimeSpan.FromSeconds( 10 );
             Salt = Server.GetRandomString( 32 );

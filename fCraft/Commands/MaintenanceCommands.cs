@@ -1042,11 +1042,9 @@ namespace fCraft {
             Category = CommandCategory.Maintenance,
             Permissions = new[] { Permission.ReloadConfig },
             IsConsoleSafe = true,
-            Usage = "/Reload config/autorank/salt/swears",
+            Usage = "/Reload config/autorank/swears",
             Help = "Reloads a given configuration file or setting. " +
-                   "Config note: changes to ranks and IRC settings still require a full restart. " +
-                   "Salt note: Until server synchronizes with Minecraft.net, " +
-                   "connecting players may have trouble verifying names.",
+                   "Config note: changes to ranks and IRC settings still require a full restart. ",
             Handler = ReloadHandler
         };
 
@@ -1074,13 +1072,6 @@ namespace fCraft {
                     case "swears":
                         Chat.badWordMatchers = null;
                         Chat.Swears.Clear();
-                        success = true;
-                        break;
-
-                    case "salt":
-                        Heartbeat.Salt = Server.GetRandomString( 32 );
-                        player.Message( "&WNote: Until server synchronizes with Minecraft.net, " +
-                                        "connecting players may have trouble verifying names." );
                         success = true;
                         break;
 
