@@ -29,14 +29,6 @@ namespace fCraft.ConfigGUI {
             toolTip.SetToolTip( nPort, ConfigKey.Port.GetDescription() );
             toolTip.SetToolTip( lPort, ConfigKey.Port.GetDescription() );
 
-            toolTip.SetToolTip( bPortCheck,
-@"Check if the selected port is connectible.
-If port check fails, you may need to set up
-port forwarding on your router." );
-
-            toolTip.SetToolTip( nUploadBandwidth, ConfigKey.UploadBandwidth.GetDescription() );
-            toolTip.SetToolTip( lUploadBandwidth, ConfigKey.UploadBandwidth.GetDescription() );
-
             toolTip.SetToolTip( bMeasure,
 @"Test your connection's upload speed with speedtest.net
 Note: to convert from megabits to kilobytes, multiply the
@@ -513,27 +505,6 @@ Affected command:
 Required permission: Build
 Affected commands:
     /Solid
-    /Bind";
-
-            vPermissions.Items[(int)Permission.PlaceGrass].ToolTipText =
-@"Ability to place grass blocks. This also affects draw commands.
-Required permission: Build
-Affected commands:
-    /Grass
-    /Bind";
-
-            vPermissions.Items[(int)Permission.PlaceLava].ToolTipText =
-@"Ability to place lava blocks. This also affects draw commands.
-Required permission: Build
-Affected commands:
-    /Lava
-    /Bind";
-
-            vPermissions.Items[(int)Permission.PlaceWater].ToolTipText =
-@"Ability to place water blocks. This also affects draw commands.
-Required permission: Build
-Affected commands:
-    /Water
     /Bind";
     
     vPermissions.Items[(int)Permission.Possess].ToolTipText =

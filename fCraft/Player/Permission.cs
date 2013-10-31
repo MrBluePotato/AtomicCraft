@@ -22,15 +22,6 @@ namespace fCraft {
         /// world-specific and zone-specific permissions. </summary>
         Delete,
 
-        /// <summary> Ability to place grass blocks. </summary>
-        PlaceGrass,
-
-        /// <summary> Ability to place water blocks. </summary>
-        PlaceWater,
-
-        /// <summary> Ability to place lava blocks. </summary>
-        PlaceLava,
-
         /// <summary> Ability to build admincrete. </summary>
         PlaceAdmincrete,
 

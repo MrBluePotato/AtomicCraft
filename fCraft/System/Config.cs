@@ -989,9 +989,6 @@ namespace fCraft {
             owner.Add( new XElement( Permission.UseSpeedHack.ToString() ) );
             owner.Add( new XElement( Permission.UseColorCodes.ToString() ) );
 
-            owner.Add( new XElement( Permission.PlaceGrass.ToString() ) );
-            owner.Add( new XElement( Permission.PlaceWater.ToString() ) );
-            owner.Add( new XElement( Permission.PlaceLava.ToString() ) );
             owner.Add( new XElement( Permission.PlaceAdmincrete.ToString() ) );
             owner.Add( new XElement( Permission.DeleteAdmincrete.ToString() ) );
 
@@ -1108,9 +1105,6 @@ namespace fCraft {
             op.Add( new XElement( Permission.UseSpeedHack.ToString() ) );
             op.Add( new XElement( Permission.UseColorCodes.ToString() ) );
 
-            op.Add( new XElement( Permission.PlaceGrass.ToString() ) );
-            op.Add( new XElement( Permission.PlaceWater.ToString() ) );
-            op.Add( new XElement( Permission.PlaceLava.ToString() ) );
             op.Add( new XElement( Permission.PlaceAdmincrete.ToString() ) );
             op.Add( new XElement( Permission.DeleteAdmincrete.ToString() ) );
 
@@ -1178,9 +1172,6 @@ namespace fCraft {
             builder.Add( new XElement( Permission.Delete.ToString() ) );
             builder.Add( new XElement( Permission.UseSpeedHack.ToString() ) );
 
-            builder.Add( new XElement( Permission.PlaceGrass.ToString() ) );
-            builder.Add( new XElement( Permission.PlaceWater.ToString() ) );
-            builder.Add( new XElement( Permission.PlaceLava.ToString() ) );
             builder.Add( new XElement( Permission.PlaceAdmincrete.ToString() ) );
             builder.Add( new XElement( Permission.DeleteAdmincrete.ToString() ) );
             builder.Add(new XElement(Permission.Economy.ToString()));

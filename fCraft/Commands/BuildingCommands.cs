@@ -21,11 +21,8 @@ namespace fCraft {
 
         internal static void Init () {
             CommandManager.RegisterCommand( CdBind );
-            CommandManager.RegisterCommand( CdGrass );
-            CommandManager.RegisterCommand( CdLava );
             CommandManager.RegisterCommand( CdPaint );
             CommandManager.RegisterCommand( CdSolid );
-            CommandManager.RegisterCommand( CdWater );
 
             CommandManager.RegisterCommand( CdCancel );
             CommandManager.RegisterCommand( CdMark );
@@ -1246,75 +1243,6 @@ namespace fCraft {
                 player.Message( "Paint mode: OFF" );
             }
         }
-
-
-
-        static readonly CommandDescriptor CdGrass = new CommandDescriptor {
-            Name = "Grass",
-            Aliases = new[] { "g" },
-            Category = CommandCategory.Building,
-            Permissions = new[] { Permission.PlaceGrass },
-            Help = "Toggles the grass placement mode. When enabled, any dirt block you place is replaced with a grass block.",
-            Handler = GrassHandler
-        };
-
-        static void GrassHandler ( Player player, Command cmd ) {
-            if ( player.GetBind( Block.Dirt ) == Block.Grass ) {
-                player.ResetBind( Block.Dirt );
-                player.Message( "Grass: OFF" );
-            } else {
-                player.Bind( Block.Dirt, Block.Grass );
-                player.Message( "Grass: ON. Dirt blocks are replaced with grass." );
-            }
-        }
-
-
-
-        static readonly CommandDescriptor CdWater = new CommandDescriptor {
-            Name = "Water",
-            Aliases = new[] { "w" },
-            Category = CommandCategory.Building,
-            Permissions = new[] { Permission.PlaceWater },
-            Help = "Toggles the water placement mode. When enabled, any blue or cyan block you place is replaced with water.",
-            Handler = WaterHandler
-        };
-
-        static void WaterHandler ( Player player, Command cmd ) {
-            if ( player.GetBind( Block.Aqua ) == Block.Water ||
-                player.GetBind( Block.Cyan ) == Block.Water ||
-                player.GetBind( Block.Blue ) == Block.Water ) {
-                player.ResetBind( Block.Aqua, Block.Cyan, Block.Blue );
-                player.Message( "Water: OFF" );
-            } else {
-                player.Bind( Block.Aqua, Block.Water );
-                player.Bind( Block.Cyan, Block.Water );
-                player.Bind( Block.Blue, Block.Water );
-                player.Message( "Water: ON. Blue blocks are replaced with water." );
-            }
-        }
-
-
-
-        static readonly CommandDescriptor CdLava = new CommandDescriptor {
-            Name = "Lava",
-            Aliases = new[] { "l" },
-            Category = CommandCategory.Building,
-            Permissions = new[] { Permission.PlaceLava },
-            Help = "Toggles the lava placement mode. When enabled, any red block you place is replaced with lava.",
-            Handler = LavaHandler
-        };
-
-        static void LavaHandler ( Player player, Command cmd ) {
-            if ( player.GetBind( Block.Red ) == Block.Lava ) {
-                player.ResetBind( Block.Red );
-                player.Message( "Lava: OFF" );
-            } else {
-                player.Bind( Block.Red, Block.Lava );
-                player.Message( "Lava: ON. Red blocks are replaced with lava." );
-            }
-        }
-
-
 
         static readonly CommandDescriptor CdBind = new CommandDescriptor {
             Name = "Bind",

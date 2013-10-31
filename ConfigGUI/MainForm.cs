@@ -995,24 +995,12 @@ Your rank is {RANK}&S. Type &H/Help&S for help." );
                     if( !check ) {
                         vPermissions.Items[(int)Permission.PlaceAdmincrete].Checked = false;
                         vPermissions.Items[(int)Permission.PlaceAdmincrete].ForeColor = SystemColors.GrayText;
-                        vPermissions.Items[(int)Permission.PlaceGrass].Checked = false;
-                        vPermissions.Items[(int)Permission.PlaceGrass].ForeColor = SystemColors.GrayText;
-                        vPermissions.Items[(int)Permission.PlaceLava].Checked = false;
-                        vPermissions.Items[(int)Permission.PlaceLava].ForeColor = SystemColors.GrayText;
-                        vPermissions.Items[(int)Permission.PlaceWater].Checked = false;
-                        vPermissions.Items[(int)Permission.PlaceWater].ForeColor = SystemColors.GrayText;
                     } else {
                         vPermissions.Items[(int)Permission.PlaceAdmincrete].ForeColor = SystemColors.ControlText;
-                        vPermissions.Items[(int)Permission.PlaceGrass].ForeColor = SystemColors.ControlText;
-                        vPermissions.Items[(int)Permission.PlaceLava].ForeColor = SystemColors.ControlText;
-                        vPermissions.Items[(int)Permission.PlaceWater].ForeColor = SystemColors.ControlText;
                     }
                     break;
 
                 case Permission.PlaceAdmincrete:
-                case Permission.PlaceGrass:
-                case Permission.PlaceLava:
-                case Permission.PlaceWater:
                     if( check ) vPermissions.Items[(int)Permission.Build].Checked = true;
                     break;
 
