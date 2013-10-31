@@ -11,7 +11,7 @@ using JetBrains.Annotations;
 using System.Collections.Concurrent;
 
 namespace fCraft {
-    public unsafe sealed class Map {
+    public sealed partial class Map {
         public const MapFormat SaveFormat = MapFormat.FCMv3;
 
         /// <summary> The world associated with this map, if any. May be null. </summary>
@@ -489,7 +489,7 @@ namespace fCraft {
         /// <summary> Converts nonstandard (50-255) blocks using the given mapping. </summary>
         /// <param name="mapping"> Byte array of length 256. </param>
         /// <returns> True if any blocks needed conversion/mapping. </returns>
-        public bool ConvertBlockTypes( [NotNull] byte[] mapping ) {
+        public unsafe bool ConvertBlockTypes( [NotNull] byte[] mapping ) {
             if( mapping == null ) throw new ArgumentNullException( "mapping" );
             if( mapping.Length != 256 ) throw new ArgumentException( "Mapping must list all 256 blocks", "mapping" );
 
@@ -528,140 +528,95 @@ namespace fCraft {
             }
 
             // alternative names for blocks
-            BlockNames["none"] = Block.Undefined;
-
             BlockNames["a"] = Block.Air; // common typo
-            BlockNames["nothing"] = Block.Air;
-            BlockNames["empty"] = Block.Air;
-            BlockNames["delete"] = Block.Air;
-            BlockNames["erase"] = Block.Air;
-            BlockNames["blank"] = Block.Air;
-
-            BlockNames["cement"] = Block.Stone;
-            BlockNames["concrete"] = Block.Stone;
 
             BlockNames["g"] = Block.Grass;
             BlockNames["gras"] = Block.Grass; // common typo
 
-            BlockNames["soil"] = Block.Dirt;
-            BlockNames["stones"] = Block.Cobblestone;
-            BlockNames["rocks"] = Block.Cobblestone;
-            BlockNames["plank"] = Block.Wood;
-            BlockNames["planks"] = Block.Wood;
-            BlockNames["board"] = Block.Wood;
-            BlockNames["boards"] = Block.Wood;
-            BlockNames["tree"] = Block.Plant;
-            BlockNames["sappling"] = Block.Plant;
-            BlockNames["adminium"] = Block.Admincrete;
-            BlockNames["adminite"] = Block.Admincrete;
-            BlockNames["opcrete"] = Block.Admincrete;
-            BlockNames["hardrock"] = Block.Admincrete;
+            BlockNames["planks"] = Block.Plank;
+
+            BlockNames["plant"] = Block.Sappling;
+
             BlockNames["solid"] = Block.Admincrete;
             BlockNames["bedrock"] = Block.Admincrete;
             BlockNames["w"] = Block.Water;
+
             BlockNames["l"] = Block.Lava;
             BlockNames["magma"] = Block.Lava;
+
             BlockNames["gold_ore"] = Block.GoldOre;
+
             BlockNames["iron_ore"] = Block.IronOre;
-            BlockNames["copper"] = Block.IronOre;
-            BlockNames["copperore"] = Block.IronOre;
-            BlockNames["copper_ore"] = Block.IronOre;
-            BlockNames["ore"] = Block.IronOre;
+
             BlockNames["coals"] = Block.Coal;
             BlockNames["coalore"] = Block.Coal;
-            BlockNames["blackore"] = Block.Coal;
 
-            BlockNames["trunk"] = Block.Log;
-            BlockNames["stump"] = Block.Log;
-            BlockNames["treestump"] = Block.Log;
-            BlockNames["treetrunk"] = Block.Log;
+            BlockNames["wood"] = Block.Log;
 
             BlockNames["leaf"] = Block.Leaves;
-            BlockNames["foliage"] = Block.Leaves;
 
-            BlockNames["cheese"] = Block.Sponge;
+            BlockNames["redwool"] = Block.RedWool;
 
-            BlockNames["redcloth"] = Block.Red;
-            BlockNames["redwool"] = Block.Red;
-            BlockNames["orangecloth"] = Block.Orange;
-            BlockNames["orangewool"] = Block.Orange;
-            BlockNames["yellowcloth"] = Block.Yellow;
-            BlockNames["yellowwool"] = Block.Yellow;
-            BlockNames["limecloth"] = Block.Lime;
-            BlockNames["limewool"] = Block.Lime;
-            BlockNames["greenyellow"] = Block.Lime;
-            BlockNames["yellowgreen"] = Block.Lime;
-            BlockNames["lightgreen"] = Block.Lime;
-            BlockNames["lightgreencloth"] = Block.Lime;
-            BlockNames["lightgreenwool"] = Block.Lime;
-            BlockNames["greencloth"] = Block.Green;
-            BlockNames["greenwool"] = Block.Green;
-            BlockNames["springgreen"] = Block.Teal;
-            BlockNames["emerald"] = Block.Teal;
-            BlockNames["tealwool"] = Block.Teal;
-            BlockNames["tealcloth"] = Block.Teal;
-            BlockNames["aquawool"] = Block.Aqua;
-            BlockNames["aquacloth"] = Block.Aqua;
-            BlockNames["cyanwool"] = Block.Cyan;
-            BlockNames["cyancloth"] = Block.Cyan;
-            BlockNames["bluewool"] = Block.Blue;
-            BlockNames["bluecloth"] = Block.Blue;
-            BlockNames["indigowool"] = Block.Indigo;
-            BlockNames["indigocloth"] = Block.Indigo;
-            BlockNames["violetwool"] = Block.Violet;
-            BlockNames["violetcloth"] = Block.Violet;
-            BlockNames["lightpurple"] = Block.Violet;
-            BlockNames["purple"] = Block.Violet;
-            BlockNames["purplewool"] = Block.Violet;
-            BlockNames["purplecloth"] = Block.Violet;
-            BlockNames["fuchsia"] = Block.Magenta;
-            BlockNames["magentawool"] = Block.Magenta;
-            BlockNames["magentacloth"] = Block.Magenta;
-            BlockNames["darkpink"] = Block.Pink;
-            BlockNames["pinkwool"] = Block.Pink;
-            BlockNames["pinkcloth"] = Block.Pink;
-            BlockNames["cloth"] = Block.White;
-            BlockNames["cotton"] = Block.White;
-            BlockNames["grey"] = Block.Gray;
-            BlockNames["lightgray"] = Block.Gray;
-            BlockNames["lightgrey"] = Block.Gray;
-            BlockNames["darkgray"] = Block.Black;
-            BlockNames["darkgrey"] = Block.Black;
+            BlockNames["orange"] = Block.OrangeWool;
 
-            BlockNames["yellow_flower"] = Block.YellowFlower;
+            BlockNames["yellow"] = Block.YellowWool;
+
+            BlockNames["lightgreenwool"] = Block.LimeWool;
+            BlockNames["lime"] = Block.LimeWool;
+            BlockNames["lightgreen"] = Block.LimeWool;
+
+            BlockNames["green"] = Block.GreenWool;
+
+            BlockNames["teal"] = Block.TealWool;
+
+            BlockNames["aqua"] = Block.AquaWool;
+
+            BlockNames["cyan"] = Block.CyanWool;
+
+            BlockNames["blue"] = Block.BlueWool;
+
+            BlockNames["indigo"] = Block.IndigoWool;
+
+            BlockNames["purple"] = Block.PurpleWool;
+            BlockNames["violet"] = Block.PurpleWool;
+
+            BlockNames["magenta"] = Block.MagentaWool;
+
+            BlockNames["pink"] = Block.PinkWool;
+
+            BlockNames["wool"] = Block.WhiteWool;
+
+            BlockNames["grey"] = Block.GrayWool;
+
+            BlockNames["lightgray"] = Block.GrayWool;
+            BlockNames["lightgrey"] = Block.GrayWool;
+
+            BlockNames["darkgray"] = Block.BlackWool;
+            BlockNames["darkgrey"] = Block.BlackWool;
+
+            BlockNames["lightpink"] = Block.LightPinkWool;
+
+            BlockNames["darkgreen"] = Block.ForestGreenWool;
+            BlockNames["forstegreen"] = Block.ForestGreenWool;
+
+            BlockNames["brown"] = Block.BrownWool;
+
+            BlockNames["darkblue"] = Block.DeepBlueWool;
+            BlockNames["deepblue"] = Block.DeepBlueWool;
+
+            BlockNames["turqoise"] = Block.TurquoiseWool;
+
+            BlockNames["yellowflower"] = Block.YellowFlower;
             BlockNames["flower"] = Block.YellowFlower;
             BlockNames["rose"] = Block.RedFlower;
             BlockNames["redrose"] = Block.RedFlower;
-            BlockNames["red_flower"] = Block.RedFlower;
+            BlockNames["redflower"] = Block.RedFlower;
 
             BlockNames["mushroom"] = Block.BrownMushroom;
-            BlockNames["shroom"] = Block.BrownMushroom;
-            BlockNames["brown_shroom"] = Block.BrownMushroom;
-            BlockNames["red_shroom"] = Block.RedMushroom;
 
             BlockNames["goldblock"] = Block.Gold;
-            BlockNames["goldsolid"] = Block.Gold;
-            BlockNames["golden"] = Block.Gold;
-            BlockNames["copper"] = Block.Gold;
-            BlockNames["brass"] = Block.Gold;
 
             BlockNames["ironblock"] = Block.Iron;
-            BlockNames["steel"] = Block.Iron;
-            BlockNames["metal"] = Block.Iron;
-            BlockNames["silver"] = Block.Iron;
-
-            BlockNames["slab"] = Block.Stair;
-            BlockNames["slabs"] = Block.DoubleStair;
-            BlockNames["steps"] = Block.DoubleStair;
-            BlockNames["stairs"] = Block.DoubleStair;
-            BlockNames["doublestep"] = Block.DoubleStair;
-            BlockNames["double_step"] = Block.DoubleStair;
-            BlockNames["double_stair"] = Block.DoubleStair;
-            BlockNames["staircasefull"] = Block.DoubleStair;
-            BlockNames["step"] = Block.Stair;
-            BlockNames["halfstep"] = Block.Stair;
-            BlockNames["halfblock"] = Block.Stair;
-            BlockNames["staircasestep"] = Block.Stair;
 
             BlockNames["bricks"] = Block.Brick;
             BlockNames["explosive"] = Block.TNT;
@@ -676,16 +631,13 @@ namespace fCraft {
 
             BlockNames["moss"] = Block.MossyRocks;
             BlockNames["mossy"] = Block.MossyRocks;
-            BlockNames["stonevine"] = Block.MossyRocks;
-            BlockNames["mossyrock"] = Block.MossyRocks;
             BlockNames["mossystone"] = Block.MossyRocks;
-            BlockNames["mossystones"] = Block.MossyRocks;
             BlockNames["greencobblestone"] = Block.MossyRocks;
             BlockNames["mossycobblestone"] = Block.MossyRocks;
-            BlockNames["mossy_cobblestone"] = Block.MossyRocks;
-            BlockNames["blockthathasgreypixelsonitmostlybutsomeareactuallygreen"] = Block.MossyRocks;
 
-            BlockNames["onyx"] = Block.Obsidian;
+            BlockNames["cobbleslab"] = Block.CobblestoneSlab;
+
+            BlockNames["stoneslab"] = Block.Slab;
 
             // add WoM file hashes for edge textures
             BlockEdgeTextures[Block.Air] = "bed8ac09b8c761527f3e205f8b85a2e22519b937";
