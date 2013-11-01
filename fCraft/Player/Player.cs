@@ -1010,9 +1010,9 @@ namespace fCraft {
             }
 
             CanPlaceResult canPlaceResult;
-            if ( type == Block.Stair && coord.Z > 0 && map.GetBlock( coordBelow ) == Block.Stair ) {
+            if ( type == Block.Slab && coord.Z > 0 && map.GetBlock( coordBelow ) == Block.Slab ) {
                 // stair stacking
-                canPlaceResult = CanPlace( map, coordBelow, Block.DoubleStair, context );
+                canPlaceResult = CanPlace( map, coordBelow, Block.DoubleSlab, context );
             } else {
                 // normal placement
                 canPlaceResult = CanPlace( map, coord, type, context );
@@ -1022,13 +1022,13 @@ namespace fCraft {
             switch ( canPlaceResult ) {
                 case CanPlaceResult.Allowed:
                     BlockUpdate blockUpdate;
-                    if ( type == Block.Stair && coord.Z > 0 && map.GetBlock( coordBelow ) == Block.Stair ) {
+                    if ( type == Block.Slab && coord.Z > 0 && map.GetBlock( coordBelow ) == Block.Slab ) {
                         // handle stair stacking
-                        blockUpdate = new BlockUpdate( this, coordBelow, Block.DoubleStair );
-                        Info.ProcessBlockPlaced( ( byte )Block.DoubleStair );
+                        blockUpdate = new BlockUpdate( this, coordBelow, Block.DoubleSlab );
+                        Info.ProcessBlockPlaced( ( byte )Block.DoubleSlab );
                         map.QueueUpdate( blockUpdate );
-                        RaisePlayerPlacedBlockEvent( this, World.Map, coordBelow, Block.Stair, Block.DoubleStair, context );
-                        SendNow( PacketWriter.MakeSetBlock( coordBelow, Block.DoubleStair ) );
+                        RaisePlayerPlacedBlockEvent( this, World.Map, coordBelow, Block.Slab, Block.DoubleSlab, context );
+                        SendNow( PacketWriter.MakeSetBlock( coordBelow, Block.DoubleSlab ) );
                         RevertBlockNow( coord );
                         break;
 
@@ -1121,7 +1121,7 @@ namespace fCraft {
                 DateTime oldestTime = spamBlockLog.Dequeue();
                 double spamTimer = DateTime.UtcNow.Subtract( oldestTime ).TotalSeconds;
                 if ( spamTimer < Info.Rank.AntiGriefSeconds ) {
-                    KickNow( "You were kicked by antigrief system. Slow down.", LeaveReason.BlockSpamKick );
+                    KickNow( "You were kicked by the antigrief system. Slow down.", LeaveReason.BlockSpamKick );
                     Server.Message( "{0}&W was kicked for suspected griefing.", ClassyName );
                     Logger.Log( LogType.SuspiciousActivity,
                                 "{0} was kicked for block spam ({1} blocks in {2} seconds)",
@@ -1138,7 +1138,7 @@ namespace fCraft {
 
         #region Binding
 
-        readonly Block[] bindings = new Block[50];
+        readonly Block[] bindings = new Block[66];
 
         public void Bind ( Block type, Block replacement ) {
             bindings[( byte )type] = replacement;
@@ -1232,10 +1232,10 @@ namespace fCraft {
             if ( newBlock == Block.Admincrete && !Can( Permission.PlaceAdmincrete ) ) {
                 result = CanPlaceResult.BlocktypeDenied;
                 goto eventCheck;
-            } else if ( ( newBlock == Block.Water || newBlock == Block.StillWater ) && !Can( Permission.PlaceWater ) ) {
+            } else if ( ( newBlock == Block.Water || newBlock == Block.StillWater )) {
                 result = CanPlaceResult.BlocktypeDenied;
                 goto eventCheck;
-            } else if ( ( newBlock == Block.Lava || newBlock == Block.StillLava ) && !Can( Permission.PlaceLava ) ) {
+            } else if ( ( newBlock == Block.Lava || newBlock == Block.StillLava )) {
                 result = CanPlaceResult.BlocktypeDenied;
                 goto eventCheck;
             }

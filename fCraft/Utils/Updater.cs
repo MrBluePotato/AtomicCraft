@@ -20,8 +20,6 @@ namespace fCraft {
         public static readonly ReleaseInfo CurrentRelease = new ReleaseInfo(
             301,
             1,
-            new DateTime( 2013, 01, 02, 1, 0, 0, DateTimeKind.Utc ),
-            "", "",
             ReleaseFlags.Bugfix
 #if DEBUG
             | ReleaseFlags.Dev
@@ -177,13 +175,9 @@ namespace fCraft {
 
 
     public sealed class ReleaseInfo {
-        internal ReleaseInfo ( int version, int revision, DateTime releaseDate,
-                              string summary, string changeLog, ReleaseFlags releaseType ) {
+        internal ReleaseInfo ( int version, int revision, ReleaseFlags releaseType ) {
             Version = version;
             Revision = revision;
-            Date = releaseDate;
-            Summary = summary;
-            ChangeLog = changeLog.Split( new[] { '\n' } );
             Flags = releaseType;
         }
 
