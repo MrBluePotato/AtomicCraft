@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 namespace fCraft {
 
     /// <summary> Packet struct, just a wrapper for a byte array. </summary>
-    public struct Packet {
+    public partial struct Packet {
         public readonly byte[] Data;
 
         public OpCode OpCode {
@@ -49,7 +49,16 @@ namespace fCraft {
             2,      // RemoveEntity
             66,     // Message
             65,     // Kick
-            2       // SetPermission
+            2,       // SetPermission
+
+// Part of FemtoCraft | Copyright 2012-2013 Matvei Stefarov <me@matvei.org>
+
+            67,     // ExtInfo
+            69,     // ExtEntry
+            0,
+            2,      // CustomBlockSupportLevel
+            0,0,0,0,0,0,0,0,
+            4       // SetBlockPermission
         };
     }
 }

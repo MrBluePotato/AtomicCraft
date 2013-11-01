@@ -29,7 +29,7 @@ namespace fCraft
         const int SocketPollInterval = 200; // multiples of SleepDelay, approx. 1 second
         const int PingInterval = 3; // multiples of SocketPollInterval, approx. 3 seconds
 
-        const string NoSmpMessage = "This server is for Minecraft Classic only.";
+        const string NoSmpMessage = "This is a ClassiCube-only server.";
 
         static Player()
         {
@@ -626,7 +626,7 @@ namespace fCraft
 
 
             string verificationCode = ReadString();
-            reader.ReadByte(); // unused
+            byte checkCPE = reader.ReadByte();
             BytesReceived += 131;
 
             // ReSharper disable PossibleNullReferenceException
@@ -772,7 +772,6 @@ namespace fCraft
                 return false;
             }
 
-
             // Check if max number of connections is reached for IP
             if (!Server.RegisterSession(this))
             {
@@ -784,17 +783,13 @@ namespace fCraft
                 return false;
             }
 
+            // Negotiate protocol extensions, if needed
+            //From FemtoCraft | Copyright 2012-2013 Matvei Stefarov <me@matvei.org>
 
-            // Check if player is paid (if required)
-            if (ConfigKey.PaidPlayersOnly.Enabled())
+            if (Config.ProtocolExtension && checkCPE == 0x42)
             {
-                SendNow(PacketWriter.MakeHandshake(this,
-                                                     ConfigKey.ServerName.GetString(),
-                                                     "Please wait; Checking paid status..."));
-                writer.Flush();
-
+                if (!NegotiateProtocolExtension()) return false;
             }
-
 
             // Any additional security checks should be done right here
             if (RaisePlayerConnectingEvent(this)) return false;

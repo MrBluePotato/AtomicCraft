@@ -11,7 +11,7 @@ using JetBrains.Annotations;
 namespace fCraft {
     /// <summary> Static class responsible for sending heartbeats. </summary>
     public static class Heartbeat {
-        static readonly Uri MinecraftNetUri;
+        static readonly Uri ClassiCubeNetUri;
 
         /// <summary> Delay between sending heartbeats. Default: 25s </summary>
         public static TimeSpan Delay { get; set; }
@@ -26,7 +26,7 @@ namespace fCraft {
 
 
         static Heartbeat() {
-            MinecraftNetUri = new Uri( "https://classicube.net/heartbeat.jsp" );
+            ClassiCubeNetUri = new Uri( "https://classicube.net/heartbeat.jsp" );
             Delay = TimeSpan.FromSeconds( 25 );
             Timeout = TimeSpan.FromSeconds( 10 );
             Salt = Server.GetRandomString( 32 );
@@ -34,8 +34,8 @@ namespace fCraft {
         }
 
         static void OnServerShutdown( object sender, ShutdownEventArgs e ) {
-            if( minecraftNetRequest != null ) {
-                minecraftNetRequest.Abort();
+            if( ClassiCubeNetRequest != null ) {
+                ClassiCubeNetRequest.Abort();
             }
         }
 
@@ -49,7 +49,7 @@ namespace fCraft {
             if( Server.IsShuttingDown ) return;
 
             if( ConfigKey.HeartbeatEnabled.Enabled() ) {
-                SendMinecraftNetBeat();
+                SendClassiCubeNetBeat();
                 HbSave();
             } else {
                 // If heartbeats are disabled, the server data is written
@@ -69,16 +69,18 @@ namespace fCraft {
             }
         }
 
-        static HttpWebRequest minecraftNetRequest;
+        static HttpWebRequest ClassiCubeNetRequest;
 
-        static void SendMinecraftNetBeat() {
-            HeartbeatData data = new HeartbeatData( MinecraftNetUri );
-            if( !RaiseHeartbeatSendingEvent( data, MinecraftNetUri, true ) ) {
+        static void SendClassiCubeNetBeat()
+        {
+            HeartbeatData data = new HeartbeatData(ClassiCubeNetUri);
+            if (!RaiseHeartbeatSendingEvent(data, ClassiCubeNetUri, true))
+            {
                 return;
             }
-            minecraftNetRequest = CreateRequest( data.CreateUri() );
-            var state = new HeartbeatRequestState( minecraftNetRequest, data, true );
-            minecraftNetRequest.BeginGetResponse( ResponseCallback, state );
+            ClassiCubeNetRequest = CreateRequest(data.CreateUri());
+            var state = new HeartbeatRequestState(ClassiCubeNetRequest, data, true);
+            ClassiCubeNetRequest.BeginGetResponse(ResponseCallback, state);
         }
 
         // Creates an asynchrnous HTTP request to the given URL
