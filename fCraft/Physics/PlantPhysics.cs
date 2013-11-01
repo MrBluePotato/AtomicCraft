@@ -39,7 +39,7 @@ namespace fCraft
                 {
 					if (null!=world.Map && world.IsLoaded && world.plantPhysics)
 					{
-						if (e.NewBlock == Block.Plant)
+						if (e.NewBlock == Block.Sapling)
 						{
 							world.AddPhysicsTask(new PlantTask(world, (short)e.Coords.X, (short)e.Coords.Y, (short)e.Coords.Z), PlantTask.GetRandomDelay());
 						}
@@ -118,7 +118,7 @@ namespace fCraft
                 }
 
                 //since we scan the whole world anyway add the plant task for each not shadowed plant found - it will not harm
-                if (!shadowed && Block.Plant == b)
+                if (!shadowed && Block.Sapling == b)
                 {
                     _world.AddPlantTask(c.X, c.Y, z);
                     continue;
@@ -147,7 +147,7 @@ namespace fCraft
                 case Block.RedFlower:
                 case Block.BrownMushroom:
                 case Block.RedMushroom:
-                case Block.Plant:
+                case Block.Sapling:
                     return false;
                 default:
                     return true;
@@ -186,7 +186,7 @@ namespace fCraft
 
         protected override int PerformInternal()
         {
-            if (_map.GetBlock(_x, _y, _z) != Block.Plant) //superflous task added by grass scanner or deleted plant. just forget it
+            if (_map.GetBlock(_x, _y, _z) != Block.Sapling) //superflous task added by grass scanner or deleted plant. just forget it
                 return 0;
 
             TreeType type = TypeByBlock(_map.GetBlock(_x, _y, _z - 1));

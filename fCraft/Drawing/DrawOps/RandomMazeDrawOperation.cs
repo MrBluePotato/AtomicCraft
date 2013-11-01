@@ -336,9 +336,9 @@ namespace RandomMaze
 										  new Block[]{ Block.Leaves, Block.Glass, Block.Leaves }, 
 										  new Block[]{ Block.Glass, Block.Leaves, Block.Glass } },
 										};
-        private Block[] _randomBlocks = {Block.White, Block.Blue, Block.Gold, Block.Cyan, Block.Green, 
-											Block.Indigo, Block.Magenta, Block.Obsidian, Block.Orange, 
-											Block.Pink,Block.Red, Block.Sponge, Block.Violet, Block.Yellow};
+        private Block[] _randomBlocks = {Block.WhiteWool, Block.BlueWool, Block.Gold, Block.CyanWool, Block.GreenWool, 
+											Block.IndigoWool, Block.MagentaWool, Block.Obsidian, Block.OrangeWool, 
+											Block.PinkWool,Block.RedWool, Block.Sponge, Block.PurpleWool, Block.YellowWool};
 
 		private const Block HintBlock = Block.Log;
 
@@ -347,7 +347,7 @@ namespace RandomMaze
             if (_drawingElevator)
                 return Block.Water;
             if (!_drawingWall)
-                return Block.Wood;//_playersBrush.NextBlock(this);
+                return Block.Plank;//_playersBrush.NextBlock(this);
 
             if (_patternIdx < 0)
 			{
@@ -357,13 +357,13 @@ namespace RandomMaze
 					return HintBlock;
 				}
 				return _r.NextDouble() < 0.2
-				       	? Block.Wood /*_playersBrush.NextBlock(this)*/
+				       	? Block.Plank /*_playersBrush.NextBlock(this)*/
 				       	: _randomBlocks[_r.Next(_randomBlocks.Length)];
 			}
 
             Block b = _patterns[_patternIdx][_wallPatternCoordX][_wallPatternCoordY];
             if (b == Block.Undefined)
-                b = Block.Wood; //_playersBrush.NextBlock(this);
+                b = Block.Plank; //_playersBrush.NextBlock(this);
 			
             return b;
         }

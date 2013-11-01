@@ -95,8 +95,8 @@ namespace fCraft {
         private static void SetUpRed () {
             for ( int x = 0; x <= _map.Width; x++ ) {
                 for ( int y = 0; y <= 10; y++ ) {
-                    _map.SetBlock( x, y, _ground, Block.Red );
-                    _map.SetBlock( x, y, _ground - 1, Block.Black );
+                    _map.SetBlock(x, y, _ground, Block.RedWool);
+                    _map.SetBlock(x, y, _ground - 1, Block.BlackWool);
                 }
             }
         }
@@ -113,8 +113,8 @@ namespace fCraft {
         private static void SetUpGreen () {
             for ( int x = _map.Width; x >= 0; x-- ) {
                 for ( int y = _map.Length; y >= _map.Length - 10; y-- ) {
-                    _map.SetBlock( x, y, _ground, Block.Green );
-                    _map.SetBlock( x, y, _ground - 1, Block.Black );
+                    _map.SetBlock(x, y, _ground, Block.GreenWool);
+                    _map.SetBlock(x, y, _ground - 1, Block.BlackWool);
                 }
             }
         }
@@ -122,8 +122,8 @@ namespace fCraft {
         private static void SetUpMines () {
             for ( short i = 0; i <= _map.Width; ++i ) {
                 for ( short j = 0; j <= _map.Length; ++j ) {
-                    if ( _map.GetBlock( i, j, _ground ) != Block.Red &&
-                        _map.GetBlock( i, j, _ground ) != Block.Green &&
+                    if (_map.GetBlock(i, j, _ground) != Block.RedWool &&
+                        _map.GetBlock(i, j, _ground) != Block.GreenWool &&
                         _map.GetBlock( i, j, _ground ) != Block.Water ) {
                         _map.SetBlock( i, j, _ground, Block.Dirt );
                         _map.SetBlock( i, j, _ground - 1, Block.Dirt );
@@ -179,7 +179,7 @@ namespace fCraft {
                                     Mines.TryRemove( pos.ToString(), out removed );
                                 }
                             }
-                            if ( _map.GetBlock( newPos.X, newPos.Y, newPos.Z - 2 ) == Block.Green
+                            if (_map.GetBlock(newPos.X, newPos.Y, newPos.Z - 2) == Block.GreenWool
                                 && !_stopped ) {
                                 _stopped = true;
                                 Stop( e.Player, true );

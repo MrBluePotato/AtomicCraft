@@ -130,7 +130,7 @@ namespace fCraft.Games {
             for ( int x = startX; x <= startX + 5; x++ ) {
                 for ( int y = startY; y <= startY + 5; y++ ) {
                     for ( int z = startZ; z <= startZ + 1; z++ ) {
-                        world.Map.QueueUpdate( new BlockUpdate( null, ( short )x, ( short )y, ( short )z, Block.Pink ) );
+                        world.Map.QueueUpdate(new BlockUpdate(null, (short)x, (short)y, (short)z, Block.PinkWool));
                         platform.TryAdd( new Vector3I( x, y, z ).ToString(), new Vector3I( x, y, z ) );
                     }
                 }
@@ -161,7 +161,7 @@ namespace fCraft.Games {
                 Vector3I block = new Vector3I( p.Position.X / 32, p.Position.Y / 32, ( p.Position.Z / 32 ) + 8 );
                 if ( world.Map.InBounds( block ) ) {
                     randomBlocks.TryAdd( block.ToString(), block );
-                    world.Map.QueueUpdate( new BlockUpdate( null, block, Block.Black ) );
+                    world.Map.QueueUpdate(new BlockUpdate(null, block, Block.BlackWool));
                 }
             }
             world.Players.Message( "&WYou have 20 seconds to shoot all &8BLACK &Wblocks.... &AGO!" );
@@ -189,7 +189,7 @@ namespace fCraft.Games {
                         foreach ( Vector3I block in platform.Values ) {
                             if ( e.Coords == block ) {
                                 Player.RaisePlayerPlacedBlockEvent( e.Player, world.Map, block, world.Map.GetBlock( e.Coords ), world.Map.GetBlock( e.Coords ), BlockChangeContext.Manual );
-                                world.Map.QueueUpdate( new BlockUpdate( null, block, Block.Pink ) );
+                                world.Map.QueueUpdate(new BlockUpdate(null, block, Block.PinkWool));
                             }
                         }
                     }

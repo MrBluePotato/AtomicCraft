@@ -89,11 +89,11 @@ namespace fCraft.Drawing {
                                 if ( ( colblock.r + colblock.g + colblock.b ) / 3 < ( 256 / 4 ) ) {
                                     colblock.type = ( byte )Block.Obsidian;
                                 } else if ( ( ( colblock.r + colblock.g + colblock.b ) / 3 ) >= ( 256 / 4 ) && ( ( colblock.r + colblock.g + colblock.b ) / 3 ) < ( 256 / 4 ) * 2 ) {
-                                    colblock.type = ( byte )Block.Black;
+                                    colblock.type = (byte)Block.BlackWool;
                                 } else if ( ( ( colblock.r + colblock.g + colblock.b ) / 3 ) >= ( 256 / 4 ) * 2 && ( ( colblock.r + colblock.g + colblock.b ) / 3 ) < ( 256 / 4 ) * 3 ) {
-                                    colblock.type = ( byte )Block.Gray;
+                                    colblock.type = (byte)Block.GrayWool;
                                 } else {
-                                    colblock.type = ( byte )Block.White;
+                                    colblock.type = (byte)Block.WhiteWool;
                                 }
                             } else {
                                 for ( int j = 0; j < distance.Length; j++ ) // Calculate distances between the colors in the image and the set referance colors, and store them.

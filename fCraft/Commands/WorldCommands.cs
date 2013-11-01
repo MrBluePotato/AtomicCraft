@@ -1921,7 +1921,7 @@ namespace fCraft {
                         world.SkyColor = sky;
                         world.CloudColor = clouds;
                         world.FogColor = fog;
-                        world.EdgeBlock = Block.Black;
+                        world.EdgeBlock = Block.BlackWool;
                         WorldManager.SaveWorldList();
                         return;
                     }

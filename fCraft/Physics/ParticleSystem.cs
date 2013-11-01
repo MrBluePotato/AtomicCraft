@@ -123,7 +123,7 @@ namespace fCraft
                 {
                     _prevBlock = _map.GetBlock(pos);
                     if (Block.Undefined != _prevBlock) //out of bounds!
-                        if (owner.CanPlace(_map, pos, Block.Wood, BlockChangeContext.Manual) == CanPlaceResult.Allowed)
+                        if (owner.CanPlace(_map, pos, Block.Plank, BlockChangeContext.Manual) == CanPlaceResult.Allowed)
                         UpdateMap(new BlockUpdate(null, pos, block));
                 }
             }
@@ -148,7 +148,7 @@ namespace fCraft
 
             if (Block.Undefined != _prevBlock)
             {
-                if (_owner.CanPlace(_map, _pos, Block.Wood, BlockChangeContext.Manual) == CanPlaceResult.Allowed)
+                if (_owner.CanPlace(_map, _pos, Block.Plank, BlockChangeContext.Manual) == CanPlaceResult.Allowed)
                 {
                     UpdateMap(new BlockUpdate(null, _pos, _prevBlock));
                 }
@@ -180,14 +180,14 @@ namespace fCraft
                     && updates[idx].Y == _pos.Y
                     && updates[idx].Z == _pos.Z)
                 {
-                    if (_owner.CanPlace(_map, _pos, Block.Wood, BlockChangeContext.Manual) == CanPlaceResult.Allowed)
+                    if (_owner.CanPlace(_map, _pos, Block.Plank, BlockChangeContext.Manual) == CanPlaceResult.Allowed)
                     {
                         updates[idx] = new BlockUpdate(null, _pos, _block);
                     }
                 }
                 else
                 {
-                    if (_owner.CanPlace(_map, _pos, Block.Wood, BlockChangeContext.Manual) == CanPlaceResult.Allowed)
+                    if (_owner.CanPlace(_map, _pos, Block.Plank, BlockChangeContext.Manual) == CanPlaceResult.Allowed)
                     {
                         updates.Add(new BlockUpdate(null, _pos, _block));
                     }
@@ -251,7 +251,7 @@ namespace fCraft
 				world.AddPhysicsTask(new TNTTask(world, pos, owner, false, true), _r.Next(150, 300));
 			}
 			if (Block.Air != block && Block.Water != block && Block.Lava != block)
-                if (owner.CanPlace(world.Map, pos, Block.Wood, BlockChangeContext.Manual) == CanPlaceResult.Allowed)
+                if (owner.CanPlace(world.Map, pos, Block.Plank, BlockChangeContext.Manual) == CanPlaceResult.Allowed)
 				updates.Add(new BlockUpdate(null, pos, Block.Air));
 			return true;
         }

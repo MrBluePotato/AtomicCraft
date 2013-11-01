@@ -44,7 +44,7 @@ namespace fCraft {
                     }
                 }
             }
-            _world.Map.QueueUpdate( new BlockUpdate( null, _startPos, Block.White ) );
+            _world.Map.QueueUpdate(new BlockUpdate(null, _startPos, Block.WhiteWool));
         }
 
         private FootballBehavior _footballBehavior = new FootballBehavior();
@@ -55,7 +55,7 @@ namespace fCraft {
                 double r = Math.Cos( ksi );
                 double phi = 2.0 * Math.PI * ( e.Player.Position.R - 64 ) / 256.0;
                 Vector3F dir = new Vector3F( ( float )( r * Math.Cos( phi ) ), ( float )( r * Math.Sin( phi ) ), ( float )( Math.Sin( ksi ) ) );
-                _world.AddPhysicsTask( new Particle( _world, e.Coords, dir, e.Player, Block.White, _footballBehavior ), 0 );
+                _world.AddPhysicsTask(new Particle(_world, e.Coords, dir, e.Player, Block.WhiteWool, _footballBehavior), 0);
             }
         }
     }

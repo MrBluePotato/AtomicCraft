@@ -237,7 +237,7 @@ namespace fCraft
                 && e.NewBlock != Block.RedFlower
                 && e.NewBlock != Block.RedMushroom
                 && e.NewBlock != Block.YellowFlower
-                && e.NewBlock != Block.Plant)
+                && e.NewBlock != Block.Sapling)
             {
                 if (e.Context == BlockChangeContext.Manual)
                 {
@@ -256,7 +256,7 @@ namespace fCraft
             switch (block)
             {
                 case Block.BrownMushroom:
-                case Block.Plant:
+                case Block.Sapling:
                 case Block.RedFlower:
                 case Block.RedMushroom:
                 case Block.YellowFlower:
@@ -284,24 +284,24 @@ namespace fCraft
         {
             switch (block)
             {
-                case Block.Red:
-                case Block.Orange:
-                case Block.Yellow:
-                case Block.Lime:
-                case Block.Green:
-                case Block.Teal:
-                case Block.Aqua:
-                case Block.Cyan:
-                case Block.Blue:
-                case Block.Indigo:
-                case Block.Violet:
-                case Block.Magenta:
-                case Block.Pink:
-                case Block.Black:
-                case Block.Gray:
-                case Block.White:
+                case Block.RedWool:
+                case Block.OrangeWool:
+                case Block.YellowWool:
+                case Block.LimeWool:
+                case Block.GreenWool:
+                case Block.TealWool:
+                case Block.AquaWool:
+                case Block.CyanWool:
+                case Block.BlueWool:
+                case Block.IndigoWool:
+                case Block.PurpleWool:
+                case Block.MagentaWool:
+                case Block.PinkWool:
+                case Block.BlackWool:
+                case Block.GrayWool:
+                case Block.WhiteWool:
                 case Block.Sponge:
-                case Block.Wood:
+                case Block.Plank:
                 case Block.Leaves:
                     return true;
                 default:

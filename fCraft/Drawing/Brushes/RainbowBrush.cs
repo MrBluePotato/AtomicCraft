@@ -46,13 +46,13 @@ namespace fCraft.Drawing {
         }
 
         static readonly Block[] Rainbow = new[]{
-            Block.Red,
-            Block.Orange,
-            Block.Yellow,
-            Block.Green,
-            Block.Aqua,
-            Block.Blue,
-            Block.Violet
+            Block.RedWool,
+            Block.OrangeWool,
+            Block.YellowWool,
+            Block.GreenWool,
+            Block.AquaWool,
+            Block.BlueWool,
+            Block.PurpleWool
         };
 
         public string InstanceDescription {

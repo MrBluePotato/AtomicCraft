@@ -71,7 +71,7 @@ namespace fCraft
 	{
 		public int MaxSize = 2500;
 
-		public static readonly Block[] DefaultBlocks = {Block.Air,Block.Red,Block.Black,Block.Brick};
+        public static readonly Block[] DefaultBlocks = { Block.Air, Block.RedWool, Block.BlackWool, Block.Brick };
 		public const int EmptyIdx = 0;
 		public const int NormalIdx = 1;
 		public const int DeadIdx = 2;

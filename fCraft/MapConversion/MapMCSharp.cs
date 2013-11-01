@@ -20,7 +20,7 @@ namespace fCraft.MapConversion {
             Mapping[106] = (byte)Block.Water;       // op_water
 
             // 107-109 unused
-            Mapping[110] = (byte)Block.Wood;        // wood_float
+            Mapping[110] = (byte)Block.Plank;        // wood_float
             Mapping[111] = (byte)Block.Log;         // door
             Mapping[112] = (byte)Block.Lava;        // lava_fast
             Mapping[113] = (byte)Block.Obsidian;    // door2
@@ -28,10 +28,10 @@ namespace fCraft.MapConversion {
             Mapping[115] = (byte)Block.Stone;       // door4
             Mapping[116] = (byte)Block.Leaves;      // door5
             Mapping[117] = (byte)Block.Sand;        // door6
-            Mapping[118] = (byte)Block.Wood;        // door7
-            Mapping[119] = (byte)Block.Green;       // door8
+            Mapping[118] = (byte)Block.Plank;        // door7
+            Mapping[119] = (byte)Block.GreenWool;       // door8
             Mapping[120] = (byte)Block.TNT;         // door9
-            Mapping[121] = (byte)Block.Stair;       // door10
+            Mapping[121] = (byte)Block.Slab;       // door10
 
             Mapping[122] = (byte)Block.Log;         // tdoor
             Mapping[123] = (byte)Block.Obsidian;    // tdoor2
@@ -39,30 +39,30 @@ namespace fCraft.MapConversion {
             Mapping[125] = (byte)Block.Stone;       // tdoor4
             Mapping[126] = (byte)Block.Leaves;      // tdoor5
             Mapping[127] = (byte)Block.Sand;        // tdoor6
-            Mapping[128] = (byte)Block.Wood;        // tdoor7
-            Mapping[129] = (byte)Block.Green;       // tdoor8
+            Mapping[128] = (byte)Block.Plank;        // tdoor7
+            Mapping[129] = (byte)Block.GreenWool;       // tdoor8
 
-            Mapping[130] = (byte)Block.White;       // MsgWhite
-            Mapping[131] = (byte)Block.Black;       // MsgBlack
+            Mapping[130] = (byte)Block.WhiteWool;       // MsgWhite
+            Mapping[131] = (byte)Block.BlackWool;       // MsgBlack
             Mapping[132] = (byte)Block.Air;         // MsgAir
             Mapping[133] = (byte)Block.Water;       // MsgWater
             Mapping[134] = (byte)Block.Lava;        // MsgLava
 
             Mapping[135] = (byte)Block.TNT;         // tdoor9
-            Mapping[136] = (byte)Block.Stair;       // tdoor10
+            Mapping[136] = (byte)Block.Slab;       // tdoor10
             Mapping[137] = (byte)Block.Air;         // tdoor11
             Mapping[138] = (byte)Block.Water;       // tdoor12
             Mapping[139] = (byte)Block.Lava;        // tdoor13
 
             Mapping[140] = (byte)Block.Water;       // WaterDown
             Mapping[141] = (byte)Block.Lava;        // LavaDown
-            Mapping[143] = (byte)Block.Aqua;        // WaterFaucet
-            Mapping[144] = (byte)Block.Orange;      // LavaFaucet
+            Mapping[143] = (byte)Block.AquaWool;        // WaterFaucet
+            Mapping[144] = (byte)Block.OrangeWool;      // LavaFaucet
 
             // 143 unused
             Mapping[145] = (byte)Block.Water;       // finiteWater
             Mapping[146] = (byte)Block.Lava;        // finiteLava
-            Mapping[147] = (byte)Block.Cyan;        // finiteFaucet
+            Mapping[147] = (byte)Block.CyanWool;        // finiteFaucet
 
             Mapping[148] = (byte)Block.Log;         // odoor1
             Mapping[149] = (byte)Block.Obsidian;    // odoor2
@@ -70,10 +70,10 @@ namespace fCraft.MapConversion {
             Mapping[151] = (byte)Block.Stone;       // odoor4
             Mapping[152] = (byte)Block.Leaves;      // odoor5
             Mapping[153] = (byte)Block.Sand;        // odoor6
-            Mapping[154] = (byte)Block.Wood;        // odoor7
-            Mapping[155] = (byte)Block.Green;       // odoor8
+            Mapping[154] = (byte)Block.Plank;        // odoor7
+            Mapping[155] = (byte)Block.GreenWool;       // odoor8
             Mapping[156] = (byte)Block.TNT;         // odoor9
-            Mapping[157] = (byte)Block.Stair;       // odoor10
+            Mapping[157] = (byte)Block.Slab;       // odoor10
             Mapping[158] = (byte)Block.Lava;        // odoor11
             Mapping[159] = (byte)Block.Water;       // odoor12
 
@@ -88,8 +88,8 @@ namespace fCraft.MapConversion {
             Mapping[167] = (byte)Block.Lava;        // lava_door
 
             // 168-174 = odoor*_air
-            Mapping[175] = (byte)Block.Cyan;        // blue_portal
-            Mapping[176] = (byte)Block.Orange;      // orange_portal
+            Mapping[175] = (byte)Block.CyanWool;        // blue_portal
+            Mapping[176] = (byte)Block.OrangeWool;      // orange_portal
             // 177-181 = odoor*_air
 
             Mapping[182] = (byte)Block.TNT;         // smalltnt
@@ -112,29 +112,29 @@ namespace fCraft.MapConversion {
             Mapping[196] = (byte)Block.Water;       // geyser
 
             // 197-210 = air
-            Mapping[211] = (byte)Block.Red;         // door8_air
+            Mapping[211] = (byte)Block.RedWool;         // door8_air
             Mapping[212] = (byte)Block.Lava;        // door9_air
             // 213-229 = air
 
-            Mapping[230] = (byte)Block.Aqua;        // train
+            Mapping[230] = (byte)Block.AquaWool;        // train
             Mapping[231] = (byte)Block.TNT;         // creeper
-            Mapping[232] = (byte)Block.MossyRocks;  // zombiebody
-            Mapping[233] = (byte)Block.Lime;        // zombiehead
+            Mapping[232] = (byte)Block.MossyCobblestone;  // zombiebody
+            Mapping[233] = (byte)Block.LimeWool;        // zombiehead
 
             // 234 unused
-            Mapping[235] = (byte)Block.White;       // birdwhite
-            Mapping[236] = (byte)Block.Black;       // birdblack
+            Mapping[235] = (byte)Block.WhiteWool;       // birdwhite
+            Mapping[236] = (byte)Block.BlackWool;       // birdblack
             Mapping[237] = (byte)Block.Lava;        // birdlava
-            Mapping[238] = (byte)Block.Red;         // birdred
+            Mapping[238] = (byte)Block.RedWool;         // birdred
             Mapping[239] = (byte)Block.Water;       // birdwater
-            Mapping[240] = (byte)Block.Blue;        // birdblue
+            Mapping[240] = (byte)Block.BlueWool;        // birdblue
             Mapping[242] = (byte)Block.Lava;        // birdkill
 
             Mapping[245] = (byte)Block.Gold;        // fishgold
             Mapping[246] = (byte)Block.Sponge;      // fishsponge
-            Mapping[247] = (byte)Block.Gray;        // fishshark
-            Mapping[248] = (byte)Block.Red;         // fishsalmon
-            Mapping[249] = (byte)Block.Blue;        // fishbetta
+            Mapping[247] = (byte)Block.GrayWool;        // fishshark
+            Mapping[248] = (byte)Block.RedWool;         // fishsalmon
+            Mapping[249] = (byte)Block.BlueWool;        // fishbetta
         }
 
 

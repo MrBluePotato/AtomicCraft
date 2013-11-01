@@ -138,7 +138,7 @@ namespace fCraft
                                 {
                                     for (int mz = -1; mz < 2; mz += 2)
                                     {
-                                        if (_owner.CanPlace(_map, new Vector3I(mx * ix + _pos.X, my * iy + _pos.Y, mz * z + _pos.Z), Block.Wood, BlockChangeContext.Manual) == CanPlaceResult.Allowed)
+                                        if (_owner.CanPlace(_map, new Vector3I(mx * ix + _pos.X, my * iy + _pos.Y, mz * z + _pos.Z), Block.Plank, BlockChangeContext.Manual) == CanPlaceResult.Allowed)
                                         {
                                             TryAddPoint(mx * ix + _pos.X, my * iy + _pos.Y, mz * z + _pos.Z);
                                         }
@@ -154,7 +154,7 @@ namespace fCraft
                 Util.RndPermutate(_explosion);
                 foreach (BData pt in _explosion)
                 {
-                    if (_owner.CanPlace(_map, new Vector3I(pt.X, pt.Y, pt.Z), Block.Wood, BlockChangeContext.Manual) == CanPlaceResult.Allowed)
+                    if (_owner.CanPlace(_map, new Vector3I(pt.X, pt.Y, pt.Z), Block.Plank, BlockChangeContext.Manual) == CanPlaceResult.Allowed)
                     {
                         if (_map.GetBlock(pt.X, pt.Y, pt.Z) != Block.Lava) //if another tnt hasnt already caused lava here
                         {
@@ -173,7 +173,7 @@ namespace fCraft
             {
                 foreach (BData pt in toClean)
                 {
-                    if (_owner.CanPlace(_map, new Vector3I(pt.X, pt.Y, pt.Z), Block.Wood, BlockChangeContext.Manual) == CanPlaceResult.Allowed)
+                    if (_owner.CanPlace(_map, new Vector3I(pt.X, pt.Y, pt.Z), Block.Plank, BlockChangeContext.Manual) == CanPlaceResult.Allowed)
                     {
                         UpdateMap(new BlockUpdate(null, (short)pt.X, (short)pt.Y, (short)pt.Z,
                             pt.PrevBlock == Block.Water ? Block.Water : Block.Air));

@@ -15,22 +15,22 @@ namespace fCraft.MapConversion {
             Mapping[254] = (byte)Block.TNT;         // dynamite
             Mapping[253] = (byte)Block.Sponge;      // supersponge
             Mapping[252] = (byte)Block.Water;       // watervator
-            Mapping[251] = (byte)Block.White;       // soccer
-            Mapping[250] = (byte)Block.Red;         // fire
-            Mapping[249] = (byte)Block.Red;         // badfire
-            Mapping[248] = (byte)Block.Red;         // hellfire
-            Mapping[247] = (byte)Block.Black;       // ashes
-            Mapping[246] = (byte)Block.Orange;      // torch
-            Mapping[245] = (byte)Block.Orange;      // safetorch
-            Mapping[244] = (byte)Block.Orange;      // helltorch
-            Mapping[243] = (byte)Block.Red;         // uberfire
-            Mapping[242] = (byte)Block.Red;         // godfire
+            Mapping[251] = (byte)Block.WhiteWool;       // soccer
+            Mapping[250] = (byte)Block.RedWool;         // fire
+            Mapping[249] = (byte)Block.RedWool;         // badfire
+            Mapping[248] = (byte)Block.RedWool;         // hellfire
+            Mapping[247] = (byte)Block.BlackWool;       // ashes
+            Mapping[246] = (byte)Block.OrangeWool;      // torch
+            Mapping[245] = (byte)Block.OrangeWool;      // safetorch
+            Mapping[244] = (byte)Block.OrangeWool;      // helltorch
+            Mapping[243] = (byte)Block.RedWool;         // uberfire
+            Mapping[242] = (byte)Block.RedWool;         // godfire
             Mapping[241] = (byte)Block.TNT;         // nuke
             Mapping[240] = (byte)Block.Lava;        // lavavator
             Mapping[239] = (byte)Block.Admincrete;  // instawall
             Mapping[238] = (byte)Block.Admincrete;  // spleef
-            Mapping[237] = (byte)Block.Green;       // resetspleef
-            Mapping[236] = (byte)Block.Red;         // deletespleef
+            Mapping[237] = (byte)Block.GreenWool;       // resetspleef
+            Mapping[236] = (byte)Block.RedWool;         // deletespleef
             Mapping[235] = (byte)Block.Sponge;      // godsponge
             // all others default to 0/air
         }

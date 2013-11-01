@@ -66,7 +66,7 @@ namespace fCraft.Portals
                     }
                 }
 
-                if (e.NewBlock == Block.Red)
+                if (e.NewBlock == Block.RedWool)
                 {
                     if (e.Context == BlockChangeContext.Manual)
                     {

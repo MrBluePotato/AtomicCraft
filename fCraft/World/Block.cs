@@ -11,7 +11,7 @@ namespace fCraft {
         Dirt = 3,
         Cobblestone = 4,
         Plank = 5,
-        Sappling = 6,
+        Sapling = 6,
         Admincrete = 7,
         Water = 8,
         StillWater = 9,
@@ -53,7 +53,7 @@ namespace fCraft {
         Brick = 45,
         TNT = 46,
         Books = 47,
-        MossyRocks = 48,
+        MossyCobblestone = 48,
         Obsidian = 49,
 
         CobblestoneSlab = 50,

@@ -285,7 +285,7 @@ namespace fCraft {
             for ( int x = sx; x < ex; x++ ) {
                 for ( int y = sy; y < ey; y++ ) {
                     for ( int z = sh; z < eh; z++ ) {
-                        if ( player.CanPlace( player.World.Map, new Vector3I( x, y, z ), Block.Wood, BlockChangeContext.Manual ) != CanPlaceResult.Allowed ) {
+                        if ( player.CanPlace( player.World.Map, new Vector3I( x, y, z ), Block.Plank, BlockChangeContext.Manual ) != CanPlaceResult.Allowed ) {
                             player.Message( "Cannot add a door to world {0}&S: Build permissions in this area replied with 'denied'.",
                                         player.World.ClassyName );
                             return;
@@ -1293,17 +1293,8 @@ namespace fCraft {
             } else {
                 Permission permission = Permission.Build;
                 switch ( replacementBlock ) {
-                    case Block.Grass:
-                        permission = Permission.PlaceGrass;
-                        break;
                     case Block.Admincrete:
                         permission = Permission.PlaceAdmincrete;
-                        break;
-                    case Block.Water:
-                        permission = Permission.PlaceWater;
-                        break;
-                    case Block.Lava:
-                        permission = Permission.PlaceLava;
                         break;
                 }
                 if ( player.Can( permission ) ) {

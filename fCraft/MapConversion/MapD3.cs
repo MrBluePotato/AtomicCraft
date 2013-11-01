@@ -14,9 +14,9 @@ namespace fCraft.MapConversion {
             // 0-49 default
             Mapping[50] = (byte)Block.TNT;          // Torch
             Mapping[51] = (byte)Block.StillLava;    // Fire
-            Mapping[52] = (byte)Block.Blue;         // Water Source
-            Mapping[53] = (byte)Block.Red;          // Lava Source
-            Mapping[54] = (byte)Block.TNT;          // Chest
+            Mapping[52] = (byte)Block.BlueWool;         // Water Source
+            Mapping[53] = (byte)Block.RedWool;          // Lava Source
+            Mapping[54] = (byte)Block.Crate;          // Chest
             Mapping[55] = (byte)Block.TNT;          // Gear
             Mapping[56] = (byte)Block.Glass;        // Diamond Ore
             Mapping[57] = (byte)Block.Glass;        // Diamond
@@ -29,7 +29,7 @@ namespace fCraft.MapConversion {
             Mapping[200] = (byte)Block.Lava;        // Kill Lava
             Mapping[201] = (byte)Block.Stone;       // Kill Lava
             // 202 unused
-            Mapping[203] = (byte)Block.Stair;       // Still Stair
+            Mapping[203] = (byte)Block.Slab;       // Still Stair
             // 204-205 unused
             Mapping[206] = (byte)Block.Water;       // Original Water
             Mapping[207] = (byte)Block.Lava;        // Original Lava
@@ -40,9 +40,9 @@ namespace fCraft.MapConversion {
             Mapping[212] = (byte)Block.RedFlower;   // Kill Rose
             Mapping[213] = (byte)Block.Gravel;      // Still Gravel
             // 214 No Entry
-            Mapping[215] = (byte)Block.White;       // Snow
+            Mapping[215] = (byte)Block.Snow;       // Snow
             Mapping[216] = (byte)Block.Lava;        // Fast Lava
-            Mapping[217] = (byte)Block.White;       // Kill Glass
+            Mapping[217] = (byte)Block.WhiteWool;       // Kill Glass
             // 218 Invisible Sponge
             Mapping[219] = (byte)Block.Sponge;      // Drain Sponge
             Mapping[220] = (byte)Block.Sponge;      // Super Drain Sponge
@@ -56,11 +56,11 @@ namespace fCraft.MapConversion {
             Mapping[228] = (byte)Block.Iron;       // Fan
             Mapping[229] = (byte)Block.Iron;       // Door
             Mapping[230] = (byte)Block.Lava;        // Campfire
-            Mapping[231] = (byte)Block.Red;         // Laser
-            Mapping[232] = (byte)Block.Black;       // Ash
+            Mapping[231] = (byte)Block.RedWool;         // Laser
+            Mapping[232] = (byte)Block.BlackWool;       // Ash
             // 233-234 unused
             Mapping[235] = (byte)Block.Water;       // Sea
-            Mapping[236] = (byte)Block.White;       // Flasher
+            Mapping[236] = (byte)Block.WhiteWool;       // Flasher
             // 237-243 unused
             Mapping[244] = (byte)Block.Leaves;      // Vines
             Mapping[245] = (byte)Block.Lava;        // Flamethrower

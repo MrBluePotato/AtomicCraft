@@ -283,8 +283,8 @@ namespace fCraft
                         else
                         {
                             Block block = e.Block;
-                            if (block == Block.Blue) block = Block.Water;
-                            if (block == Block.Orange) block = Block.Lava;
+                            if (block == Block.BlueWool) block = Block.Water;
+                            if (block == Block.OrangeWool) block = Block.Lava;
                             double ksi = 2.0 * Math.PI * (-e.Player.Position.L) / 256.0;
                             double r = Math.Cos(ksi);
                             double phi = 2.0 * Math.PI * (e.Player.Position.R - 64) / 256.0;

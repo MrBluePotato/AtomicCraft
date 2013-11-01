@@ -431,7 +431,7 @@ namespace fCraft
                         {
                             if (slope < args.CliffThreshold)
                             {
-                                map.SetBlock(x, y, level, (snow ? Block.White : bGroundSurface));
+                                map.SetBlock(x, y, level, (snow ? Block.WhiteWool : bGroundSurface));
                             }
                             else
                             {
@@ -453,7 +453,7 @@ namespace fCraft
                                     {
                                         if (snow)
                                         {
-                                            map.SetBlock(x, y, i, Block.White);
+                                            map.SetBlock(x, y, i, Block.WhiteWool);
                                         }
                                         else
                                         {
@@ -850,10 +850,10 @@ namespace fCraft
                 case MapGenTheme.Arctic:
                     bWaterSurface = Block.Glass;
                     bDeepWaterSurface = Block.Water;
-                    bGroundSurface = Block.White;
+                    bGroundSurface = Block.WhiteWool;
                     bWater = Block.Water;
-                    bGround = Block.White;
-                    bSeaFloor = Block.White;
+                    bGround = Block.WhiteWool;
+                    bSeaFloor = Block.WhiteWool;
                     bBedrock = Block.Stone;
                     bCliff = Block.Stone;
                     groundThickness = 1;

@@ -15,11 +15,11 @@ namespace fCraft.MapConversion {
             Mapping[50] = (byte)Block.Air;      // torch
             Mapping[51] = (byte)Block.Lava;     // fire
             Mapping[52] = (byte)Block.Glass;    // spawner
-            Mapping[53] = (byte)Block.Stair;    // wood stairs
-            Mapping[54] = (byte)Block.Wood;     // chest
+            Mapping[53] = (byte)Block.Slab;    // wood stairs
+            Mapping[54] = (byte)Block.Crate;     // chest
             Mapping[55] = (byte)Block.Air;      // redstone wire
             Mapping[56] = (byte)Block.IronOre;  // diamond ore
-            Mapping[57] = (byte)Block.Aqua;     // diamond block
+            Mapping[57] = (byte)Block.AquaWool;     // diamond block
             Mapping[58] = (byte)Block.Log;      // workbench
             Mapping[59] = (byte)Block.Leaves;   // crops
             Mapping[60] = (byte)Block.Dirt;     // soil
@@ -29,7 +29,7 @@ namespace fCraft.MapConversion {
             Mapping[64] = (byte)Block.Air;      // wooden door
             Mapping[65] = (byte)Block.Air;      // ladder
             Mapping[66] = (byte)Block.Air;      // rails
-            Mapping[67] = (byte)Block.Stair;    // cobblestone stairs
+            Mapping[67] = (byte)Block.Slab;    // cobblestone stairs
             Mapping[68] = (byte)Block.Air;      // wall sign
             Mapping[69] = (byte)Block.Air;      // lever
             Mapping[70] = (byte)Block.Air;      // pressure plate
@@ -42,18 +42,18 @@ namespace fCraft.MapConversion {
             Mapping[77] = (byte)Block.Air;      // stone button
             Mapping[78] = (byte)Block.Air;      // snow
             Mapping[79] = (byte)Block.Glass;    // ice
-            Mapping[80] = (byte)Block.White;    // snow block
+            Mapping[80] = (byte)Block.Snow;    // snow block
             Mapping[81] = (byte)Block.Leaves;   // cactus
-            Mapping[82] = (byte)Block.Gray;     // clay
+            Mapping[82] = (byte)Block.GrayWool;     // clay
             Mapping[83] = (byte)Block.Leaves;   // reed
             Mapping[84] = (byte)Block.Log;      // jukebox
-            Mapping[85] = (byte)Block.Wood;     // fence
-            Mapping[86] = (byte)Block.Orange;   // pumpkin
+            Mapping[85] = (byte)Block.Plank;     // fence
+            Mapping[86] = (byte)Block.OrangeWool;   // pumpkin
             Mapping[87] = (byte)Block.Dirt;     // netherstone
             Mapping[88] = (byte)Block.Gravel;   // slow sand
             Mapping[89] = (byte)Block.Sand;     // lightstone
-            Mapping[90] = (byte)Block.Violet;   // portal
-            Mapping[91] = (byte)Block.Orange;   // jack-o-lantern
+            Mapping[90] = (byte)Block.PurpleWool;   // portal
+            Mapping[91] = (byte)Block.OrangeWool;   // jack-o-lantern
             // all others default to 0/air
         }
 
