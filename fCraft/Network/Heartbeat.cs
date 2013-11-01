@@ -26,7 +26,7 @@ namespace fCraft {
 
 
         static Heartbeat() {
-            ClassiCubeNetUri = new Uri( "https://classicube.net/heartbeat.jsp" );
+            ClassiCubeNetUri = new Uri("http://www.classicube.net/heartbeat.jsp");
             Delay = TimeSpan.FromSeconds( 25 );
             Timeout = TimeSpan.FromSeconds( 10 );
             Salt = Server.GetRandomString( 32 );
