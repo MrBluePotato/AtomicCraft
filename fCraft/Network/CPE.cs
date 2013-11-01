@@ -130,6 +130,7 @@ namespace fCraft
                 byte clientLevel = reader.ReadByte();
                 UsesCustomBlocks = (clientLevel >= CustomBlocksLevel);
             }
+            this.reader = new BinaryReader(this.stream);
             return true;
         }
 
