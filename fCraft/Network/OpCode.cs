@@ -49,17 +49,17 @@ namespace fCraft {
         ExtEntry = 17,
         SetClickDistance = 18,
         CustomBlockSupportLevel = 19,
-        HeldBlock = 20,
+        HoldThis = 20,
         SetTextHotKey = 21,
         ExtAddPlayerName = 22,
         ExtAddEntity = 23,
         ExtRemovePlayerName = 24,
         EnvSetColor = 25,
-        SelectionCuboid = 26,
-        RemoveSelectionCuboid = 27,
+        MakeSelection = 26,
+        RemoveSelection = 27,
         SetBlockPermissions = 28,
         ChangeModel = 29,
-        EnvSetMapAppearance = 30,
+        EnvMapAppearance = 30,
         EnvWeatherType = 31
 
     }

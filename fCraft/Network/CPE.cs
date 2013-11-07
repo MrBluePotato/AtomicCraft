@@ -40,14 +40,36 @@ namespace fCraft
         const int CustomBlocksExtVersion = 1;
         const string BlockPermissionsExtName = "BlockPermissions";
         const int BlockPermissionsExtVersion = 1;
+        const string ClickDistanceExtName = "ClickDistance";
+        const int ClickDistanceExtVersion = 1;
+        const string HeldBlockExtName = "HeldBlock";
+        const int HeldBlockExtVersion = 1;
+        const string EmoteFixExtName = "EmoteFix";
+        const int EmoteFixExtVersion = 1;
+        const string TextHotKeyExtName = "TextHotKey";
+        const int TextHotKeyExtVersion = 1;
+        const string ExtPlayerListName = "ExtPlayerList";
+        const int ExtPlayerListVersion = 1;
+        const string EnvColorsExtName = "EnvColors";
+        const int EnvColorsExtVersion = 1;
+        const string SelectionCuboidExtName = "SelectionCuboid";
+        const int SelectionCuboidExtVersion = 1;
+        const string ChangeModelExtName = "ChangeModel";
+        const int ChangeModelExtVersion = 1;
+        const string EnvMapAppearanceExtName = "EnvMapAppearance";
+        const int EnvMapAppearanceExtVersion = 1;
         const byte CustomBlocksLevel = 1;
 
         // Note: if more levels are added, change UsesCustomBlocks from bool to int
         bool UsesCustomBlocks { get; set; }
         public bool SupportsBlockPermissions { get; set; }
+        public bool SupportsClickDistance { get; set; }
         public bool SupportsHeldBlock { get; set; }
         public bool SupportsEmoteFix { get; set; }
+        public bool SupportsTextHotKey { get; set; }
+        public bool SupportsExtPlayerList { get; set; }
         public bool SupportsEnvColors { get; set; }
+        public bool SupportsSelectionCuboid { get; set; }
         public bool SupportsChangeModel { get; set; }
         public bool SupportsEnvMapAppearance { get; set; }
         public bool SupportsEnvWeatherType { get; set; }
@@ -60,6 +82,14 @@ namespace fCraft
             writer.Write(Packet.MakeExtInfo(2).Data);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Data);
             writer.Write(Packet.MakeExtEntry(BlockPermissionsExtName, BlockPermissionsExtVersion).Data);
+            writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, ClickDistanceExtVersion).Data);
+            writer.Write(Packet.MakeExtEntry(HeldBlockExtName, HeldBlockExtVersion).Data);
+            writer.Write(Packet.MakeExtEntry(EmoteFixExtName, EmoteFixExtVersion).Data);
+            writer.Write(Packet.MakeExtEntry(TextHotKeyExtName, TextHotKeyExtVersion).Data);
+            writer.Write(Packet.MakeExtEntry(EnvColorsExtName, EnvColorsExtVersion).Data);
+            writer.Write(Packet.MakeExtEntry(SelectionCuboidExtName, SelectionCuboidExtVersion).Data);
+            writer.Write(Packet.MakeExtEntry(ChangeModelExtName, ChangeModelExtVersion).Data);
+            writer.Write(Packet.MakeExtEntry(EnvMapAppearanceExtName, EnvMapAppearanceExtVersion).Data);
 
             // Expect ExtInfo reply from the client
             OpCode extInfoReply = (OpCode)reader.ReadByte();
@@ -157,7 +187,7 @@ namespace fCraft
         [Pure]
         public static Packet MakeExtInfo(short extCount)
         {
-            String VersionString = "AtomicCraft "+ Updater.LatestStable;
+            String VersionString = "AtomicCraft " + Updater.LatestStable;
             // Logger.Log( "Send: ExtInfo({0},{1})", Server.VersionString, extCount );
             Packet packet = new Packet(OpCode.ExtInfo);
             Encoding.ASCII.GetBytes(VersionString.PadRight(64), 0, 64, packet.Data, 1);
@@ -194,18 +224,145 @@ namespace fCraft
             packet.Data[3] = (byte)(canDelete ? 1 : 0);
             return packet;
         }
-        //Not ready yet
-        /*
+
+
         [Pure]
-        public static Packet HeldBlock(Block block, bool canPlace, bool canDelete)
+        public static Packet MakeSetClickDistance(short distance)
         {
+            if (distance < 0) throw new ArgumentOutOfRangeException("distance");
+            Packet packet = new Packet(OpCode.SetClickDistance);
+            ToNetOrder(distance, packet.Data, 1);
+            return packet;
         }
-        
-         //Not yet supported by ClassiCube launcher
+
         [Pure]
-        public static Packet EnvWeatherType(Block block, bool canPlace, bool canDelete)
+        public static Packet MakeHoldThis(Block block, bool preventChange)
         {
+            Packet packet = new Packet(OpCode.HoldThis);
+            packet.Data[1] = (byte)block;
+            packet.Data[2] = (byte)(preventChange ? 1 : 0);
+            return packet;
+        }
+
+                [Pure]
+        public static Packet MakeSetTextHotKey([NotNull] string label, [NotNull] string action, int keyCode,
+                                               byte keyMods)
+        {
+            if (label == null) throw new ArgumentNullException("label");
+            if (action == null) throw new ArgumentNullException("action");
+            Packet packet = new Packet(OpCode.SetTextHotKey);
+            Encoding.ASCII.GetBytes(label.PadRight(64), 0, 64, packet.Data, 1);
+            Encoding.ASCII.GetBytes(action.PadRight(64), 0, 64, packet.Data, 65);
+            ToNetOrder(keyCode, packet.Data, 129);
+            packet.Data[133] = keyMods;
+            return packet;
+        }
+
+
+        [Pure]
+        public static Packet MakeExtAddPlayerName(short nameId, string playerName, string listName, string groupName,
+                                                   byte groupRank)
+        {
+            if (playerName == null) throw new ArgumentNullException("playerName");
+            if (listName == null) throw new ArgumentNullException("listName");
+            if (groupName == null) throw new ArgumentNullException("groupName");
+            Packet packet = new Packet(OpCode.ExtAddPlayerName);
+            ToNetOrder(nameId, packet.Data, 1);
+            Encoding.ASCII.GetBytes(playerName.PadRight(64), 0, 64, packet.Data, 3);
+            Encoding.ASCII.GetBytes(listName.PadRight(64), 0, 64, packet.Data, 67);
+            Encoding.ASCII.GetBytes(groupName.PadRight(64), 0, 64, packet.Data, 131);
+            packet.Data[195] = groupRank;
+            return packet;
+        }
+
+
+        [Pure]
+        public static Packet MakeExtAddEntity(byte entityId, [NotNull] string inGameName, [NotNull] string skinName)
+        {
+            if (inGameName == null) throw new ArgumentNullException("inGameName");
+            if (skinName == null) throw new ArgumentNullException("skinName");
+            Packet packet = new Packet(OpCode.ExtAddEntity);
+            packet.Data[1] = entityId;
+            Encoding.ASCII.GetBytes(inGameName.PadRight(64), 0, 64, packet.Data, 2);
+            Encoding.ASCII.GetBytes(skinName.PadRight(64), 0, 64, packet.Data, 66);
+            return packet;
+        }
+
+
+        [Pure]
+        public static Packet MakeExtRemovePlayerName(short nameId)
+        {
+            Packet packet = new Packet(OpCode.ExtRemovePlayerName);
+            ToNetOrder(nameId, packet.Data, 1);
+            return packet;
+        }
+
+
+        /*[Pure]
+        public static Packet MakeEnvSetColor(EnvVariable variable, int color)
+        {
+            Packet packet = new Packet(OpCode.EnvSetColor);
+            packet.Data[1] = (byte)variable;
+            ToNetOrder((short)((color >> 16) & 0xFF), packet.Data, 2);
+            ToNetOrder((short)((color >> 8) & 0xFF), packet.Data, 4);
+            ToNetOrder((short)(color & 0xFF), packet.Data, 6);
+            return packet;
         }*/
+
+
+        [Pure]
+        public static Packet MakeMakeSelection(byte selectionId, [NotNull] string label, [NotNull] BoundingBox bounds,
+                                               int color, byte opacity)
+        {
+            if (label == null) throw new ArgumentNullException("label");
+            if (bounds == null) throw new ArgumentNullException("bounds");
+            Packet packet = new Packet(OpCode.MakeSelection);
+            packet.Data[1] = selectionId;
+            Encoding.ASCII.GetBytes(label.PadRight(64), 0, 64, packet.Data, 2);
+            ToNetOrder(bounds.XMin, packet.Data, 66);
+            ToNetOrder(bounds.ZMin, packet.Data, 68);
+            ToNetOrder(bounds.YMin, packet.Data, 70);
+            ToNetOrder(bounds.XMax, packet.Data, 72);
+            ToNetOrder(bounds.ZMax, packet.Data, 74);
+            ToNetOrder(bounds.YMax, packet.Data, 76);
+            packet.Data[78] = (byte)((color >> 16) & 0xFF);
+            packet.Data[79] = (byte)((color >> 8) & 0xFF);
+            packet.Data[81] = (byte)(color & 0xFF);
+            packet.Data[82] = opacity;
+            return packet;
+        }
+
+
+        [Pure]
+        public static Packet MakeRemoveSelection(byte selectionId)
+        {
+            Packet packet = new Packet(OpCode.RemoveSelection);
+            packet.Data[1] = selectionId;
+            return packet;
+        }
+
+        [Pure]
+        public static Packet MakeChangeModel(byte entityId, [NotNull] string modelName)
+        {
+            if (modelName == null) throw new ArgumentNullException("modelName");
+            Packet packet = new Packet(OpCode.ChangeModel);
+            packet.Data[1] = entityId;
+            Encoding.ASCII.GetBytes(modelName.PadRight(64), 0, 64, packet.Data, 2);
+            return packet;
+        }
+
+        [Pure]
+        public static Packet MakeEnvSetMapAppearance([NotNull] string textureUrl, Block sideBlock, Block edgeBlock,
+                                                     short sideLevel)
+        {
+            if (textureUrl == null) throw new ArgumentNullException("textureUrl");
+            Packet packet = new Packet(OpCode.EnvMapAppearance);
+            Encoding.ASCII.GetBytes(textureUrl.PadRight(64), 0, 64, packet.Data, 1);
+            packet.Data[65] = (byte)sideBlock;
+            packet.Data[66] = (byte)edgeBlock;
+            ToNetOrder(sideLevel, packet.Data, 67);
+            return packet;
+        }
 
         static void ToNetOrder(short number, [NotNull] byte[] arr, int offset)
         {

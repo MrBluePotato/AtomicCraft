@@ -252,6 +252,7 @@ namespace fCraft {
         //if null, default skin is used
         public string iName = null;
         public bool entityChanged = false;
+        public string modelName = null;
         #endregion
 
 
@@ -1229,17 +1230,11 @@ namespace fCraft {
             }
 
             // check special blocktypes
-            if ( newBlock == Block.Admincrete && !Can( Permission.PlaceAdmincrete ) ) {
-                result = CanPlaceResult.BlocktypeDenied;
-                goto eventCheck;
-            } else if ( ( newBlock == Block.Water || newBlock == Block.StillWater )) {
-                result = CanPlaceResult.BlocktypeDenied;
-                goto eventCheck;
-            } else if ( ( newBlock == Block.Lava || newBlock == Block.StillLava )) {
+            if (newBlock == Block.Admincrete && !Can(Permission.PlaceAdmincrete))
+            {
                 result = CanPlaceResult.BlocktypeDenied;
                 goto eventCheck;
             }
-
             // check admincrete-related permissions
             if ( oldBlock == Block.Admincrete && !Can( Permission.DeleteAdmincrete ) ) {
                 result = CanPlaceResult.BlocktypeDenied;
@@ -1530,6 +1525,8 @@ namespace fCraft {
         #endregion
         [CanBeNull]
         Player possessionPlayer;
+
+        String model;
 
         #region Spectating
 

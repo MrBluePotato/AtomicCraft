@@ -1415,6 +1415,10 @@ namespace fCraft
         readonly Stack<Player> playersToRemove = new Stack<Player>(127);
         readonly Stack<sbyte> freePlayerIDs = new Stack<sbyte>(127);
 
+        // This number is used to track when entity should be re-added by other clients,
+        // e.g. if their name appearance or skin changes. Calling .RefreshEntity() increments this.
+        int entityVersion;
+
         // movement optimization
         int fullUpdateCounter;
         public const int FullPositionUpdateIntervalDefault = 20;
@@ -1433,6 +1437,9 @@ namespace fCraft
         readonly Queue<DateTime> antiSpeedPacketLog = new Queue<DateTime>();
         DateTime antiSpeedLastNotification = DateTime.UtcNow;
 
+        public void RefreshEntity() {
+            Interlocked.Increment( ref entityVersion );
+        }
 
         void ResetVisibleEntities()
         {
@@ -1549,11 +1556,10 @@ namespace fCraft
                 if (entities.TryGetValue(otherPlayer, out entity))
                 {
                     entity.MarkedForRetention = true;
-
-                    if (entity.LastKnownRank != otherPlayer.Info.Rank)
-                    {
+                    int otherEntityVersion = otherPlayer.entityVersion;
+                    if( entity.LastEntityVersion != otherEntityVersion ) {
                         ReAddEntity(entity, otherPlayer, otherPos);
-                        entity.LastKnownRank = otherPlayer.Info.Rank;
+                        entity.LastEntityVersion = otherEntityVersion;
                     }
                     if (otherPlayer.entityChanged)
                     {
@@ -1584,7 +1590,7 @@ namespace fCraft
                 }
                 else
                 {
-                    AddEntity(otherPlayer, otherPos);
+                    AddEntity(otherPlayer);
                 }
             }
 
@@ -1616,17 +1622,37 @@ namespace fCraft
         }
 
 
-        void AddEntity([NotNull] Player player, Position newPos)
+        /*void AddEntity([NotNull] Player player, Position newPos)
         {
             if (player == null) throw new ArgumentNullException("player");
             if (freePlayerIDs.Count > 0)
             {
-                var pos = new VisibleEntity(newPos, freePlayerIDs.Pop(), player.Info.Rank);
-                entities.Add(player, pos);
-                SendNow(PacketWriter.MakeAddEntity(pos.Id, player.ListName, newPos));
+                var newEntity = new VisibleEntity(VisibleEntity.HiddenPosition, freePlayerIDs.Pop(), player.entityVersion);
+                entities.Add(player, newEntity);
+                SendNow(PacketWriter.MakeAddEntity(newEntity.Id, player.ListName, newPos));
             }
-        }
+        }*/
 
+        [NotNull]
+        VisibleEntity AddEntity([NotNull] Player player)
+        {
+            if (player == null) throw new ArgumentNullException("player");
+                if (freePlayerIDs.Count > 0)
+                {
+                    var newEntity = new VisibleEntity(VisibleEntity.HiddenPosition, freePlayerIDs.Pop(), player.entityVersion);
+                    entities.Add(player, newEntity);
+#if DEBUG_MOVEMENT
+                Logger.Log( LogType.Debug, "AddEntity: {0} added {1} ({2})", Name, newEntity.Id, player.Name );
+#endif
+                    SendNow(PacketWriter.MakeAddEntity(newEntity.Id, player.ListName, newEntity.LastKnownPosition));
+                    return newEntity;
+                }
+
+                else
+                {
+                    throw new InvalidOperationException("Player.AddEntity: Ran out of entity IDs.");
+                }
+            }
 
         void HideEntity([NotNull] VisibleEntity entity)
         {
@@ -1747,18 +1773,18 @@ namespace fCraft
         {
             public static readonly Position HiddenPosition = new Position(0, 0, short.MinValue);
 
-            public VisibleEntity(Position newPos, sbyte newId, Rank newRank)
+            public VisibleEntity( Position newPos, sbyte newId, int newEntityVersion )
             {
                 Id = newId;
                 LastKnownPosition = newPos;
                 MarkedForRetention = true;
                 Hidden = true;
-                LastKnownRank = newRank;
+                LastEntityVersion = newEntityVersion;
             }
 
             public readonly sbyte Id;
             public Position LastKnownPosition;
-            public Rank LastKnownRank;
+            public int LastEntityVersion;
             public bool Hidden;
             public bool MarkedForRetention;
             public bool SkippedLastMove;

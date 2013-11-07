@@ -51,14 +51,24 @@ namespace fCraft {
             65,     // Kick
             2,       // SetPermission
 
-// Part of FemtoCraft | Copyright 2012-2013 Matvei Stefarov <me@matvei.org>
+// Part of fCraft | Copyright 2012-2013 Matvei Stefarov <me@matvei.org>
 
-            67,     // ExtInfo
-            69,     // ExtEntry
-            0,
-            2,      // CustomBlockSupportLevel
-            0,0,0,0,0,0,0,0,
-            4       // SetBlockPermission
+            67, // ExtInfo
+            69, // ExtEntry
+
+            3, // SetClickDistance
+            2, // CustomBlockSupportLevel
+            2, // HoldThis
+            134, // SetTextHotKey
+            196, // ExtAddPlayerName
+            130, // ExtAddEntity
+            3, // ExtRemovePlayerName
+            8, // EnvSetColor
+            82, // MakeSelection
+            2, // RemoveSelection
+            4, // SetBlockPermission
+            66, // ChangeModel
+            69 // EnvMapAppearance
         };
     }
 }
