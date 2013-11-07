@@ -8,6 +8,8 @@ AtomicCraft is the continuation of 800Craft, and is developed and MrBluePotato.
 
 AtomicCraft is designed to have tons of features, while not compromising speed and server efficency.
 
+Huge thanks to Scoot (fragmer) and the other people in #fCraft.dev on Esper
+
 ## Installation & Troubleshooting
 Read the "Read Me.txt" for installation and troubleshooting information
 
