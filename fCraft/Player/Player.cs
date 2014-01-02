@@ -60,9 +60,6 @@ namespace fCraft {
             }
         }
 
-        //Zombie head thingy
-        public bool ZombieHead { get; set; }
-
         /// <summary> Whether the player name was verified at login. </summary>
         public bool IsVerified { get; private set; }
 
@@ -75,6 +72,9 @@ namespace fCraft {
         /// <summary> Whether player has blocked all incoming chat.
         /// Deaf players can't hear anything. </summary>
         public bool IsDeaf { get; set; }
+
+        /// <summary> Whether the player has a custom model or not. </summary>
+        public string Model = "steve";
 
 
         /// <summary> The world that the player is currently on. May be null.

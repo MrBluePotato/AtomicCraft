@@ -107,6 +107,7 @@
     <Compile Include="AutoRank\Criterion.cs" />
     <Compile Include="Commands\BuildingCommands.cs" />
     <Compile Include="Commands\ChatCommands.cs" />
+    <Compile Include="Commands\MapCommands.cs" />
     <Compile Include="Commands\Command Handlers\BroModeHandler.cs" />
     <Compile Include="Commands\Command Handlers\FlyHandler.cs" />
     <Compile Include="Commands\Command Handlers\GunHandler.cs" />

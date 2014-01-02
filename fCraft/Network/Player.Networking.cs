@@ -1561,11 +1561,14 @@ namespace fCraft
                         ReAddEntity(entity, otherPlayer, otherPos);
                         entity.LastEntityVersion = otherEntityVersion;
                     }
+                    if (this.UsesCustomBlocks)
+                    {
+                        this.Send(Packet.MakeChangeModel((byte)entity.Id, otherPlayer.Model));
+                    }
                     if (otherPlayer.entityChanged)
                     {
                         ReAddEntity(entity, otherPlayer, otherPos);
                         otherPlayer.entityChanged = false;
-
                     }
                     else if (entity.Hidden)
                     {

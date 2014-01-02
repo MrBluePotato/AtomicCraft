@@ -29,9 +29,24 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdLife );
             CommandManager.RegisterCommand( CdPossess );
             CommandManager.RegisterCommand( CdUnpossess );
+            CommandManager.RegisterCommand(CdChangeModel);
         }
 
-        #region Possess / UnPossess
+        static string[] acceptedModels = 
+            {
+                "chicken",
+                "creeper",
+                "croc",
+                "humanoid",
+                "pig",
+                "printer",
+                "sheep",
+                "skeleton",
+                "spider",
+                "zombie"
+            };
+
+        #region Possess
 
         static readonly CommandDescriptor CdPossess = new CommandDescriptor {
             Name = "Possess",
@@ -70,8 +85,10 @@ namespace fCraft {
                 player.Message( "Already possessing {0}", target.ClassyName );
             }
         }
+        #endregion
 
 
+        #region Unpossess
         static readonly CommandDescriptor CdUnpossess = new CommandDescriptor {
             Name = "unpossess",
             Category = CommandCategory.Fun,
@@ -97,6 +114,8 @@ namespace fCraft {
 
         #endregion
 
+
+        #region Life
         static readonly CommandDescriptor CdLife = new CommandDescriptor {
             Name = "Life",
             Category = CommandCategory.Fun,
@@ -108,7 +127,27 @@ namespace fCraft {
             UsableByFrozenPlayers = false,
             Handler = LifeHandlerFunc,
         };
+        static void LifeHandlerFunc(Player p, Command cmd)
+        {
+            try
+            {
+                if (!cmd.HasNext)
+                {
+                    p.Message("&H/Life <command> <params>. Commands are Help, Create, Delete, Start, Stop, Set, List, Print");
+                    p.Message("Type /Life help <command> for more information");
+                    return;
+                }
+                LifeHandler.ProcessCommand(p, cmd);
+            }
+            catch (Exception e)
+            {
+                p.Message("Error: " + e.Message);
+            }
+        }
+        #endregion
 
+
+        #region Firework
         static readonly CommandDescriptor CdFirework = new CommandDescriptor {
             Name = "Firework",
             Category = CommandCategory.Fun,
@@ -134,8 +173,10 @@ namespace fCraft {
                     "All Gold blocks are now being replaced with Fireworks." );
             }
         }
+        #endregion
 
 
+        #region RandomMaze
         static readonly CommandDescriptor CdRandomMaze = new CommandDescriptor {
             Name = "RandomMaze",
             Aliases = new string[] { "3dmaze" },
@@ -148,6 +189,22 @@ namespace fCraft {
             Usage = "/randommaze <width> <length> <height> [nolifts] [hints]",
             Handler = MazeHandler
         };
+        static void MazeHandler(Player p, Command cmd)
+        {
+            try
+            {
+                RandomMazeDrawOperation op = new RandomMazeDrawOperation(p, cmd);
+                BuildingCommands.DrawOperationBegin(p, cmd, op);
+            }
+            catch (Exception e)
+            {
+                Logger.Log(LogType.Error, "Error: " + e.Message);
+            }
+        }
+        #endregion
+
+
+        #region MazeCuboid
         static readonly CommandDescriptor CdMazeCuboid = new CommandDescriptor {
             Name = "MazeCuboid",
             Aliases = new string[] { "Mc", "Mz", "Maze" },
@@ -159,35 +216,70 @@ namespace fCraft {
             Usage = "/MazeCuboid [block type]",
             Handler = MazeCuboidHandler,
         };
+        static void MazeCuboidHandler(Player p, Command cmd)
+        {
+            try
+            {
+                MazeCuboidDrawOperation op = new MazeCuboidDrawOperation(p);
+                BuildingCommands.DrawOperationBegin(p, cmd, op);
+            }
+            catch (Exception e)
+            {
+                Logger.Log(LogType.Error, "Error: " + e.Message);
+            }
+        }
+        #endregion
 
-        private static void MazeHandler ( Player p, Command cmd ) {
-            try {
-                RandomMazeDrawOperation op = new RandomMazeDrawOperation( p, cmd );
-                BuildingCommands.DrawOperationBegin( p, cmd, op );
-            } catch ( Exception e ) {
-                Logger.Log( LogType.Error, "Error: " + e.Message );
+
+        #region ChangeModel
+        static readonly CommandDescriptor CdChangeModel = new CommandDescriptor
+        {
+            Name = "Model",
+            Aliases = new string[] { "model, disguise, changemodel" },
+            Category = CommandCategory.Moderation,
+            Permissions = new[] { Permission.Bring },
+            Usage = "&1/Model [Player] [Model]",
+            Help = "&1Change the Model of [Player]!\n" +
+            "&1Valid models: &echicken, creeper, croc, steve, pig, sheep, skeleton, spider, zombie!",
+            Handler = ModelHandler
+        };
+        static void ModelHandler(Player player, Command cmd)
+        {
+            if (!cmd.HasNext)
+            {
+                CdChangeModel.PrintUsage(player);
+                return;
             }
-        }
-        private static void MazeCuboidHandler ( Player p, Command cmd ) {
-            try {
-                MazeCuboidDrawOperation op = new MazeCuboidDrawOperation( p );
-                BuildingCommands.DrawOperationBegin( p, cmd, op );
-            } catch ( Exception e ) {
-                Logger.Log( LogType.Error, "Error: " + e.Message );
+            string target = cmd.Next();
+            if (!cmd.HasNext)
+            {
+                CdChangeModel.PrintUsage(player);
+                return;
             }
-        }
-        private static void LifeHandlerFunc ( Player p, Command cmd ) {
-            try {
-                if ( !cmd.HasNext ) {
-                    p.Message( "&H/Life <command> <params>. Commands are Help, Create, Delete, Start, Stop, Set, List, Print" );
-                    p.Message( "Type /Life help <command> for more information" );
+            string model = cmd.NextAll();
+            PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, target);
+            if (p == null)
+            {
+                return;
+            }
+            if (!acceptedModels.Contains(model))
+            {
+                player.Message(model + " is not a vald model. Type /help model to see valid models.");
+                return;
+            }
+            if (acceptedModels.Contains(model))
+            {
+                if (p.PlayerObject == null)
+                {
+                    player.Message("This player is offline!");
                     return;
                 }
-                LifeHandler.ProcessCommand( p, cmd );
-            } catch ( Exception e ) {
-                p.Message( "Error: " + e.Message );
+                player.Message("Changed model of " + p.ClassyName + " from " + p.PlayerObject.Model + " to " + model);
+                p.PlayerObject.Model = model;
             }
         }
+        #endregion 
+
 
 
     }
