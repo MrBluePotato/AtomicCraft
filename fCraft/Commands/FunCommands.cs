@@ -267,15 +267,13 @@ namespace fCraft {
                 player.Message(model + " is not a vald model. Type /help model to see valid models.");
                 return;
             }
-            if (acceptedModels.Contains(model))
+            if (p.PlayerObject == null)
             {
-                if (p.PlayerObject == null)
-                {
-                    player.Message("This player is offline!");
-                    return;
-                }
-                player.Message("Changed model of " + p.ClassyName + " from " + p.PlayerObject.Model + " to " + model);
-                p.PlayerObject.Model = model;
+                player.Message("This player is offline!");
+                return;
+            }
+            player.Message("Changed model of " + p.ClassyName + " from " + p.PlayerObject.Model + " to " + model);
+            p.PlayerObject.Model = model;
             }
         }
         #endregion 
