@@ -51,8 +51,6 @@ namespace fCraft {
             65,     // Kick
             2,       // SetPermission
 
-// Part of fCraft | Copyright 2012-2013 Matvei Stefarov <me@matvei.org>
-
             67, // ExtInfo
             69, // ExtEntry
 
@@ -68,7 +66,9 @@ namespace fCraft {
             2, // RemoveSelection
             4, // SetBlockPermission
             66, // ChangeModel
-            69 // EnvMapAppearance
+            69, // EnvMapAppearance
+            2, // EnvWeatherType
+            8 // HackControl
         };
     }
 }

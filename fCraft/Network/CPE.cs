@@ -58,6 +58,10 @@ namespace fCraft
         const int ChangeModelExtVersion = 1;
         const string EnvMapAppearanceExtName = "EnvMapAppearance";
         const int EnvMapAppearanceExtVersion = 1;
+        const string EnvWeatherTypeExtName = "EnvWeatherType";
+        const int EnvWeatherTypeExtVersion = 1;
+        const string HackControlExtName = "HackControl";
+        const int HackControlExtVersion = 1;
         const byte CustomBlocksLevel = 1;
 
         // Note: if more levels are added, change UsesCustomBlocks from bool to int
@@ -73,6 +77,7 @@ namespace fCraft
         public bool SupportsChangeModel { get; set; }
         public bool SupportsEnvMapAppearance { get; set; }
         public bool SupportsEnvWeatherType { get; set; }
+        public bool SupportsHackControl { get; set; }
         string ClientName { get; set; }
 
         bool NegotiateProtocolExtension()
@@ -90,6 +95,8 @@ namespace fCraft
             writer.Write(Packet.MakeExtEntry(SelectionCuboidExtName, SelectionCuboidExtVersion).Data);
             writer.Write(Packet.MakeExtEntry(ChangeModelExtName, ChangeModelExtVersion).Data);
             writer.Write(Packet.MakeExtEntry(EnvMapAppearanceExtName, EnvMapAppearanceExtVersion).Data);
+            writer.Write(Packet.MakeExtEntry(EnvWeatherTypeExtName, EnvWeatherTypeExtVersion).Data);
+            writer.Write(Packet.MakeExtEntry(HackControlExtName, HackControlExtVersion).Data);
 
             // Expect ExtInfo reply from the client
             OpCode extInfoReply = (OpCode)reader.ReadByte();
@@ -361,6 +368,14 @@ namespace fCraft
             packet.Data[65] = (byte)sideBlock;
             packet.Data[66] = (byte)edgeBlock;
             ToNetOrder(sideLevel, packet.Data, 67);
+            return packet;
+        }
+
+        [Pure]
+        public static Packet EnvWeatherType(int weatherType)
+        {
+            Packet packet = new Packet(OpCode.EnvWeatherType);
+            packet.Data[1] = (byte)weatherType;
             return packet;
         }
 
