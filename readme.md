@@ -1,12 +1,24 @@
 ## Download AtomicCraft
 The website is currently experiencing technical difficulties. A link will be posted soon.
 
-## About 800Craft 
-AtomicCraft is the continuation of 800Craft, and is developed and MrBluePotato.
+## Coming Soon
+
+* Web administration panel
+
+* Prophunt game
+
+* Global ban list
+
+* Improved global chat
+
+* Full CPE support
+
+## About AtomicCraft
+AtomicCraft is a branch of 800Craft, and is developed and MrBluePotato.
 
 800Craft was developed by Jonty800, GlennMR and LaoTszy.
 
-AtomicCraft is designed to have tons of features, while not compromising speed and server efficency.
+The main goal of AtomicCraft is to have tons of features and games, while keeping the server fast and stable.
 
 Huge thanks to Scoot (fragmer) and the other people in #fCraft.dev on Esper
 
