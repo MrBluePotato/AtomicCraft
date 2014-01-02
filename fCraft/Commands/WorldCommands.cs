@@ -1,4 +1,19 @@
 ﻿// Copyright 2009-2013 Matvei Stefarov <me@matvei.org>
+
+//Copyright (C) <2011 - 2013>  <Jon Baker, Glenn Mariën and Lao Tszy>
+
+//This program is free software: you can redistribute it and/or modify
+//it under the terms of the GNU General Public License as published by
+//the Free Software Foundation, either version 3 of the License, or
+//(at your option) any later version.
+
+//This program is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU General Public License for more details.
+
+//You should have received a copy of the GNU General Public License
+//along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,35 +34,22 @@ namespace fCraft {
         internal static void Init () {
             CommandManager.RegisterCommand( CdBlockDB );
             CommandManager.RegisterCommand( CdBlockInfo );
-
             CommandManager.RegisterCommand( CdEnv );
-
-            CdGenerate.Help = "Generates a new map. If no dimensions are given, uses current world's dimensions. " +
-                              "If no filename is given, loads generated world into current world.\n" +
-                              "Available themes: Grass, " + Enum.GetNames( typeof( MapGenTheme ) ).JoinToString() + '\n' +
-                              "Available terrain types: Empty, Ocean, " + Enum.GetNames( typeof( MapGenTemplate ) ).JoinToString() + '\n' +
-                              "Note: You do not need to specify a theme with \"Empty\" and \"Ocean\" templates.";
             CommandManager.RegisterCommand( CdGenerate );
-
             CommandManager.RegisterCommand( CdJoin );
-
             CommandManager.RegisterCommand( CdWorldLock );
             CommandManager.RegisterCommand( CdWorldUnlock );
-
             CommandManager.RegisterCommand( CdSpawn );
-
             CommandManager.RegisterCommand( CdWorlds );
             CommandManager.RegisterCommand( CdWorldAccess );
             CommandManager.RegisterCommand( CdWorldBuild );
             CommandManager.RegisterCommand( CdWorldFlush );
-
             CommandManager.RegisterCommand( CdWorldInfo );
             CommandManager.RegisterCommand( CdWorldLoad );
             CommandManager.RegisterCommand( CdWorldMain );
             CommandManager.RegisterCommand( CdWorldRename );
             CommandManager.RegisterCommand( CdWorldSave );
             CommandManager.RegisterCommand( CdWorldUnload );
-
             CommandManager.RegisterCommand( CdRealm );
             CommandManager.RegisterCommand( CdPortal );
             CommandManager.RegisterCommand( CdWorldSearch );
@@ -56,943 +58,12 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdWorldSet );
             CommandManager.RegisterCommand( CdMessageBlock );
         }
-        #region 800craft
 
-        //Copyright (C) <2011 - 2013>  <Jon Baker, Glenn Mariën and Lao Tszy>
-
-        //This program is free software: you can redistribute it and/or modify
-        //it under the terms of the GNU General Public License as published by
-        //the Free Software Foundation, either version 3 of the License, or
-        //(at your option) any later version.
-
-        //This program is distributed in the hope that it will be useful,
-        //but WITHOUT ANY WARRANTY; without even the implied warranty of
-        //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-        //GNU General Public License for more details.
-
-        //You should have received a copy of the GNU General Public License
-        //along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-        #region Physics
-        static readonly CommandDescriptor CdPhysics = new CommandDescriptor {
-            Name = "Physics",
-            Category = CommandCategory.World,
-            Permissions = new Permission[] { Permission.Physics },
-            IsConsoleSafe = false,
-            Usage = "/Physics <TNT | Fireworks | Water | Plant | Sand | Gun | All> <On / Off>",
-            Help = "Enables / disables a type of Physics for the current world. Physics may use more server resources.",
-            HelpSections = new Dictionary<string, string>() {
-                { "tnt",     "&H/Physics tnt on/off \n&S" +
-                                "Turns TNT exploding physics on / off in the current world"},
-                { "fireworks",     "&H/Physics fireworks on/off \n&S" +
-                                "Turns firework physics on / off in the current world"},
-                { "water",       "&H/Physics water on/off \n&S" +
-                                "Turns water physics on / off in the current world"},
-                { "plant",       "&H/Physics plant on/off \n&S" +
-                                "Turns plant physics on / off in the current world"},
-                { "sand",       "&H/Physics sand on/off \n&S" +
-                                "Turns sand and gravel physics on / off in the current world"},
-                { "gun",       "&H/Physics gun on/off \n&S" +
-                                "Turns gun physics on / off in the current world"},
-                { "all",     "&H/Physics all on/off \n&S" +
-                                "Turns all physics on / off in the current world"},
-            },
-            Handler = PhysicsHandler
-        };
-
-        private static void PhysicsHandler ( Player player, Command cmd ) {
-            string option = cmd.Next();
-            World world = player.World;
-            if ( option == null ) {
-                CdPhysics.PrintUsage( player );
-                return;
-            }
-            string NextOp = cmd.Next();
-            if ( NextOp == null ) {
-                CdPhysics.PrintUsage( player );
-                return;
-            }
-            switch ( option.ToLower() ) {
-                case "tnt":
-                    if ( NextOp.ToLower() == "on" ) {
-                        world.EnableTNTPhysics( player, true );
-                        return;
-                    }
-                    if ( NextOp.ToLower() == "off" ) {
-                        world.DisableTNTPhysics( player, true );
-                        return;
-                    }
-                    break;
-                case "gun":
-                    if ( NextOp.ToLower() == "on" ) {
-                        world.EnableGunPhysics( player, true );
-                        return;
-                    }
-                    if ( NextOp.ToLower() == "off" ) {
-                        world.DisableGunPhysics( player, true );
-                        return;
-                    }
-                    break;
-                case "plant":
-                    if ( NextOp.ToLower() == "off" ) {
-                        world.DisablePlantPhysics( player, true );
-                        return;
-                    }
-                    if ( NextOp.ToLower() == "on" ) {
-                        world.EnablePlantPhysics( player, true );
-                        return;
-                    }
-                    break;
-                case "fireworks":
-                case "firework":
-                    if ( NextOp.ToLower() == "on" ) {
-                        world.EnableFireworkPhysics( player, true );
-                        return;
-                    }
-                    if ( NextOp.ToLower() == "off" ) {
-                        world.DisableFireworkPhysics( player, true );
-                        return;
-                    }
-                    break;
-
-                case "sand":
-                    if ( NextOp.ToLower() == "on" ) {
-                        world.EnableSandPhysics( player, true );
-                        return;
-                    }
-                    if ( NextOp.ToLower() == "off" ) {
-                        world.DisableSandPhysics( player, true );
-                        return;
-                    }
-                    break;
-                case "water":
-                    if ( NextOp.ToLower() == "on" ) {
-                        world.EnableWaterPhysics( player, true );
-                        return;
-                    }
-                    if ( NextOp.ToLower() == "off" ) {
-                        world.DisableWaterPhysics( player, true );
-                        return;
-                    }
-                    break;
-                case "all":
-                    if ( NextOp.ToLower() == "on" ) {
-                        if ( !world.tntPhysics ) {
-                            world.EnableTNTPhysics( player, false );
-                        } if ( !world.sandPhysics ) {
-                            world.EnableSandPhysics( player, false );
-                        } if ( !world.fireworkPhysics ) {
-                            world.EnableFireworkPhysics( player, false );
-                        } if ( !world.waterPhysics ) {
-                            world.EnableWaterPhysics( player, false );
-                        } if ( !world.plantPhysics ) {
-                            world.EnablePlantPhysics( player, false );
-                        } if ( !world.gunPhysics ) {
-                            world.EnableGunPhysics( player, false );
-                        }
-                        Server.Players.Message( "{0}&S turned ALL Physics on for {1}", player.ClassyName, world.ClassyName );
-                        Logger.Log( LogType.SystemActivity, "{0} turned ALL Physics on for {1}", player.Name, world.Name );
-                    } else if ( NextOp.ToLower() == "off" ) {
-                        if ( world.tntPhysics ) {
-                            world.DisableTNTPhysics( player, false );
-                        } if ( world.sandPhysics ) {
-                            world.DisableSandPhysics( player, false );
-                        } if ( world.fireworkPhysics ) {
-                            world.DisableFireworkPhysics( player, false );
-                        } if ( world.waterPhysics ) {
-                            world.DisableWaterPhysics( player, false );
-                        } if ( world.plantPhysics ) {
-                            world.DisablePlantPhysics( player, false );
-                        } if ( world.gunPhysics ) {
-                            world.DisableGunPhysics( player, false );
-                        }
-                        Server.Players.Message( "{0}&S turned ALL Physics off for {1}", player.ClassyName, world.ClassyName );
-                        Logger.Log( LogType.SystemActivity, "{0} turned ALL Physics off for {1}", player.Name, world.Name );
-                    }
-                    break;
-
-                default: CdPhysics.PrintUsage( player );
-                    break;
-            }
-            WorldManager.SaveWorldList();
-        }
-        #endregion
-
-        #region MessageBlocks
-        static readonly CommandDescriptor CdMessageBlock = new CommandDescriptor {
-            Name = "MessageBlock",
-            Aliases = new[] { "mb" },
-            Category = CommandCategory.Building,
-            Permissions = new[] { Permission.ManageMessageBlocks },
-            IsConsoleSafe = false,
-            Usage = "/MessageBlock [add | remove | info | list]",
-            Help = "Create and controls a MessageBlock, options are: add, remove, list, info\n&S" +
-                   "See &H/Help MessageBlock <option>&S for details about each option.",
-            HelpSections = new Dictionary<string, string>() {
-                { "add",     "&H/MessageBlock add [Your Message Goes here]\n&S" +
-                                "Adds a MessageBlock with a custom message. When a player walks in" +
-                                 " radius of a message block the message inside is shown to them."},
-                { "remove",     "&H/MessageBlock remove MessageBlock1\n&S" +
-                                "Removes MessageBlock with name 'MessageBlock1'."},
-                { "list",       "&H/MessageBlock list\n&S" +
-                                "Gives you a list of MessageBlocks in the current world."},
-                { "info",       "&H/MessageBlock info MB1\n&S" +
-                                "Gives you information of MessageBlock with name 'MB1'."},
-            },
-            Handler = MessageBlock
-        };
-        static void MessageBlock ( Player player, Command cmd ) {
-            string option = cmd.Next();
-            if ( option == null ) {
-                CdMessageBlock.PrintUsage( player );
-                return;
-            } else if ( option.ToLower() == "add" || option.ToLower() == "create" ) {
-                string Message = cmd.NextAll();
-                player.SelectionStart( 1, MessageBlockAdd, Message, CdMessageBlock.Permissions );
-                player.Message( "MessageBlock: Place a block or type /mark to use your location." );
-                return;
-            } else if ( option.ToLower().Equals( "remove" ) || option.ToLower().Equals( "rd" ) ) {
-                string MessageBlockName = cmd.Next();
-
-                if ( MessageBlockName == null ) {
-                    player.Message( "No MessageBlock name specified." );
-                } else {
-                    if ( player.World.Map.MessageBlocks != null && player.World.Map.MessageBlocks.Count > 0 ) {
-                        bool found = false;
-                        MessageBlock MessageBlockFound = null;
-
-                        lock ( player.World.Map.MessageBlocks.SyncRoot ) {
-                            foreach ( MessageBlock MessageBlock in player.World.Map.MessageBlocks ) {
-                                if ( MessageBlock.Name.ToLower().Equals( MessageBlockName.ToLower() ) ) {
-                                    MessageBlockFound = MessageBlock;
-                                    found = true;
-                                    break;
-                                }
-                            }
-
-                            if ( !found ) {
-                                player.Message( "Could not find MessageBlock by name {0}.", MessageBlockName );
-                            } else {
-                                MessageBlockFound.Remove( player );
-                                player.Message( "MessageBlock was removed." );
-                            }
-                        }
-                    } else {
-                        player.Message( "Could not find MessageBlock as this world doesn't contain a MessageBlock." );
-                    }
-                }
-            } else if ( option.ToLower().Equals( "info" ) ) {
-                string MessageBlockName = cmd.Next();
-
-                if ( MessageBlockName == null ) {
-                    player.Message( "No MessageBlock name specified." );
-                } else {
-                    if ( player.World.Map.MessageBlocks != null && player.World.Map.MessageBlocks.Count > 0 ) {
-                        bool found = false;
-
-                        lock ( player.World.Map.MessageBlocks.SyncRoot ) {
-                            foreach ( MessageBlock MessageBlock in player.World.Map.MessageBlocks ) {
-                                if ( MessageBlock.Name.ToLower().Equals( MessageBlockName.ToLower() ) ) {
-                                    World MessageBlockWorld = WorldManager.FindWorldExact( MessageBlock.World );
-                                    player.Message( "MessageBlock '{0}&S' was created by {1}&S at {2}",
-                                        MessageBlock.Name, MessageBlock.Creator, MessageBlock.Created );
-                                    found = true;
-                                }
-                            }
-                        }
-
-                        if ( !found ) {
-                            player.Message( "Could not find MessageBlock by name {0}.", MessageBlockName );
-                        }
-                    } else {
-                        player.Message( "Could not find MessageBlock as this world doesn't contain a MessageBlock." );
-                    }
-                }
-            } else if ( option.ToLower().Equals( "list" ) ) {
-                if ( player.World.Map.MessageBlocks == null || player.World.Map.MessageBlocks.Count == 0 ) {
-                    player.Message( "There are no MessageBlocks in {0}&S.", player.World.ClassyName );
-                } else {
-                    String[] MessageBlockNames = new String[player.World.Map.MessageBlocks.Count];
-                    System.Text.StringBuilder output = new System.Text.StringBuilder( "There are " + player.World.Map.MessageBlocks.Count + " MessageBlocks in " + player.World.ClassyName + "&S: " );
-
-                    for ( int i = 0; i < player.World.Map.MessageBlocks.Count; i++ ) {
-                        MessageBlockNames[i] = ( ( MessageBlock )player.World.Map.MessageBlocks[i] ).Name;
-                    }
-                    output.Append( MessageBlockNames.JoinToString( ", " ) );
-                    player.Message( output.ToString() );
-                }
-            } else {
-                CdMessageBlock.PrintUsage( player );
-            }
-        }
-
-        static void MessageBlockAdd ( Player player, Vector3I[] marks, object tag ) {
-            string Message = ( string )tag;
-            Vector3I mark = marks[0];
-            if ( !player.Info.Rank.AllowSecurityCircumvention ) {
-                SecurityCheckResult buildCheck = player.World.BuildSecurity.CheckDetailed( player.Info );
-                switch ( buildCheck ) {
-                    case SecurityCheckResult.BlackListed:
-                        player.Message( "Cannot add a MessageBlock to world {0}&S: You are barred from building here.",
-                                        player.World.ClassyName );
-                        return;
-                    case SecurityCheckResult.RankTooLow:
-                        player.Message( "Cannot add a MessageBlock to world {0}&S: You are not allowed to build here.",
-                                        player.World.ClassyName );
-                        return;
-                    //case SecurityCheckResult.RankTooHigh:
-                }
-            }
-            if ( player.LastUsedBlockType != Block.Undefined ) {
-                Vector3I Pos = mark;
-
-                if ( player.CanPlace( player.World.Map, Pos, player.LastUsedBlockType, BlockChangeContext.Manual ) != CanPlaceResult.Allowed ) {
-                    player.Message( "&WYou are not allowed to build here" );
-                    return;
-                }
-
-                Player.RaisePlayerPlacedBlockEvent( player, player.WorldMap, Pos, player.WorldMap.GetBlock( Pos ), player.LastUsedBlockType, BlockChangeContext.Manual );
-                BlockUpdate blockUpdate = new BlockUpdate( null, Pos, player.LastUsedBlockType );
-                player.World.Map.QueueUpdate( blockUpdate );
-            } else {
-                player.Message( "&WError: No last used blocktype was found" );
-                return;
-            }
-            MessageBlock MessageBlock = new MessageBlock( player.World.Name, mark,
-                MessageBlock.GenerateName( player.World ),
-                player.ClassyName, Message );
-            MessageBlock.Range = new MessageBlockRange( mark.X, mark.X, mark.Y, mark.Y, mark.Z, mark.Z );
-
-            MessageBlockHandler.CreateMessageBlock( MessageBlock, player.World );
-            NormalBrush brush = new NormalBrush( Block.Air );
-            Logger.Log( LogType.UserActivity, "{0} created MessageBlock {1} (on world {2})", player.Name, MessageBlock.Name, player.World.Name );
-            player.Message( "MessageBlock created on world {0}&S with name {1}", player.World.ClassyName, MessageBlock.Name );
-        }
-        #endregion
-
-        #region portals
-
-        static readonly CommandDescriptor CdPortal = new CommandDescriptor {
-            Name = "Portal",
-            Category = CommandCategory.World,
-            Permissions = new Permission[] { Permission.UsePortal },
-            IsConsoleSafe = false,
-            Usage = "/portal [create | remove | info | list | enable | disable ]",
-            Help = "Controls portals, options are: create, remove, list, info, enable, disable\n&S" +
-                   "See &H/Help portal <option>&S for details about each option.",
-            HelpSections = new Dictionary<string, string>() {
-                { "create",     "&H/portal create water Guest\n&S" +
-                                "Creates a basic water portal to world Guest.\n&S" +
-                                "&H/portal create Guest lava test\n&S" +
-                                "Creates a lava portal with name 'test' to world Guest.\n" +
-                                "&H/Portal create will create a portal where the output can be the position of your next red block."},
-                { "remove",     "&H/portal remove Portal1\n&S" +
-                                "Removes portal with name 'Portal1'."},
-                { "list",       "&H/portal list\n&S" +
-                                "Gives you a list of portals in the current world."},
-                { "info",       "&H/portal info Portal1\n&S" +
-                                "Gives you information of portal with name 'Portal1'."},
-                { "enable",     "&H/portal enable\n&S" +
-                                "Enables the use of portals, this is player specific."},
-                { "disable",     "&H/portal disable\n&S" +
-                                "Disables the use of portals, this is player specific."},
-            },
-            Handler = PortalH
-        };
-
-        struct PDATA {
-            public bool custom;
-            public DrawOperation op;
-        }
-        private static void PortalH ( Player player, Command command ) {
-            try {
-                String option = command.Next();
-
-                if ( option == null ) {
-                    CdPortal.PrintUsage( player );
-                } else if ( option.ToLower().Equals( "create" ) ) {
-                    if ( player.Can( Permission.ManagePortal ) ) {
-                        string blockTypeOrName = command.Next();
-                        DrawOperation operation = new CuboidDrawOperation( player );
-                        NormalBrush brush = new NormalBrush( Block.Water, Block.Water );
-                        if ( blockTypeOrName == null ) blockTypeOrName = "water";
-                        if ( blockTypeOrName.ToLower().Equals( "lava" ) ) {
-                            brush = new NormalBrush( Block.Lava, Block.Lava );
-                        } else if ( !blockTypeOrName.ToLower().Equals( "water" ) ) {
-                            player.Message( "Invalid block, choose between water or lava." );
-                            return;
-                        }
-
-                        string world = command.Next();
-                        bool CustomOutput = ( world == null );
-                        operation.Brush = brush;
-                        if ( world != null && WorldManager.FindWorldExact( world ) != null ) {
-                            player.PortalWorld = world;
-                        } else player.PortalWorld = player.World.Name;
-                        player.SelectionStart( operation.ExpectedMarks, PortalCreateCallback, new PDATA() { op = operation, custom = CustomOutput }, Permission.Draw );
-                        player.Message( "Click {0} blocks or use &H/Mark&S to mark the area of the portal.", operation.ExpectedMarks );
-
-                        if ( world == null ) {
-                            return; //custom, continue in Selectstart
-                        }
-                        if ( world != null && WorldManager.FindWorldExact( world ) != null ) {
-
-                            string portalName = command.Next();
-
-                            if ( portalName == null ) {
-                                player.PortalName = null;
-                            } else {
-                                if ( !Portal.DoesNameExist( player.World, portalName ) ) {
-                                    player.PortalName = portalName;
-                                } else {
-                                    player.Message( "A portal with name {0} already exists in this world.", portalName );
-                                    return;
-                                }
-                            }
-                        } else {
-                            if ( world == null ) {
-                                player.Message( "No world specified." );
-                            } else {
-                                player.MessageNoWorld( world );
-                            }
-                        }
-                    } else {
-                        player.MessageNoAccess( Permission.ManagePortal );
-                    }
-                } else if ( option.ToLower().Equals( "remove" ) ) {
-                    if ( player.Can( Permission.ManagePortal ) ) {
-                        string portalName = command.Next();
-
-                        if ( portalName == null ) {
-                            player.Message( "No portal name specified." );
-                        } else {
-                            if ( player.World.Map.Portals != null && player.World.Map.Portals.Count > 0 ) {
-                                bool found = false;
-                                Portal portalFound = null;
-
-                                lock ( player.World.Map.Portals.SyncRoot ) {
-                                    foreach ( Portal portal in player.World.Map.Portals ) {
-                                        if ( portal.Name.Equals( portalName ) ) {
-                                            portalFound = portal;
-                                            found = true;
-                                            break;
-                                        }
-                                    }
-
-                                    if ( !found ) {
-                                        player.Message( "Could not find portal by name {0}.", portalName );
-                                    } else {
-                                        portalFound.Remove( player );
-                                        player.Message( "Portal was removed." );
-                                    }
-                                }
-                            } else {
-                                player.Message( "Could not find portal as this world doesn't contain a portal." );
-                            }
-                        }
-                    } else {
-                        player.MessageNoAccess( Permission.ManagePortal );
-                    }
-                } else if ( option.ToLower().Equals( "info" ) ) {
-                    string portalName = command.Next();
-
-                    if ( portalName == null ) {
-                        player.Message( "No portal name specified." );
-                    } else {
-                        if ( player.World.Map.Portals != null && player.World.Map.Portals.Count > 0 ) {
-                            bool found = false;
-
-                            lock ( player.World.Map.Portals.SyncRoot ) {
-                                foreach ( Portal portal in player.World.Map.Portals ) {
-                                    if ( portal.Name.Equals( portalName ) ) {
-                                        World portalWorld = WorldManager.FindWorldExact( portal.World );
-                                        player.Message( "Portal {0}&S was created by {1}&S at {2} and teleports to world {3}&S.",
-                                            portal.Name, PlayerDB.FindPlayerInfoExact( portal.Creator ).ClassyName, portal.Created, portalWorld.ClassyName );
-                                        found = true;
-                                    }
-                                }
-                            }
-
-                            if ( !found ) {
-                                player.Message( "Could not find portal by name {0}.", portalName );
-                            }
-                        } else {
-                            player.Message( "Could not find portal as this world doesn't contain a portal." );
-                        }
-                    }
-                } else if ( option.ToLower().Equals( "list" ) ) {
-                    if ( player.World.Map.Portals == null || player.World.Map.Portals.Count == 0 ) {
-                        player.Message( "There are no portals in {0}&S.", player.World.ClassyName );
-                    } else {
-                        String[] portalNames = new String[player.World.Map.Portals.Count];
-                        StringBuilder output = new StringBuilder( "There are " + player.World.Map.Portals.Count + " portals in " + player.World.ClassyName + "&S: " );
-
-                        for ( int i = 0; i < player.World.Map.Portals.Count; i++ ) {
-                            portalNames[i] = ( ( Portal )player.World.Map.Portals[i] ).Name;
-                        }
-
-                        output.Append( portalNames.JoinToString( ", " ) );
-
-                        player.Message( output.ToString() );
-                    }
-                } else if ( option.ToLower().Equals( "enable" ) ) {
-                    player.PortalsEnabled = true;
-                    player.Message( "You enabled the use of portals." );
-                } else if ( option.ToLower().Equals( "disable" ) ) {
-                    player.PortalsEnabled = false;
-                    player.Message( "You disabled the use of portals, type /portal enable to re-enable portals." );
-                } else {
-                    CdPortal.PrintUsage( player );
-                }
-            } catch ( PortalException ex ) {
-                player.Message( ex.Message );
-                Logger.Log( LogType.Error, "WorldCommands.PortalH: " + ex );
-            } catch ( Exception ex ) {
-                player.Message( "Unexpected error: " + ex );
-                Logger.Log( LogType.Error, "WorldCommands.PortalH: " + ex );
-            }
-        }
-
-        static void PortalCreateCallback ( Player player, Vector3I[] marks, object tag ) {
-            try {
-                World world = WorldManager.FindWorldExact( player.PortalWorld );
-
-                if ( world != null ) {
-                    PDATA pd = ( PDATA )tag;
-                    DrawOperation op = pd.op;
-                    bool CustomOutput = pd.custom;
-                    if ( !op.Prepare( marks ) ) return;
-                    if ( !player.CanDraw( op.BlocksTotalEstimate ) ) {
-                        player.MessageNow( "You are only allowed to run draw commands that affect up to {0} blocks. This one would affect {1} blocks.",
-                                           player.Info.Rank.DrawLimit,
-                                           op.Bounds.Volume );
-                        op.Cancel();
-                        return;
-                    }
-
-                    int Xmin = Math.Min( marks[0].X, marks[1].X );
-                    int Xmax = Math.Max( marks[0].X, marks[1].X );
-                    int Ymin = Math.Min( marks[0].Y, marks[1].Y );
-                    int Ymax = Math.Max( marks[0].Y, marks[1].Y );
-                    int Zmin = Math.Min( marks[0].Z, marks[1].Z );
-                    int Zmax = Math.Max( marks[0].Z, marks[1].Z );
-
-                    for ( int x = Xmin; x <= Xmax; x++ ) {
-                        for ( int y = Ymin; y <= Ymax; y++ ) {
-                            for ( int z = Zmin; z <= Zmax; z++ ) {
-                                if ( PortalHandler.IsInRangeOfSpawnpoint( player.World, new Vector3I( x, y, z ) ) ) {
-                                    player.Message( "You can not build a portal near a spawnpoint." );
-                                    return;
-                                }
-
-                                if ( PortalHandler.GetInstance().GetPortal( player.World, new Vector3I( x, y, z ) ) != null ) {
-                                    player.Message( "You can not build a portal inside a portal, U MAD BRO?" );
-                                    return;
-                                }
-                            }
-                        }
-                    }
-
-                    if ( player.PortalName == null ) {
-                        player.PortalName = Portal.GenerateName( player.World.Name, false );
-                    }
-
-                    if ( !CustomOutput ) {
-                        Portal portal = new Portal( player.PortalWorld, marks, player.PortalName, player.Name, player.World.Name, false );
-                        PortalHandler.CreatePortal( portal, player.World, false );
-                        player.Message( "Successfully created portal with name " + portal.Name + "." );
-                    } else {
-                        player.PortalCache.World = player.World.Name;
-                        player.PortalCache = new Portal( player.PortalWorld, marks, player.PortalName, player.Name, player.World.Name, true );
-                        player.Message( "  &SPortal started, place a red block for the desired output (can be multiworld)" );
-                    }
-                    op.AnnounceCompletion = false;
-                    op.Context = BlockChangeContext.Portal;
-                    op.Begin();
-                } else {
-                    player.MessageInvalidWorldName( player.PortalWorld );
-                }
-            } catch ( Exception ex ) {
-                player.Message( "Failed to create portal." );
-                Logger.Log( LogType.Error, "WorldCommands.PortalCreateCallback: " + ex );
-            }
-        }
-        #endregion
-
-        static readonly CommandDescriptor CdWorldSearch = new CommandDescriptor {
-            Name = "Worldsearch",
-            Aliases = new[] { "ws" },
-            Category = CommandCategory.World,
-            IsConsoleSafe = true,
-            Permissions = new[] { Permission.Chat },
-            Usage = "/Worldsearch WorldName",
-            Help = "An easy way to search through a big list of worlds",
-            Handler = WorldSearchHandler
-        };
-
-        static void WorldSearchHandler ( Player player, Command cmd ) {
-            string worldName = cmd.Next();
-            if ( worldName == null ) {
-                CdWorldSearch.PrintUsage( player );
-                return;
-            }
-            if ( worldName.Length < 2 ) {
-                CdWorldSearch.PrintUsage( player );
-                return;
-            } else {
-                worldName = worldName.ToLower();
-                var WorldNames = WorldManager.Worlds
-                                         .Where( w => w.Name.ToLower().Contains( worldName ) ).ToArray();
-
-                if ( WorldNames.Length <= 30 ) {
-                    player.MessageManyMatches( "worlds", WorldNames );
-                } else {
-                    int offset;
-                    if ( !cmd.NextInt( out offset ) ) offset = 0;
-
-                    if ( offset >= WorldNames.Count() )
-                        offset = Math.Max( 0, WorldNames.Length - 30 );
-
-                    World[] WorldPart = WorldNames.Skip( offset ).Take( 30 ).ToArray();
-                    player.MessageManyMatches( "worlds", WorldPart );
-
-                    if ( offset + WorldNames.Length < WorldNames.Length )
-                        player.Message( "Showing {0}-{1} (out of {2}). Next: &H/List {3} {4}",
-                                        offset + 1, offset + WorldPart.Length, WorldNames.Length,
-                                        "worldsearch", offset + WorldPart.Length );
-                    else
-                        player.Message( "Showing matches {0}-{1} (out of {2}).",
-                                        offset + 1, offset + WorldPart.Length, WorldNames.Length );
-                    return;
-                }
-            }
-        }
-
-
-        static readonly CommandDescriptor CdRealm = new CommandDescriptor {
-            Name = "Realm",
-            Category = CommandCategory.World,
-            Permissions = new[] { Permission.Realm },
-            IsConsoleSafe = false,
-            Usage = "/Realm <Option>. /Help Realm for a list of commands.",
-            Help = "/Realm &A| Help | Join | Like | Home | Flush | Spawn " +
-            "| Review | Create | Allow | Unallow | Ban | Unban | Activate | Physics | Env | Control",
-            Handler = Realm,
-        };
-
-        internal static void Realm ( Player player, Command cmd ) {
-            string Choice = cmd.Next();
-            if ( Choice == null ) {
-                CdRealm.PrintUsage( player );
-                return;
-            }
-            switch ( Choice.ToLower() ) {
-                default:
-                    CdRealm.PrintUsage( player );
-                    break;
-
-                case "env":
-                    if ( player.World.Name == player.Name ) {
-                        string variable = cmd.Next();
-                        string valueText = cmd.Next();
-                        EnvHandler( player, new Command( "/Env " + player.World.Name + " " + variable + " " + valueText ) );
-                    } else {
-                        player.Message( "&WYou need to be in your realm" );
-                        return;
-                    }
-                    break;
-
-                case "review":
-
-                    if ( player.World.Name == player.Name ) {
-                        var recepientList = Server.Players.Can( Permission.ReadStaffChat )
-                                              .NotIgnoring( player )
-                                              .Union( player );
-                        string message = String.Format( "{0}&C would like staff to review their realm", player.ClassyName );
-                        recepientList.Message( message );
-                    } else
-                        player.Message( "You are not in your Realm" );
-
-                    break;
-
-                case "like":
-
-                    Choice = player.World.Name;
-                    World world = WorldManager.FindWorldOrPrintMatches( player, Choice );
-                    if ( world == null ) player.Message( "You need to enter a realm name" );
-
-                    if ( world.IsRealm ) {
-                        Server.Players.Message( "{0}&S likes realm {1}.",
-                                               player.ClassyName, world.ClassyName );
-                        return;
-                    } else player.Message( "You are not in a Realm" );
-
-                    break;
-
-                case "flush":
-
-                    WorldFlushHandler( player, new Command( "/wflush " + player.Name ) );
-                    break;
-
-                case "create":
-
-                    string Theme = cmd.Next();
-                    string Template = cmd.Next();
-                    if ( player.World.Name == player.Name ) {
-                        player.Message( "You cannot create a new Realm when you are inside your Realm" );
-                        return;
-                    }
-
-                    if ( Theme == null || Template == null ) {
-                        player.Message( "&HUse /Realm create [ThemeType] [TerrainType]\n" +
-                            "&9Available themes: Grass, " + Enum.GetNames( typeof( MapGenTheme ) ).JoinToString() + '\n' +
-                              "&EAvailable terrain types: Empty, Ocean, " + Enum.GetNames( typeof( MapGenTemplate ) ).JoinToString() + '\n' );
-                        return;
-                    }
-                    RealmHandler.RealmCreate( player, cmd, Theme, Template );
-                    player.Message( "&9You can now activate your realm by typing /Realm Activate" );
-                    break;
-
-                case "home":
-                    JoinHandler( player, new Command( "/join " + player.Name ) );
-                    break;
-
-                case "help":
-
-                    player.Message( "To build a realm, use /realm create. To activate it so you can build, use /realm activate. " +
-                    "If you find yourself unable to build in your Realm, use /realm activate again. " +
-                    "If there are any Bugs, report them to Jonty800@gmail.com." );
-                    break;
-
-                case "activate": {
-                        if ( player.World.Name == player.Name ) {
-                            player.Message( "You cannot use /Realm activate when you are in your Realm" );
-                            return;
-                        }
-                        RealmHandler.RealmLoad( player, cmd, player.Name + ".fcm", player.Name, RankManager.HighestRank.Name, RankManager.DefaultBuildRank.Name );
-                        World realmworld = WorldManager.FindWorldExact( player.Name );
-                        if ( realmworld == null ) return;
-                        if ( !realmworld.AccessSecurity.Check( player.Info ) ) {
-                            realmworld.AccessSecurity.Include( player.Info );
-                        }
-                        if ( !realmworld.BuildSecurity.Check( player.Info ) ) {
-                            realmworld.BuildSecurity.Include( player.Info );
-                        }
-                        WorldManager.SaveWorldList();
-                        break;
-                    }
-
-                case "control":
-                    World w1 = WorldManager.FindWorldExact( player.Name );
-                    if ( w1 == null ) return;
-                    if ( !w1.AccessSecurity.Check( player.Info ) ) {
-                        w1.AccessSecurity.Include( player.Info );
-                        player.Message( "You have regained access control of your realm" );
-                    }
-                    if ( !w1.BuildSecurity.Check( player.Info ) ) {
-                        w1.BuildSecurity.Include( player.Info );
-                        player.Message( "You have regained building control of your realm" );
-                    }
-                    w1.IsRealm = true;
-                    break;
-
-                case "spawn":
-
-                    if ( player.World.Name == player.Name ) {
-                        ModerationCommands.SetSpawnHandler( player, new Command( "/setspawn" ) );
-                        return;
-                    } else {
-                        player.Message( "You can only change the Spawn on your own realm" );
-                        return;
-                    }
-
-                case "physics":
-
-                    string phyOption = cmd.Next();
-                    string onOff = cmd.Next();
-                    world = player.World;
-
-                    if ( phyOption == null ) {
-                        player.Message( "Turn physics on in your realm. Useage: /Realm physics [Plant|Water|Gun|Fireworks] On/Off." );
-                        return;
-                    }
-                    if ( onOff == null ) {
-                        player.Message( "&WInvalid option: /Realm Physics [Type] [On/Off]" );
-                        return;
-                    }
-                    if ( world.Name != player.Name ) {
-                        player.Message( "&WYou can only turn physics on in your realm" );
-                        return;
-                    }
-                    
-                    switch ( phyOption.ToLower() ) {
-                        case "water":
-                            if ( onOff.ToLower() == "on" ) {
-                                world.EnableWaterPhysics( player, true );
-                            }
-                            if ( onOff.ToLower() == "off" ) {
-                                world.DisableWaterPhysics( player, true );
-                            } else player.Message( "&WInvalid option: /Realm Physics [Type] [On/Off]" );
-                            break;
-                        case "plant":
-                            if ( onOff.ToLower() == "on" ) {
-                                world.EnablePlantPhysics( player, true );
-                            }
-                            if ( onOff.ToLower() == "off" ) {
-                                world.DisablePlantPhysics( player, true );
-                            } else player.Message( "&WInvalid option: /Realm Physics [Type] [On/Off]" );
-                            break;
-                        case "gun":
-                            if ( onOff.ToLower() == "on" ) {
-                                world.EnableGunPhysics( player, true );
-                            }
-                            if ( onOff.ToLower() == "off" ) {
-                                world.DisableGunPhysics( player, true );
-                            } else player.Message( "&WInvalid option: /Realm Physics [Type] [On/Off]" );
-                            break;
-                        case "firework":
-                        case "fireworks":
-                            if ( onOff.ToLower() == "on" ) {
-                                world.EnableFireworkPhysics( player, true );
-                            }
-                            if ( onOff.ToLower() == "off" ) {
-                                world.DisableFireworkPhysics( player, true );
-                            } else player.Message( "&WInvalid option: /Realm Physics [Type] [On/Off]" );
-                            break;
-                        default: player.Message( "&WInvalid option: /Realm physics [Plant|Water|Gun|Fireworks] On/Off" );
-                            break;
-                    }
-                    break;
-
-                case "join":
-
-                    string JoinCmd = cmd.Next();
-                    if ( JoinCmd == null ) {
-                        player.Message( "Derp. Invalid Realm." );
-                        return;
-                    } else {
-                        Player target = Server.FindPlayerOrPrintMatches( player, Choice, false, true );
-                        JoinHandler( player, new Command( "/goto " + JoinCmd ) );
-                        return;
-                    }
-
-                case "allow":
-
-                    string toAllow = cmd.Next();
-
-                    if ( toAllow == null ) {
-                        player.Message( "Allows a player to build in your world. useage: /realm allow playername." );
-                        return;
-                    }
-
-                    PlayerInfo targetAllow = PlayerDB.FindPlayerInfoOrPrintMatches( player, toAllow );
-
-                    if ( targetAllow == null ) {
-                        player.Message( "Please enter the name of the player you want to allow to build in your Realm." );
-                        return;
-                    }
-
-                    if ( !Player.IsValidName( targetAllow.Name ) ) {
-                        player.Message( "Player not found. Please specify valid name." );
-                        return;
-                    } else {
-                        RealmHandler.RealmBuild( player, cmd, player.Name, "+" + targetAllow.Name, null );
-                        if ( !Player.IsValidName( targetAllow.Name ) ) {
-                            player.Message( "Player not found. Please specify valid name." );
-                            return;
-                        }
-                    }
-                    break;
-
-                case "unallow":
-
-                    string Unallow = cmd.Next();
-
-                    if ( Unallow == null ) {
-                        player.Message( "Stops a player from building in your world. usage: /realm unallow playername." );
-                        return;
-                    }
-                    PlayerInfo targetUnallow = PlayerDB.FindPlayerInfoOrPrintMatches( player, Unallow );
-
-
-                    if ( targetUnallow == null ) {
-                        player.Message( "Please enter the name of the player you want to stop building in your Realm." );
-                        return;
-                    }
-
-                    if ( !Player.IsValidName( targetUnallow.Name ) ) {
-                        player.Message( "Player not found. Please specify valid name." );
-                        return;
-                    } else {
-                        RealmHandler.RealmBuild( player, cmd, player.Name, "-" + targetUnallow.Name, null );
-                        if ( !Player.IsValidName( targetUnallow.Name ) ) {
-                            player.Message( "Player not found. Please specify valid name." );
-                            return;
-                        }
-                    }
-                    break;
-
-                case "ban":
-
-                    string Ban = cmd.Next();
-
-                    if ( Ban == null ) {
-                        player.Message( "Bans a player from accessing your Realm. Useage: /Realm ban playername." );
-                        return;
-                    }
-                    Player targetBan = Server.FindPlayerOrPrintMatches( player, Ban, false, true );
-
-
-                    if ( targetBan == null ) {
-                        player.Message( "Please enter the name of the player you want to ban from your Realm." );
-                        return;
-                    }
-
-                    if ( !Player.IsValidName( targetBan.Name ) ) {
-                        player.Message( "Player not found. Please specify valid name." );
-                        return;
-                    } else {
-                        RealmHandler.RealmAccess( player, cmd, player.Name, "-" + targetBan.Name );
-                        if ( !Player.IsValidName( targetBan.Name ) ) {
-                            player.Message( "Player not found. Please specify valid name." );
-                            return;
-                        }
-                    }
-
-                    break;
-
-                case "unban":
-
-                    string UnBan = cmd.Next();
-
-                    if ( UnBan == null ) {
-                        player.Message( "Unbans a player from your Realm. Useage: /Realm unban playername." );
-                        return;
-                    }
-                    PlayerInfo targetUnBan = PlayerDB.FindPlayerInfoOrPrintMatches( player, UnBan );
-
-                    if ( targetUnBan == null ) {
-                        player.Message( "Please enter the name of the player you want to unban from your Realm." );
-                        return;
-                    }
-
-                    if ( !Player.IsValidName( targetUnBan.Name ) ) {
-                        player.Message( "Player not found. Please specify valid name." );
-                        return;
-                    } else {
-                        RealmHandler.RealmAccess( player, cmd, player.Name, "+" + targetUnBan.Name );
-                        if ( !Player.IsValidName( targetUnBan.Name ) ) {
-                            player.Message( "Player not found. Please specify valid name." );
-                            return;
-                        }
-                        break;
-                    }
-            }
-        }
 
         #region BlockDB
 
-        static readonly CommandDescriptor CdBlockDB = new CommandDescriptor {
+        static readonly CommandDescriptor CdBlockDB = new CommandDescriptor
+        {
             Name = "BlockDB",
             Category = CommandCategory.World,
             IsConsoleSafe = true,
@@ -1030,317 +101,419 @@ namespace fCraft {
             Handler = BlockDBHandler
         };
 
-        static void BlockDBHandler ( Player player, Command cmd ) {
-            if ( !BlockDB.IsEnabledGlobally ) {
-                player.Message( "&WBlockDB is disabled on this server." );
+        static void BlockDBHandler(Player player, Command cmd)
+        {
+            if (!BlockDB.IsEnabledGlobally)
+            {
+                player.Message("&WBlockDB is disabled on this server.");
                 return;
             }
 
             string worldName = cmd.Next();
-            if ( worldName == null ) {
+            if (worldName == null)
+            {
                 int total = 0;
-                World[] autoEnabledWorlds = WorldManager.Worlds.Where( w => ( w.BlockDB.EnabledState == YesNoAuto.Auto ) && w.BlockDB.IsEnabled ).ToArray();
-                if ( autoEnabledWorlds.Length > 0 ) {
+                World[] autoEnabledWorlds = WorldManager.Worlds.Where(w => (w.BlockDB.EnabledState == YesNoAuto.Auto) && w.BlockDB.IsEnabled).ToArray();
+                if (autoEnabledWorlds.Length > 0)
+                {
                     total += autoEnabledWorlds.Length;
-                    player.Message( "BlockDB is auto-enabled on: {0}",
-                                    autoEnabledWorlds.JoinToClassyString() );
+                    player.Message("BlockDB is auto-enabled on: {0}",
+                                    autoEnabledWorlds.JoinToClassyString());
                 }
 
-                World[] manuallyEnabledWorlds = WorldManager.Worlds.Where( w => w.BlockDB.EnabledState == YesNoAuto.Yes ).ToArray();
-                if ( manuallyEnabledWorlds.Length > 0 ) {
+                World[] manuallyEnabledWorlds = WorldManager.Worlds.Where(w => w.BlockDB.EnabledState == YesNoAuto.Yes).ToArray();
+                if (manuallyEnabledWorlds.Length > 0)
+                {
                     total += manuallyEnabledWorlds.Length;
-                    player.Message( "BlockDB is manually enabled on: {0}",
-                                    manuallyEnabledWorlds.JoinToClassyString() );
+                    player.Message("BlockDB is manually enabled on: {0}",
+                                    manuallyEnabledWorlds.JoinToClassyString());
                 }
 
-                World[] manuallyDisabledWorlds = WorldManager.Worlds.Where( w => w.BlockDB.EnabledState == YesNoAuto.No ).ToArray();
-                if ( manuallyDisabledWorlds.Length > 0 ) {
-                    player.Message( "BlockDB is manually disabled on: {0}",
-                                    manuallyDisabledWorlds.JoinToClassyString() );
+                World[] manuallyDisabledWorlds = WorldManager.Worlds.Where(w => w.BlockDB.EnabledState == YesNoAuto.No).ToArray();
+                if (manuallyDisabledWorlds.Length > 0)
+                {
+                    player.Message("BlockDB is manually disabled on: {0}",
+                                    manuallyDisabledWorlds.JoinToClassyString());
                 }
 
-                if ( total == 0 ) {
-                    player.Message( "BlockDB is not enabled on any world." );
+                if (total == 0)
+                {
+                    player.Message("BlockDB is not enabled on any world.");
                 }
                 return;
             }
 
-            World world = WorldManager.FindWorldOrPrintMatches( player, worldName );
-            if ( world == null ) return;
+            World world = WorldManager.FindWorldOrPrintMatches(player, worldName);
+            if (world == null) return;
             BlockDB db = world.BlockDB;
 
-            using ( db.GetWriteLock() ) {
+            using (db.GetWriteLock())
+            {
                 string op = cmd.Next();
-                if ( op == null ) {
-                    if ( !db.IsEnabled ) {
-                        if ( db.EnabledState == YesNoAuto.Auto ) {
-                            player.Message( "BlockDB is disabled (auto) on world {0}", world.ClassyName );
-                        } else {
-                            player.Message( "BlockDB is disabled on world {0}", world.ClassyName );
+                if (op == null)
+                {
+                    if (!db.IsEnabled)
+                    {
+                        if (db.EnabledState == YesNoAuto.Auto)
+                        {
+                            player.Message("BlockDB is disabled (auto) on world {0}", world.ClassyName);
                         }
-                    } else {
-                        if ( db.IsPreloaded ) {
-                            if ( db.EnabledState == YesNoAuto.Auto ) {
-                                player.Message( "BlockDB is enabled (auto) and preloaded on world {0}", world.ClassyName );
-                            } else {
-                                player.Message( "BlockDB is enabled and preloaded on world {0}", world.ClassyName );
+                        else
+                        {
+                            player.Message("BlockDB is disabled on world {0}", world.ClassyName);
+                        }
+                    }
+                    else
+                    {
+                        if (db.IsPreloaded)
+                        {
+                            if (db.EnabledState == YesNoAuto.Auto)
+                            {
+                                player.Message("BlockDB is enabled (auto) and preloaded on world {0}", world.ClassyName);
                             }
-                        } else {
-                            if ( db.EnabledState == YesNoAuto.Auto ) {
-                                player.Message( "BlockDB is enabled (auto) on world {0}", world.ClassyName );
-                            } else {
-                                player.Message( "BlockDB is enabled on world {0}", world.ClassyName );
+                            else
+                            {
+                                player.Message("BlockDB is enabled and preloaded on world {0}", world.ClassyName);
                             }
                         }
-                        player.Message( "    Change limit: {0}    Time limit: {1}",
+                        else
+                        {
+                            if (db.EnabledState == YesNoAuto.Auto)
+                            {
+                                player.Message("BlockDB is enabled (auto) on world {0}", world.ClassyName);
+                            }
+                            else
+                            {
+                                player.Message("BlockDB is enabled on world {0}", world.ClassyName);
+                            }
+                        }
+                        player.Message("    Change limit: {0}    Time limit: {1}",
                                         db.Limit == 0 ? "none" : db.Limit.ToStringInvariant(),
-                                        db.TimeLimit == TimeSpan.Zero ? "none" : db.TimeLimit.ToMiniString() );
+                                        db.TimeLimit == TimeSpan.Zero ? "none" : db.TimeLimit.ToMiniString());
                     }
                     return;
                 }
 
-                switch ( op.ToLower() ) {
+                switch (op.ToLower())
+                {
                     case "on":
                         // enables BlockDB
-                        if ( db.EnabledState == YesNoAuto.Yes ) {
-                            player.Message( "BlockDB is already manually enabled on world {0}", world.ClassyName );
+                        if (db.EnabledState == YesNoAuto.Yes)
+                        {
+                            player.Message("BlockDB is already manually enabled on world {0}", world.ClassyName);
 
-                        } else if ( db.EnabledState == YesNoAuto.Auto && db.IsEnabled ) {
+                        }
+                        else if (db.EnabledState == YesNoAuto.Auto && db.IsEnabled)
+                        {
                             db.EnabledState = YesNoAuto.Yes;
                             WorldManager.SaveWorldList();
-                            player.Message( "BlockDB was auto-enabled, and is now manually enabled on world {0}", world.ClassyName );
+                            player.Message("BlockDB was auto-enabled, and is now manually enabled on world {0}", world.ClassyName);
 
-                        } else {
-                            Logger.Log( LogType.UserActivity,
+                        }
+                        else
+                        {
+                            Logger.Log(LogType.UserActivity,
                                         "BlockDB: Player {0} enabled BlockDB on world {1} (was {2})",
-                                        player.Name, world.Name, db.EnabledState );
+                                        player.Name, world.Name, db.EnabledState);
                             db.EnabledState = YesNoAuto.Yes;
                             WorldManager.SaveWorldList();
-                            player.Message( "BlockDB is now manually enabled on world {0}", world.ClassyName );
+                            player.Message("BlockDB is now manually enabled on world {0}", world.ClassyName);
                         }
                         break;
 
                     case "off":
                         // disables BlockDB
-                        if ( db.EnabledState == YesNoAuto.No ) {
-                            player.Message( "BlockDB is already manually disabled on world {0}", world.ClassyName );
+                        if (db.EnabledState == YesNoAuto.No)
+                        {
+                            player.Message("BlockDB is already manually disabled on world {0}", world.ClassyName);
 
-                        } else if ( db.IsEnabled ) {
-                            if ( cmd.IsConfirmed ) {
+                        }
+                        else if (db.IsEnabled)
+                        {
+                            if (cmd.IsConfirmed)
+                            {
                                 db.EnabledState = YesNoAuto.No;
                                 WorldManager.SaveWorldList();
-                                player.Message( "BlockDB is now manually disabled on world {0}&S. Use &H/BlockDB {1} clear&S to delete all the data.",
-                                                world.ClassyName, world.Name );
-                            } else {
-                                Logger.Log( LogType.UserActivity,
-                                            "BlockDB: Asked {0} to confirm disabling BlockDB on world {1}",
-                                            player.Name, world.Name );
-                                player.Confirm( cmd,
-                                                "Disable BlockDB on world {0}&S? Block changes will stop being recorded.",
-                                                world.ClassyName );
+                                player.Message("BlockDB is now manually disabled on world {0}&S. Use &H/BlockDB {1} clear&S to delete all the data.",
+                                                world.ClassyName, world.Name);
                             }
-                        } else {
-                            Logger.Log( LogType.UserActivity,
+                            else
+                            {
+                                Logger.Log(LogType.UserActivity,
+                                            "BlockDB: Asked {0} to confirm disabling BlockDB on world {1}",
+                                            player.Name, world.Name);
+                                player.Confirm(cmd,
+                                                "Disable BlockDB on world {0}&S? Block changes will stop being recorded.",
+                                                world.ClassyName);
+                            }
+                        }
+                        else
+                        {
+                            Logger.Log(LogType.UserActivity,
                                         "BlockDB: Player {0} disabled BlockDB on world {1} (was {2})",
-                                        player.Name, world.Name, db.EnabledState );
+                                        player.Name, world.Name, db.EnabledState);
                             db.EnabledState = YesNoAuto.No;
                             WorldManager.SaveWorldList();
-                            player.Message( "BlockDB was auto-disabled, and is now manually disabled on world {0}&S.",
-                                            world.ClassyName );
+                            player.Message("BlockDB was auto-disabled, and is now manually disabled on world {0}&S.",
+                                            world.ClassyName);
                         }
                         break;
 
                     case "auto":
-                        if ( db.EnabledState == YesNoAuto.Auto ) {
-                            player.Message( "BlockDB is already set to automatically enable/disable itself on world {0}", world.ClassyName );
-                        } else {
-                            Logger.Log( LogType.UserActivity,
+                        if (db.EnabledState == YesNoAuto.Auto)
+                        {
+                            player.Message("BlockDB is already set to automatically enable/disable itself on world {0}", world.ClassyName);
+                        }
+                        else
+                        {
+                            Logger.Log(LogType.UserActivity,
                                         "BlockDB: Player {0} set BlockDB state on world {1} to Auto (was {2})",
-                                        player.Name, world.Name, db.EnabledState );
+                                        player.Name, world.Name, db.EnabledState);
                             db.EnabledState = YesNoAuto.Auto;
                             WorldManager.SaveWorldList();
-                            if ( db.IsEnabled ) {
-                                player.Message( "BlockDB is now auto-enabled on world {0}",
-                                                world.ClassyName );
-                            } else {
-                                player.Message( "BlockDB is now auto-disabled on world {0}",
-                                                world.ClassyName );
+                            if (db.IsEnabled)
+                            {
+                                player.Message("BlockDB is now auto-enabled on world {0}",
+                                                world.ClassyName);
+                            }
+                            else
+                            {
+                                player.Message("BlockDB is now auto-disabled on world {0}",
+                                                world.ClassyName);
                             }
                         }
                         break;
 
                     case "limit":
                         // sets or resets limit on the number of changes to store
-                        if ( db.IsEnabled ) {
+                        if (db.IsEnabled)
+                        {
                             string limitString = cmd.Next();
                             int limitNumber;
 
-                            if ( limitString == null ) {
-                                player.Message( "BlockDB: Limit for world {0}&S is {1}",
+                            if (limitString == null)
+                            {
+                                player.Message("BlockDB: Limit for world {0}&S is {1}",
                                                 world.ClassyName,
-                                                ( db.Limit == 0 ? "none" : db.Limit.ToStringInvariant() ) );
+                                                (db.Limit == 0 ? "none" : db.Limit.ToStringInvariant()));
                                 return;
                             }
 
-                            if ( limitString.Equals( "none", StringComparison.OrdinalIgnoreCase ) ) {
+                            if (limitString.Equals("none", StringComparison.OrdinalIgnoreCase))
+                            {
                                 limitNumber = 0;
 
-                            } else if ( !Int32.TryParse( limitString, out limitNumber ) ) {
-                                CdBlockDB.PrintUsage( player );
+                            }
+                            else if (!Int32.TryParse(limitString, out limitNumber))
+                            {
+                                CdBlockDB.PrintUsage(player);
                                 return;
 
-                            } else if ( limitNumber < 0 ) {
-                                player.Message( "BlockDB: Limit must be non-negative." );
+                            }
+                            else if (limitNumber < 0)
+                            {
+                                player.Message("BlockDB: Limit must be non-negative.");
                                 return;
                             }
 
-                            string limitDisplayString = ( limitNumber == 0 ? "none" : limitNumber.ToStringInvariant() );
-                            if ( db.Limit == limitNumber ) {
-                                player.Message( "BlockDB: Limit for world {0}&S is already set to {1}",
-                                               world.ClassyName, limitDisplayString );
+                            string limitDisplayString = (limitNumber == 0 ? "none" : limitNumber.ToStringInvariant());
+                            if (db.Limit == limitNumber)
+                            {
+                                player.Message("BlockDB: Limit for world {0}&S is already set to {1}",
+                                               world.ClassyName, limitDisplayString);
 
-                            } else if ( !cmd.IsConfirmed && limitNumber != 0 ) {
-                                Logger.Log( LogType.UserActivity,
+                            }
+                            else if (!cmd.IsConfirmed && limitNumber != 0)
+                            {
+                                Logger.Log(LogType.UserActivity,
                                             "BlockDB: Asked {0} to confirm changing BlockDB limit on world {1}",
-                                            player.Name, world.Name );
-                                player.Confirm( cmd, "BlockDB: Change limit? Some old data for world {0}&S may be discarded.", world.ClassyName );
+                                            player.Name, world.Name);
+                                player.Confirm(cmd, "BlockDB: Change limit? Some old data for world {0}&S may be discarded.", world.ClassyName);
 
-                            } else {
+                            }
+                            else
+                            {
                                 db.Limit = limitNumber;
                                 WorldManager.SaveWorldList();
-                                player.Message( "BlockDB: Limit for world {0}&S set to {1}",
-                                               world.ClassyName, limitDisplayString );
+                                player.Message("BlockDB: Limit for world {0}&S set to {1}",
+                                               world.ClassyName, limitDisplayString);
                             }
 
-                        } else {
-                            player.Message( "Block tracking is disabled on world {0}", world.ClassyName );
+                        }
+                        else
+                        {
+                            player.Message("Block tracking is disabled on world {0}", world.ClassyName);
                         }
                         break;
 
                     case "timelimit":
                         // sets or resets limit on the age of changes to store
-                        if ( db.IsEnabled ) {
+                        if (db.IsEnabled)
+                        {
                             string limitString = cmd.Next();
 
-                            if ( limitString == null ) {
-                                if ( db.TimeLimit == TimeSpan.Zero ) {
-                                    player.Message( "BlockDB: There is no time limit for world {0}",
-                                                    world.ClassyName );
-                                } else {
-                                    player.Message( "BlockDB: Time limit for world {0}&S is {1}",
-                                                    world.ClassyName, db.TimeLimit.ToMiniString() );
+                            if (limitString == null)
+                            {
+                                if (db.TimeLimit == TimeSpan.Zero)
+                                {
+                                    player.Message("BlockDB: There is no time limit for world {0}",
+                                                    world.ClassyName);
+                                }
+                                else
+                                {
+                                    player.Message("BlockDB: Time limit for world {0}&S is {1}",
+                                                    world.ClassyName, db.TimeLimit.ToMiniString());
                                 }
                                 return;
                             }
 
                             TimeSpan limit;
-                            if ( limitString.Equals( "none", StringComparison.OrdinalIgnoreCase ) ) {
+                            if (limitString.Equals("none", StringComparison.OrdinalIgnoreCase))
+                            {
                                 limit = TimeSpan.Zero;
 
-                            } else if ( !limitString.TryParseMiniTimespan( out limit ) ) {
-                                CdBlockDB.PrintUsage( player );
+                            }
+                            else if (!limitString.TryParseMiniTimespan(out limit))
+                            {
+                                CdBlockDB.PrintUsage(player);
                                 return;
                             }
-                            if ( limit > DateTimeUtil.MaxTimeSpan ) {
+                            if (limit > DateTimeUtil.MaxTimeSpan)
+                            {
                                 player.MessageMaxTimeSpan();
                                 return;
                             }
 
-                            if ( db.TimeLimit == limit ) {
-                                if ( db.TimeLimit == TimeSpan.Zero ) {
-                                    player.Message( "BlockDB: There is already no time limit for world {0}",
-                                                    world.ClassyName );
-                                } else {
-                                    player.Message( "BlockDB: Time limit for world {0}&S is already set to {1}",
-                                                    world.ClassyName, db.TimeLimit.ToMiniString() );
+                            if (db.TimeLimit == limit)
+                            {
+                                if (db.TimeLimit == TimeSpan.Zero)
+                                {
+                                    player.Message("BlockDB: There is already no time limit for world {0}",
+                                                    world.ClassyName);
+                                }
+                                else
+                                {
+                                    player.Message("BlockDB: Time limit for world {0}&S is already set to {1}",
+                                                    world.ClassyName, db.TimeLimit.ToMiniString());
                                 }
 
-                            } else if ( !cmd.IsConfirmed && limit != TimeSpan.Zero ) {
-                                Logger.Log( LogType.UserActivity,
+                            }
+                            else if (!cmd.IsConfirmed && limit != TimeSpan.Zero)
+                            {
+                                Logger.Log(LogType.UserActivity,
                                             "BlockDB: Asked {0} to confirm changing BlockDB time limit on world {1}",
-                                            player.Name, world.Name );
-                                player.Confirm( cmd, "BlockDB: Change time limit? Some old data for world {0}&S may be discarded.", world.ClassyName );
+                                            player.Name, world.Name);
+                                player.Confirm(cmd, "BlockDB: Change time limit? Some old data for world {0}&S may be discarded.", world.ClassyName);
 
-                            } else {
+                            }
+                            else
+                            {
                                 db.TimeLimit = limit;
                                 WorldManager.SaveWorldList();
-                                if ( db.TimeLimit == TimeSpan.Zero ) {
-                                    player.Message( "BlockDB: Time limit removed for world {0}",
-                                                    world.ClassyName );
-                                } else {
-                                    player.Message( "BlockDB: Time limit for world {0}&S set to {1}",
-                                                    world.ClassyName, db.TimeLimit.ToMiniString() );
+                                if (db.TimeLimit == TimeSpan.Zero)
+                                {
+                                    player.Message("BlockDB: Time limit removed for world {0}",
+                                                    world.ClassyName);
+                                }
+                                else
+                                {
+                                    player.Message("BlockDB: Time limit for world {0}&S set to {1}",
+                                                    world.ClassyName, db.TimeLimit.ToMiniString());
                                 }
                             }
 
-                        } else {
-                            player.Message( "Block tracking is disabled on world {0}", world.ClassyName );
+                        }
+                        else
+                        {
+                            player.Message("Block tracking is disabled on world {0}", world.ClassyName);
                         }
                         break;
 
                     case "clear":
                         // wipes BlockDB data
-                        bool hasData = ( db.IsEnabled || File.Exists( db.FileName ) );
-                        if ( hasData ) {
-                            if ( cmd.IsConfirmed ) {
+                        bool hasData = (db.IsEnabled || File.Exists(db.FileName));
+                        if (hasData)
+                        {
+                            if (cmd.IsConfirmed)
+                            {
                                 db.Clear();
-                                Logger.Log( LogType.UserActivity,
+                                Logger.Log(LogType.UserActivity,
                                             "BlockDB: Player {0} cleared BlockDB data world {1}",
-                                            player.Name, world.Name );
-                                player.Message( "BlockDB: Cleared all data for {0}", world.ClassyName );
-                            } else {
-                                Logger.Log( LogType.UserActivity,
-                                            "BlockDB: Asked {0} to confirm clearing BlockDB data world {1}",
-                                            player.Name, world.Name );
-                                player.Confirm( cmd, "Clear BlockDB data for world {0}&S? This cannot be undone.",
-                                                world.ClassyName );
+                                            player.Name, world.Name);
+                                player.Message("BlockDB: Cleared all data for {0}", world.ClassyName);
                             }
-                        } else {
-                            player.Message( "BlockDB: No data to clear for world {0}", world.ClassyName );
+                            else
+                            {
+                                Logger.Log(LogType.UserActivity,
+                                            "BlockDB: Asked {0} to confirm clearing BlockDB data world {1}",
+                                            player.Name, world.Name);
+                                player.Confirm(cmd, "Clear BlockDB data for world {0}&S? This cannot be undone.",
+                                                world.ClassyName);
+                            }
+                        }
+                        else
+                        {
+                            player.Message("BlockDB: No data to clear for world {0}", world.ClassyName);
                         }
                         break;
 
                     case "preload":
                         // enables/disables BlockDB preloading
-                        if ( db.IsEnabled ) {
+                        if (db.IsEnabled)
+                        {
                             string param = cmd.Next();
-                            if ( param == null ) {
+                            if (param == null)
+                            {
                                 // shows current preload setting
-                                player.Message( "BlockDB preloading is {0} for world {1}",
-                                                ( db.IsPreloaded ? "ON" : "OFF" ),
-                                                world.ClassyName );
+                                player.Message("BlockDB preloading is {0} for world {1}",
+                                                (db.IsPreloaded ? "ON" : "OFF"),
+                                                world.ClassyName);
 
-                            } else if ( param.Equals( "on", StringComparison.OrdinalIgnoreCase ) ) {
+                            }
+                            else if (param.Equals("on", StringComparison.OrdinalIgnoreCase))
+                            {
                                 // turns preload on
-                                if ( db.IsPreloaded ) {
-                                    player.Message( "BlockDB preloading is already enabled on world {0}", world.ClassyName );
-                                } else {
+                                if (db.IsPreloaded)
+                                {
+                                    player.Message("BlockDB preloading is already enabled on world {0}", world.ClassyName);
+                                }
+                                else
+                                {
                                     db.IsPreloaded = true;
                                     WorldManager.SaveWorldList();
-                                    player.Message( "BlockDB preloading is now enabled on world {0}", world.ClassyName );
+                                    player.Message("BlockDB preloading is now enabled on world {0}", world.ClassyName);
                                 }
 
-                            } else if ( param.Equals( "off", StringComparison.OrdinalIgnoreCase ) ) {
+                            }
+                            else if (param.Equals("off", StringComparison.OrdinalIgnoreCase))
+                            {
                                 // turns preload off
-                                if ( !db.IsPreloaded ) {
-                                    player.Message( "BlockDB preloading is already disabled on world {0}", world.ClassyName );
-                                } else {
+                                if (!db.IsPreloaded)
+                                {
+                                    player.Message("BlockDB preloading is already disabled on world {0}", world.ClassyName);
+                                }
+                                else
+                                {
                                     db.IsPreloaded = false;
                                     WorldManager.SaveWorldList();
-                                    player.Message( "BlockDB preloading is now disabled on world {0}", world.ClassyName );
+                                    player.Message("BlockDB preloading is now disabled on world {0}", world.ClassyName);
                                 }
 
-                            } else {
-                                CdBlockDB.PrintUsage( player );
                             }
-                        } else {
-                            player.Message( "Block tracking is disabled on world {0}", world.ClassyName );
+                            else
+                            {
+                                CdBlockDB.PrintUsage(player);
+                            }
+                        }
+                        else
+                        {
+                            player.Message("Block tracking is disabled on world {0}", world.ClassyName);
                         }
                         break;
 
                     default:
                         // unknown operand
-                        CdBlockDB.PrintUsage( player );
+                        CdBlockDB.PrintUsage(player);
                         return;
                 }
             }
@@ -1351,7 +524,8 @@ namespace fCraft {
 
         #region BlockInfo
 
-        static readonly CommandDescriptor CdBlockInfo = new CommandDescriptor {
+        static readonly CommandDescriptor CdBlockInfo = new CommandDescriptor
+        {
             Name = "BInfo",
             Category = CommandCategory.World,
             Aliases = new[] { "b", "bi", "whodid", "about" },
@@ -1362,85 +536,106 @@ namespace fCraft {
             Handler = BlockInfoHandler
         };
 
-        static void BlockInfoHandler ( Player player, Command cmd ) {
+        static void BlockInfoHandler(Player player, Command cmd)
+        {
             World playerWorld = player.World;
-            if ( playerWorld == null ) PlayerOpException.ThrowNoWorld( player );
+            if (playerWorld == null) PlayerOpException.ThrowNoWorld(player);
 
             // Make sure BlockDB is usable
-            if ( !BlockDB.IsEnabledGlobally ) {
-                player.Message( "&WBlockDB is disabled on this server." );
+            if (!BlockDB.IsEnabledGlobally)
+            {
+                player.Message("&WBlockDB is disabled on this server.");
                 return;
             }
-            if ( !playerWorld.BlockDB.IsEnabled ) {
-                player.Message( "&WBlockDB is disabled in this world." );
+            if (!playerWorld.BlockDB.IsEnabled)
+            {
+                player.Message("&WBlockDB is disabled in this world.");
                 return;
             }
 
             int x, y, z;
-            if ( cmd.NextInt( out x ) && cmd.NextInt( out y ) && cmd.NextInt( out z ) ) {
+            if (cmd.NextInt(out x) && cmd.NextInt(out y) && cmd.NextInt(out z))
+            {
                 // If block coordinates are given, run the BlockDB query right away
-                if ( cmd.HasNext ) {
-                    CdBlockInfo.PrintUsage( player );
+                if (cmd.HasNext)
+                {
+                    CdBlockInfo.PrintUsage(player);
                     return;
                 }
-                Vector3I coords = new Vector3I( x, y, z );
+                Vector3I coords = new Vector3I(x, y, z);
                 Map map = player.WorldMap;
-                coords.X = Math.Min( map.Width - 1, Math.Max( 0, coords.X ) );
-                coords.Y = Math.Min( map.Length - 1, Math.Max( 0, coords.Y ) );
-                coords.Z = Math.Min( map.Height - 1, Math.Max( 0, coords.Z ) );
-                BlockInfoSelectionCallback( player, new[] { coords }, null );
+                coords.X = Math.Min(map.Width - 1, Math.Max(0, coords.X));
+                coords.Y = Math.Min(map.Length - 1, Math.Max(0, coords.Y));
+                coords.Z = Math.Min(map.Height - 1, Math.Max(0, coords.Z));
+                BlockInfoSelectionCallback(player, new[] { coords }, null);
 
-            } else {
+            }
+            else
+            {
                 // Otherwise, start a selection
-                player.Message( "BInfo: Click a block to look it up." );
-                player.SelectionStart( 1, BlockInfoSelectionCallback, null, CdBlockInfo.Permissions );
+                player.Message("BInfo: Click a block to look it up.");
+                player.SelectionStart(1, BlockInfoSelectionCallback, null, CdBlockInfo.Permissions);
             }
         }
 
-        static void BlockInfoSelectionCallback ( Player player, Vector3I[] marks, object tag ) {
-            var args = new BlockInfoLookupArgs {
+        static void BlockInfoSelectionCallback(Player player, Vector3I[] marks, object tag)
+        {
+            var args = new BlockInfoLookupArgs
+            {
                 Player = player,
                 World = player.World,
                 Coordinate = marks[0]
             };
 
-            Scheduler.NewBackgroundTask( BlockInfoSchedulerCallback, args ).RunOnce();
+            Scheduler.NewBackgroundTask(BlockInfoSchedulerCallback, args).RunOnce();
         }
 
 
-        sealed class BlockInfoLookupArgs {
+        sealed class BlockInfoLookupArgs
+        {
             public Player Player;
             public World World;
             public Vector3I Coordinate;
         }
 
         const int MaxBlockChangesToList = 15;
-        static void BlockInfoSchedulerCallback ( SchedulerTask task ) {
-            BlockInfoLookupArgs args = ( BlockInfoLookupArgs )task.UserState;
-            if ( !args.World.BlockDB.IsEnabled ) {
-                args.Player.Message( "&WBlockDB is disabled in this world." );
+        static void BlockInfoSchedulerCallback(SchedulerTask task)
+        {
+            BlockInfoLookupArgs args = (BlockInfoLookupArgs)task.UserState;
+            if (!args.World.BlockDB.IsEnabled)
+            {
+                args.Player.Message("&WBlockDB is disabled in this world.");
                 return;
             }
-            BlockDBEntry[] results = args.World.BlockDB.Lookup( MaxBlockChangesToList, args.Coordinate );
-            if ( results.Length > 0 ) {
-                Array.Reverse( results );
-                foreach ( BlockDBEntry entry in results ) {
-                    string date = DateTime.UtcNow.Subtract( DateTimeUtil.TryParseDateTime( entry.Timestamp ) ).ToMiniString();
+            BlockDBEntry[] results = args.World.BlockDB.Lookup(MaxBlockChangesToList, args.Coordinate);
+            if (results.Length > 0)
+            {
+                Array.Reverse(results);
+                foreach (BlockDBEntry entry in results)
+                {
+                    string date = DateTime.UtcNow.Subtract(DateTimeUtil.TryParseDateTime(entry.Timestamp)).ToMiniString();
 
-                    PlayerInfo info = PlayerDB.FindPlayerInfoByID( entry.PlayerID );
+                    PlayerInfo info = PlayerDB.FindPlayerInfoByID(entry.PlayerID);
                     string playerName;
-                    if ( info == null ) {
+                    if (info == null)
+                    {
                         playerName = "?";
-                    } else {
+                    }
+                    else
+                    {
                         Player target = info.PlayerObject;
-                        if ( target != null && args.Player.CanSee( target ) ) {
+                        if (target != null && args.Player.CanSee(target))
+                        {
                             playerName = info.ClassyName;
-                        } else {
+                        }
+                        else
+                        {
                             playerName = info.ClassyName + "&S (offline)";
                         }
                     }
                     string contextString;
-                    switch ( entry.Context ) {
+                    switch (entry.Context)
+                    {
                         case BlockChangeContext.Manual:
                             contextString = "";
                             break;
@@ -1451,34 +646,44 @@ namespace fCraft {
                             contextString = " (Redone)";
                             break;
                         default:
-                            if ( ( entry.Context & BlockChangeContext.Drawn ) == BlockChangeContext.Drawn &&
-                                entry.Context != BlockChangeContext.Drawn ) {
-                                contextString = " (" + ( entry.Context & ~BlockChangeContext.Drawn ) + ")";
-                            } else {
+                            if ((entry.Context & BlockChangeContext.Drawn) == BlockChangeContext.Drawn &&
+                                entry.Context != BlockChangeContext.Drawn)
+                            {
+                                contextString = " (" + (entry.Context & ~BlockChangeContext.Drawn) + ")";
+                            }
+                            else
+                            {
                                 contextString = " (" + entry.Context + ")";
                             }
                             break;
                     }
 
-                    if ( entry.OldBlock == ( byte )Block.Air ) {
-                        args.Player.Message( "&S  {0} ago: {1}&S placed {2}{3}",
-                                             date, playerName, entry.NewBlock, contextString );
-                    } else if ( entry.NewBlock == ( byte )Block.Air ) {
-                        args.Player.Message( "&S  {0} ago: {1}&S deleted {2}{3}",
-                                             date, playerName, entry.OldBlock, contextString );
-                    } else {
-                        args.Player.Message( "&S  {0} ago: {1}&S replaced {2} with {3}{4}",
-                                             date, playerName, entry.OldBlock, entry.NewBlock, contextString );
+                    if (entry.OldBlock == (byte)Block.Air)
+                    {
+                        args.Player.Message("&S  {0} ago: {1}&S placed {2}{3}",
+                                             date, playerName, entry.NewBlock, contextString);
+                    }
+                    else if (entry.NewBlock == (byte)Block.Air)
+                    {
+                        args.Player.Message("&S  {0} ago: {1}&S deleted {2}{3}",
+                                             date, playerName, entry.OldBlock, contextString);
+                    }
+                    else
+                    {
+                        args.Player.Message("&S  {0} ago: {1}&S replaced {2} with {3}{4}",
+                                             date, playerName, entry.OldBlock, entry.NewBlock, contextString);
                     }
                 }
-            } else {
-                args.Player.Message( "BlockInfo: No results for {0}",
-                                     args.Coordinate );
+            }
+            else
+            {
+                args.Player.Message("BlockInfo: No results for {0}",
+                                     args.Coordinate);
             }
         }
 
         #endregion
-        #endregion
+
 
         #region Env
 
@@ -1944,7 +1149,7 @@ namespace fCraft {
         #endregion
 
 
-        #region Gen
+        #region Generate
 
         static readonly CommandDescriptor CdGenerate = new CommandDescriptor {
             Name = "Gen",
@@ -1952,7 +1157,11 @@ namespace fCraft {
             IsConsoleSafe = true,
             Permissions = new[] { Permission.ManageWorlds },
             Usage = "/Gen Theme Template [Width Length Height] [FileName]",
-            //Help is assigned by WorldCommands.Init
+            Help = "Generates a new map. If no dimensions are given, uses current world's dimensions. " +
+                   "If no filename is given, loads generated world into current world.\n" +
+                   "Available themes: Grass, " + Enum.GetNames( typeof( MapGenTheme ) ).JoinToString() + '\n' +
+                   "Available terrain types: Empty, Ocean, " + Enum.GetNames( typeof( MapGenTemplate ) ).JoinToString() + '\n' +
+                   "Note: You do not need to specify a theme with \"Empty\" and \"Ocean\" templates.",
             Handler = GenHandler
         };
 
@@ -2194,6 +1403,7 @@ namespace fCraft {
 
         #endregion
 
+
         #region Join
 
         static readonly CommandDescriptor CdJoin = new CommandDescriptor {
@@ -2267,7 +1477,995 @@ namespace fCraft {
         #endregion
 
 
-        #region WLock, WUnlock
+        #region MessageBlocks
+        static readonly CommandDescriptor CdMessageBlock = new CommandDescriptor {
+            Name = "MessageBlock",
+            Aliases = new[] { "mb" },
+            Category = CommandCategory.Building,
+            Permissions = new[] { Permission.ManageMessageBlocks },
+            IsConsoleSafe = false,
+            Usage = "/MessageBlock [add | remove | info | list]",
+            Help = "Create and controls a MessageBlock, options are: add, remove, list, info\n&S" +
+                   "See &H/Help MessageBlock <option>&S for details about each option.",
+            HelpSections = new Dictionary<string, string>() {
+                { "add",     "&H/MessageBlock add [Your Message Goes here]\n&S" +
+                                "Adds a MessageBlock with a custom message. When a player walks in" +
+                                 " radius of a message block the message inside is shown to them."},
+                { "remove",     "&H/MessageBlock remove MessageBlock1\n&S" +
+                                "Removes MessageBlock with name 'MessageBlock1'."},
+                { "list",       "&H/MessageBlock list\n&S" +
+                                "Gives you a list of MessageBlocks in the current world."},
+                { "info",       "&H/MessageBlock info MB1\n&S" +
+                                "Gives you information of MessageBlock with name 'MB1'."},
+            },
+            Handler = MessageBlock
+        };
+        static void MessageBlock ( Player player, Command cmd ) {
+            string option = cmd.Next();
+            if ( option == null ) {
+                CdMessageBlock.PrintUsage( player );
+                return;
+            } else if ( option.ToLower() == "add" || option.ToLower() == "create" ) {
+                string Message = cmd.NextAll();
+                player.SelectionStart( 1, MessageBlockAdd, Message, CdMessageBlock.Permissions );
+                player.Message( "MessageBlock: Place a block or type /mark to use your location." );
+                return;
+            } else if ( option.ToLower().Equals( "remove" ) || option.ToLower().Equals( "rd" ) ) {
+                string MessageBlockName = cmd.Next();
+
+                if ( MessageBlockName == null ) {
+                    player.Message( "No MessageBlock name specified." );
+                } else {
+                    if ( player.World.Map.MessageBlocks != null && player.World.Map.MessageBlocks.Count > 0 ) {
+                        bool found = false;
+                        MessageBlock MessageBlockFound = null;
+
+                        lock ( player.World.Map.MessageBlocks.SyncRoot ) {
+                            foreach ( MessageBlock MessageBlock in player.World.Map.MessageBlocks ) {
+                                if ( MessageBlock.Name.ToLower().Equals( MessageBlockName.ToLower() ) ) {
+                                    MessageBlockFound = MessageBlock;
+                                    found = true;
+                                    break;
+                                }
+                            }
+
+                            if ( !found ) {
+                                player.Message( "Could not find MessageBlock by name {0}.", MessageBlockName );
+                            } else {
+                                MessageBlockFound.Remove( player );
+                                player.Message( "MessageBlock was removed." );
+                            }
+                        }
+                    } else {
+                        player.Message( "Could not find MessageBlock as this world doesn't contain a MessageBlock." );
+                    }
+                }
+            } else if ( option.ToLower().Equals( "info" ) ) {
+                string MessageBlockName = cmd.Next();
+
+                if ( MessageBlockName == null ) {
+                    player.Message( "No MessageBlock name specified." );
+                } else {
+                    if ( player.World.Map.MessageBlocks != null && player.World.Map.MessageBlocks.Count > 0 ) {
+                        bool found = false;
+
+                        lock ( player.World.Map.MessageBlocks.SyncRoot ) {
+                            foreach ( MessageBlock MessageBlock in player.World.Map.MessageBlocks ) {
+                                if ( MessageBlock.Name.ToLower().Equals( MessageBlockName.ToLower() ) ) {
+                                    World MessageBlockWorld = WorldManager.FindWorldExact( MessageBlock.World );
+                                    player.Message( "MessageBlock '{0}&S' was created by {1}&S at {2}",
+                                        MessageBlock.Name, MessageBlock.Creator, MessageBlock.Created );
+                                    found = true;
+                                }
+                            }
+                        }
+
+                        if ( !found ) {
+                            player.Message( "Could not find MessageBlock by name {0}.", MessageBlockName );
+                        }
+                    } else {
+                        player.Message( "Could not find MessageBlock as this world doesn't contain a MessageBlock." );
+                    }
+                }
+            } else if ( option.ToLower().Equals( "list" ) ) {
+                if ( player.World.Map.MessageBlocks == null || player.World.Map.MessageBlocks.Count == 0 ) {
+                    player.Message( "There are no MessageBlocks in {0}&S.", player.World.ClassyName );
+                } else {
+                    String[] MessageBlockNames = new String[player.World.Map.MessageBlocks.Count];
+                    System.Text.StringBuilder output = new System.Text.StringBuilder( "There are " + player.World.Map.MessageBlocks.Count + " MessageBlocks in " + player.World.ClassyName + "&S: " );
+
+                    for ( int i = 0; i < player.World.Map.MessageBlocks.Count; i++ ) {
+                        MessageBlockNames[i] = ( ( MessageBlock )player.World.Map.MessageBlocks[i] ).Name;
+                    }
+                    output.Append( MessageBlockNames.JoinToString( ", " ) );
+                    player.Message( output.ToString() );
+                }
+            } else {
+                CdMessageBlock.PrintUsage( player );
+            }
+        }
+
+        static void MessageBlockAdd ( Player player, Vector3I[] marks, object tag ) {
+            string Message = ( string )tag;
+            Vector3I mark = marks[0];
+            if ( !player.Info.Rank.AllowSecurityCircumvention ) {
+                SecurityCheckResult buildCheck = player.World.BuildSecurity.CheckDetailed( player.Info );
+                switch ( buildCheck ) {
+                    case SecurityCheckResult.BlackListed:
+                        player.Message( "Cannot add a MessageBlock to world {0}&S: You are barred from building here.",
+                                        player.World.ClassyName );
+                        return;
+                    case SecurityCheckResult.RankTooLow:
+                        player.Message( "Cannot add a MessageBlock to world {0}&S: You are not allowed to build here.",
+                                        player.World.ClassyName );
+                        return;
+                    //case SecurityCheckResult.RankTooHigh:
+                }
+            }
+            if ( player.LastUsedBlockType != Block.Undefined ) {
+                Vector3I Pos = mark;
+
+                if ( player.CanPlace( player.World.Map, Pos, player.LastUsedBlockType, BlockChangeContext.Manual ) != CanPlaceResult.Allowed ) {
+                    player.Message( "&WYou are not allowed to build here" );
+                    return;
+                }
+
+                Player.RaisePlayerPlacedBlockEvent( player, player.WorldMap, Pos, player.WorldMap.GetBlock( Pos ), player.LastUsedBlockType, BlockChangeContext.Manual );
+                BlockUpdate blockUpdate = new BlockUpdate( null, Pos, player.LastUsedBlockType );
+                player.World.Map.QueueUpdate( blockUpdate );
+            } else {
+                player.Message( "&WError: No last used blocktype was found" );
+                return;
+            }
+            MessageBlock MessageBlock = new MessageBlock( player.World.Name, mark,
+                MessageBlock.GenerateName( player.World ),
+                player.ClassyName, Message );
+            MessageBlock.Range = new MessageBlockRange( mark.X, mark.X, mark.Y, mark.Y, mark.Z, mark.Z );
+
+            MessageBlockHandler.CreateMessageBlock( MessageBlock, player.World );
+            NormalBrush brush = new NormalBrush( Block.Air );
+            Logger.Log( LogType.UserActivity, "{0} created MessageBlock {1} (on world {2})", player.Name, MessageBlock.Name, player.World.Name );
+            player.Message( "MessageBlock created on world {0}&S with name {1}", player.World.ClassyName, MessageBlock.Name );
+        }
+        #endregion
+
+
+        #region Physics
+        static readonly CommandDescriptor CdPhysics = new CommandDescriptor
+        {
+            Name = "Physics",
+            Category = CommandCategory.World,
+            Permissions = new Permission[] { Permission.Physics },
+            IsConsoleSafe = false,
+            Usage = "/Physics <TNT | Fireworks | Water | Plant | Sand | Gun | All> <On / Off>",
+            Help = "Enables / disables a type of Physics for the current world. Physics may use more server resources.",
+            HelpSections = new Dictionary<string, string>() {
+                { "tnt",     "&H/Physics tnt on/off \n&S" +
+                                "Turns TNT exploding physics on / off in the current world"},
+                { "fireworks",     "&H/Physics fireworks on/off \n&S" +
+                                "Turns firework physics on / off in the current world"},
+                { "water",       "&H/Physics water on/off \n&S" +
+                                "Turns water physics on / off in the current world"},
+                { "plant",       "&H/Physics plant on/off \n&S" +
+                                "Turns plant physics on / off in the current world"},
+                { "sand",       "&H/Physics sand on/off \n&S" +
+                                "Turns sand and gravel physics on / off in the current world"},
+                { "gun",       "&H/Physics gun on/off \n&S" +
+                                "Turns gun physics on / off in the current world"},
+                { "all",     "&H/Physics all on/off \n&S" +
+                                "Turns all physics on / off in the current world"},
+            },
+            Handler = PhysicsHandler
+        };
+
+        private static void PhysicsHandler(Player player, Command cmd)
+        {
+            string option = cmd.Next();
+            World world = player.World;
+            if (option == null)
+            {
+                CdPhysics.PrintUsage(player);
+                return;
+            }
+            string NextOp = cmd.Next();
+            if (NextOp == null)
+            {
+                CdPhysics.PrintUsage(player);
+                return;
+            }
+            switch (option.ToLower())
+            {
+                case "tnt":
+                    if (NextOp.ToLower() == "on")
+                    {
+                        world.EnableTNTPhysics(player, true);
+                        return;
+                    }
+                    if (NextOp.ToLower() == "off")
+                    {
+                        world.DisableTNTPhysics(player, true);
+                        return;
+                    }
+                    break;
+                case "gun":
+                    if (NextOp.ToLower() == "on")
+                    {
+                        world.EnableGunPhysics(player, true);
+                        return;
+                    }
+                    if (NextOp.ToLower() == "off")
+                    {
+                        world.DisableGunPhysics(player, true);
+                        return;
+                    }
+                    break;
+                case "plant":
+                    if (NextOp.ToLower() == "off")
+                    {
+                        world.DisablePlantPhysics(player, true);
+                        return;
+                    }
+                    if (NextOp.ToLower() == "on")
+                    {
+                        world.EnablePlantPhysics(player, true);
+                        return;
+                    }
+                    break;
+                case "fireworks":
+                case "firework":
+                    if (NextOp.ToLower() == "on")
+                    {
+                        world.EnableFireworkPhysics(player, true);
+                        return;
+                    }
+                    if (NextOp.ToLower() == "off")
+                    {
+                        world.DisableFireworkPhysics(player, true);
+                        return;
+                    }
+                    break;
+
+                case "sand":
+                    if (NextOp.ToLower() == "on")
+                    {
+                        world.EnableSandPhysics(player, true);
+                        return;
+                    }
+                    if (NextOp.ToLower() == "off")
+                    {
+                        world.DisableSandPhysics(player, true);
+                        return;
+                    }
+                    break;
+                case "water":
+                    if (NextOp.ToLower() == "on")
+                    {
+                        world.EnableWaterPhysics(player, true);
+                        return;
+                    }
+                    if (NextOp.ToLower() == "off")
+                    {
+                        world.DisableWaterPhysics(player, true);
+                        return;
+                    }
+                    break;
+                case "all":
+                    if (NextOp.ToLower() == "on")
+                    {
+                        if (!world.tntPhysics)
+                        {
+                            world.EnableTNTPhysics(player, false);
+                        } if (!world.sandPhysics)
+                        {
+                            world.EnableSandPhysics(player, false);
+                        } if (!world.fireworkPhysics)
+                        {
+                            world.EnableFireworkPhysics(player, false);
+                        } if (!world.waterPhysics)
+                        {
+                            world.EnableWaterPhysics(player, false);
+                        } if (!world.plantPhysics)
+                        {
+                            world.EnablePlantPhysics(player, false);
+                        } if (!world.gunPhysics)
+                        {
+                            world.EnableGunPhysics(player, false);
+                        }
+                        Server.Players.Message("{0}&S turned ALL Physics on for {1}", player.ClassyName, world.ClassyName);
+                        Logger.Log(LogType.SystemActivity, "{0} turned ALL Physics on for {1}", player.Name, world.Name);
+                    }
+                    else if (NextOp.ToLower() == "off")
+                    {
+                        if (world.tntPhysics)
+                        {
+                            world.DisableTNTPhysics(player, false);
+                        } if (world.sandPhysics)
+                        {
+                            world.DisableSandPhysics(player, false);
+                        } if (world.fireworkPhysics)
+                        {
+                            world.DisableFireworkPhysics(player, false);
+                        } if (world.waterPhysics)
+                        {
+                            world.DisableWaterPhysics(player, false);
+                        } if (world.plantPhysics)
+                        {
+                            world.DisablePlantPhysics(player, false);
+                        } if (world.gunPhysics)
+                        {
+                            world.DisableGunPhysics(player, false);
+                        }
+                        Server.Players.Message("{0}&S turned ALL Physics off for {1}", player.ClassyName, world.ClassyName);
+                        Logger.Log(LogType.SystemActivity, "{0} turned ALL Physics off for {1}", player.Name, world.Name);
+                    }
+                    break;
+
+                default: CdPhysics.PrintUsage(player);
+                    break;
+            }
+            WorldManager.SaveWorldList();
+        }
+        #endregion
+
+
+        #region Portal
+
+        static readonly CommandDescriptor CdPortal = new CommandDescriptor {
+            Name = "Portal",
+            Category = CommandCategory.World,
+            Permissions = new Permission[] { Permission.UsePortal },
+            IsConsoleSafe = false,
+            Usage = "/portal [create | remove | info | list | enable | disable ]",
+            Help = "Controls portals, options are: create, remove, list, info, enable, disable\n&S" +
+                   "See &H/Help portal <option>&S for details about each option.",
+            HelpSections = new Dictionary<string, string>() {
+                { "create",     "&H/portal create water Guest\n&S" +
+                                "Creates a basic water portal to world Guest.\n&S" +
+                                "&H/portal create Guest lava test\n&S" +
+                                "Creates a lava portal with name 'test' to world Guest.\n" +
+                                "&H/Portal create will create a portal where the output can be the position of your next red block."},
+                { "remove",     "&H/portal remove Portal1\n&S" +
+                                "Removes portal with name 'Portal1'."},
+                { "list",       "&H/portal list\n&S" +
+                                "Gives you a list of portals in the current world."},
+                { "info",       "&H/portal info Portal1\n&S" +
+                                "Gives you information of portal with name 'Portal1'."},
+                { "enable",     "&H/portal enable\n&S" +
+                                "Enables the use of portals, this is player specific."},
+                { "disable",     "&H/portal disable\n&S" +
+                                "Disables the use of portals, this is player specific."},
+            },
+            Handler = PortalH
+        };
+
+        struct PDATA {
+            public bool custom;
+            public DrawOperation op;
+        }
+        private static void PortalH ( Player player, Command command ) {
+            try {
+                String option = command.Next();
+
+                if ( option == null ) {
+                    CdPortal.PrintUsage( player );
+                } else if ( option.ToLower().Equals( "create" ) ) {
+                    if ( player.Can( Permission.ManagePortal ) ) {
+                        string blockTypeOrName = command.Next();
+                        DrawOperation operation = new CuboidDrawOperation( player );
+                        NormalBrush brush = new NormalBrush( Block.Water, Block.Water );
+                        if ( blockTypeOrName == null ) blockTypeOrName = "water";
+                        if ( blockTypeOrName.ToLower().Equals( "lava" ) ) {
+                            brush = new NormalBrush( Block.Lava, Block.Lava );
+                        } else if ( !blockTypeOrName.ToLower().Equals( "water" ) ) {
+                            player.Message( "Invalid block, choose between water or lava." );
+                            return;
+                        }
+
+                        string world = command.Next();
+                        bool CustomOutput = ( world == null );
+                        operation.Brush = brush;
+                        if ( world != null && WorldManager.FindWorldExact( world ) != null ) {
+                            player.PortalWorld = world;
+                        } else player.PortalWorld = player.World.Name;
+                        player.SelectionStart( operation.ExpectedMarks, PortalCreateCallback, new PDATA() { op = operation, custom = CustomOutput }, Permission.Draw );
+                        player.Message( "Click {0} blocks or use &H/Mark&S to mark the area of the portal.", operation.ExpectedMarks );
+
+                        if ( world == null ) {
+                            return; //custom, continue in Selectstart
+                        }
+                        if ( world != null && WorldManager.FindWorldExact( world ) != null ) {
+
+                            string portalName = command.Next();
+
+                            if ( portalName == null ) {
+                                player.PortalName = null;
+                            } else {
+                                if ( !Portal.DoesNameExist( player.World, portalName ) ) {
+                                    player.PortalName = portalName;
+                                } else {
+                                    player.Message( "A portal with name {0} already exists in this world.", portalName );
+                                    return;
+                                }
+                            }
+                        } else {
+                            if ( world == null ) {
+                                player.Message( "No world specified." );
+                            } else {
+                                player.MessageNoWorld( world );
+                            }
+                        }
+                    } else {
+                        player.MessageNoAccess( Permission.ManagePortal );
+                    }
+                } else if ( option.ToLower().Equals( "remove" ) ) {
+                    if ( player.Can( Permission.ManagePortal ) ) {
+                        string portalName = command.Next();
+
+                        if ( portalName == null ) {
+                            player.Message( "No portal name specified." );
+                        } else {
+                            if ( player.World.Map.Portals != null && player.World.Map.Portals.Count > 0 ) {
+                                bool found = false;
+                                Portal portalFound = null;
+
+                                lock ( player.World.Map.Portals.SyncRoot ) {
+                                    foreach ( Portal portal in player.World.Map.Portals ) {
+                                        if ( portal.Name.Equals( portalName ) ) {
+                                            portalFound = portal;
+                                            found = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if ( !found ) {
+                                        player.Message( "Could not find portal by name {0}.", portalName );
+                                    } else {
+                                        portalFound.Remove( player );
+                                        player.Message( "Portal was removed." );
+                                    }
+                                }
+                            } else {
+                                player.Message( "Could not find portal as this world doesn't contain a portal." );
+                            }
+                        }
+                    } else {
+                        player.MessageNoAccess( Permission.ManagePortal );
+                    }
+                } else if ( option.ToLower().Equals( "info" ) ) {
+                    string portalName = command.Next();
+
+                    if ( portalName == null ) {
+                        player.Message( "No portal name specified." );
+                    } else {
+                        if ( player.World.Map.Portals != null && player.World.Map.Portals.Count > 0 ) {
+                            bool found = false;
+
+                            lock ( player.World.Map.Portals.SyncRoot ) {
+                                foreach ( Portal portal in player.World.Map.Portals ) {
+                                    if ( portal.Name.Equals( portalName ) ) {
+                                        World portalWorld = WorldManager.FindWorldExact( portal.World );
+                                        player.Message( "Portal {0}&S was created by {1}&S at {2} and teleports to world {3}&S.",
+                                            portal.Name, PlayerDB.FindPlayerInfoExact( portal.Creator ).ClassyName, portal.Created, portalWorld.ClassyName );
+                                        found = true;
+                                    }
+                                }
+                            }
+
+                            if ( !found ) {
+                                player.Message( "Could not find portal by name {0}.", portalName );
+                            }
+                        } else {
+                            player.Message( "Could not find portal as this world doesn't contain a portal." );
+                        }
+                    }
+                } else if ( option.ToLower().Equals( "list" ) ) {
+                    if ( player.World.Map.Portals == null || player.World.Map.Portals.Count == 0 ) {
+                        player.Message( "There are no portals in {0}&S.", player.World.ClassyName );
+                    } else {
+                        String[] portalNames = new String[player.World.Map.Portals.Count];
+                        StringBuilder output = new StringBuilder( "There are " + player.World.Map.Portals.Count + " portals in " + player.World.ClassyName + "&S: " );
+
+                        for ( int i = 0; i < player.World.Map.Portals.Count; i++ ) {
+                            portalNames[i] = ( ( Portal )player.World.Map.Portals[i] ).Name;
+                        }
+
+                        output.Append( portalNames.JoinToString( ", " ) );
+
+                        player.Message( output.ToString() );
+                    }
+                } else if ( option.ToLower().Equals( "enable" ) ) {
+                    player.PortalsEnabled = true;
+                    player.Message( "You enabled the use of portals." );
+                } else if ( option.ToLower().Equals( "disable" ) ) {
+                    player.PortalsEnabled = false;
+                    player.Message( "You disabled the use of portals, type /portal enable to re-enable portals." );
+                } else {
+                    CdPortal.PrintUsage( player );
+                }
+            } catch ( PortalException ex ) {
+                player.Message( ex.Message );
+                Logger.Log( LogType.Error, "WorldCommands.PortalH: " + ex );
+            } catch ( Exception ex ) {
+                player.Message( "Unexpected error: " + ex );
+                Logger.Log( LogType.Error, "WorldCommands.PortalH: " + ex );
+            }
+        }
+
+        static void PortalCreateCallback ( Player player, Vector3I[] marks, object tag ) {
+            try {
+                World world = WorldManager.FindWorldExact( player.PortalWorld );
+
+                if ( world != null ) {
+                    PDATA pd = ( PDATA )tag;
+                    DrawOperation op = pd.op;
+                    bool CustomOutput = pd.custom;
+                    if ( !op.Prepare( marks ) ) return;
+                    if ( !player.CanDraw( op.BlocksTotalEstimate ) ) {
+                        player.MessageNow( "You are only allowed to run draw commands that affect up to {0} blocks. This one would affect {1} blocks.",
+                                           player.Info.Rank.DrawLimit,
+                                           op.Bounds.Volume );
+                        op.Cancel();
+                        return;
+                    }
+
+                    int Xmin = Math.Min( marks[0].X, marks[1].X );
+                    int Xmax = Math.Max( marks[0].X, marks[1].X );
+                    int Ymin = Math.Min( marks[0].Y, marks[1].Y );
+                    int Ymax = Math.Max( marks[0].Y, marks[1].Y );
+                    int Zmin = Math.Min( marks[0].Z, marks[1].Z );
+                    int Zmax = Math.Max( marks[0].Z, marks[1].Z );
+
+                    for ( int x = Xmin; x <= Xmax; x++ ) {
+                        for ( int y = Ymin; y <= Ymax; y++ ) {
+                            for ( int z = Zmin; z <= Zmax; z++ ) {
+                                if ( PortalHandler.IsInRangeOfSpawnpoint( player.World, new Vector3I( x, y, z ) ) ) {
+                                    player.Message( "You can not build a portal near a spawnpoint." );
+                                    return;
+                                }
+
+                                if ( PortalHandler.GetInstance().GetPortal( player.World, new Vector3I( x, y, z ) ) != null ) {
+                                    player.Message( "You can not build a portal inside a portal, U MAD BRO?" );
+                                    return;
+                                }
+                            }
+                        }
+                    }
+
+                    if ( player.PortalName == null ) {
+                        player.PortalName = Portal.GenerateName( player.World.Name, false );
+                    }
+
+                    if ( !CustomOutput ) {
+                        Portal portal = new Portal( player.PortalWorld, marks, player.PortalName, player.Name, player.World.Name, false );
+                        PortalHandler.CreatePortal( portal, player.World, false );
+                        player.Message( "Successfully created portal with name " + portal.Name + "." );
+                    } else {
+                        player.PortalCache.World = player.World.Name;
+                        player.PortalCache = new Portal( player.PortalWorld, marks, player.PortalName, player.Name, player.World.Name, true );
+                        player.Message( "  &SPortal started, place a red block for the desired output (can be multiworld)" );
+                    }
+                    op.AnnounceCompletion = false;
+                    op.Context = BlockChangeContext.Portal;
+                    op.Begin();
+                } else {
+                    player.MessageInvalidWorldName( player.PortalWorld );
+                }
+            } catch ( Exception ex ) {
+                player.Message( "Failed to create portal." );
+                Logger.Log( LogType.Error, "WorldCommands.PortalCreateCallback: " + ex );
+            }
+        }
+        #endregion
+
+
+        #region Realm
+        static readonly CommandDescriptor CdRealm = new CommandDescriptor
+        {
+            Name = "Realm",
+            Category = CommandCategory.World,
+            Permissions = new[] { Permission.Realm },
+            IsConsoleSafe = false,
+            Usage = "/Realm <Option>. /Help Realm for a list of commands.",
+            Help = "/Realm &A| Help | Join | Like | Home | Flush | Spawn " +
+            "| Review | Create | Allow | Unallow | Ban | Unban | Activate | Physics | Env | Control",
+            Handler = Realm,
+        };
+
+        internal static void Realm(Player player, Command cmd)
+        {
+            string Choice = cmd.Next();
+            if (Choice == null)
+            {
+                CdRealm.PrintUsage(player);
+                return;
+            }
+            switch (Choice.ToLower())
+            {
+                default:
+                    CdRealm.PrintUsage(player);
+                    break;
+
+                case "env":
+                    if (player.World.Name == player.Name)
+                    {
+                        string variable = cmd.Next();
+                        string valueText = cmd.Next();
+                        EnvHandler(player, new Command("/Env " + player.World.Name + " " + variable + " " + valueText));
+                    }
+                    else
+                    {
+                        player.Message("&WYou need to be in your realm");
+                        return;
+                    }
+                    break;
+
+                case "review":
+
+                    if (player.World.Name == player.Name)
+                    {
+                        var recepientList = Server.Players.Can(Permission.ReadStaffChat)
+                                              .NotIgnoring(player)
+                                              .Union(player);
+                        string message = String.Format("{0}&C would like staff to review their realm", player.ClassyName);
+                        recepientList.Message(message);
+                    }
+                    else
+                        player.Message("You are not in your Realm");
+
+                    break;
+
+                case "like":
+
+                    Choice = player.World.Name;
+                    World world = WorldManager.FindWorldOrPrintMatches(player, Choice);
+                    if (world == null) player.Message("You need to enter a realm name");
+
+                    if (world.IsRealm)
+                    {
+                        Server.Players.Message("{0}&S likes realm {1}.",
+                                               player.ClassyName, world.ClassyName);
+                        return;
+                    }
+                    else player.Message("You are not in a Realm");
+
+                    break;
+
+                case "flush":
+
+                    WorldFlushHandler(player, new Command("/wflush " + player.Name));
+                    break;
+
+                case "create":
+
+                    string Theme = cmd.Next();
+                    string Template = cmd.Next();
+                    if (player.World.Name == player.Name)
+                    {
+                        player.Message("You cannot create a new Realm when you are inside your Realm");
+                        return;
+                    }
+
+                    if (Theme == null || Template == null)
+                    {
+                        player.Message("&HUse /Realm create [ThemeType] [TerrainType]\n" +
+                            "&9Available themes: Grass, " + Enum.GetNames(typeof(MapGenTheme)).JoinToString() + '\n' +
+                              "&EAvailable terrain types: Empty, Ocean, " + Enum.GetNames(typeof(MapGenTemplate)).JoinToString() + '\n');
+                        return;
+                    }
+                    RealmHandler.RealmCreate(player, cmd, Theme, Template);
+                    player.Message("&9You can now activate your realm by typing /Realm Activate");
+                    break;
+
+                case "home":
+                    JoinHandler(player, new Command("/join " + player.Name));
+                    break;
+
+                case "help":
+
+                    player.Message("To build a realm, use /realm create. To activate it so you can build, use /realm activate. " +
+                    "If you find yourself unable to build in your Realm, use /realm activate again. " +
+                    "If there are any Bugs, report them to Jonty800@gmail.com.");
+                    break;
+
+                case "activate":
+                    {
+                        if (player.World.Name == player.Name)
+                        {
+                            player.Message("You cannot use /Realm activate when you are in your Realm");
+                            return;
+                        }
+                        RealmHandler.RealmLoad(player, cmd, player.Name + ".fcm", player.Name, RankManager.HighestRank.Name, RankManager.DefaultBuildRank.Name);
+                        World realmworld = WorldManager.FindWorldExact(player.Name);
+                        if (realmworld == null) return;
+                        if (!realmworld.AccessSecurity.Check(player.Info))
+                        {
+                            realmworld.AccessSecurity.Include(player.Info);
+                        }
+                        if (!realmworld.BuildSecurity.Check(player.Info))
+                        {
+                            realmworld.BuildSecurity.Include(player.Info);
+                        }
+                        WorldManager.SaveWorldList();
+                        break;
+                    }
+
+                case "control":
+                    World w1 = WorldManager.FindWorldExact(player.Name);
+                    if (w1 == null) return;
+                    if (!w1.AccessSecurity.Check(player.Info))
+                    {
+                        w1.AccessSecurity.Include(player.Info);
+                        player.Message("You have regained access control of your realm");
+                    }
+                    if (!w1.BuildSecurity.Check(player.Info))
+                    {
+                        w1.BuildSecurity.Include(player.Info);
+                        player.Message("You have regained building control of your realm");
+                    }
+                    w1.IsRealm = true;
+                    break;
+
+                case "spawn":
+
+                    if (player.World.Name == player.Name)
+                    {
+                        ModerationCommands.SetSpawnHandler(player, new Command("/setspawn"));
+                        return;
+                    }
+                    else
+                    {
+                        player.Message("You can only change the Spawn on your own realm");
+                        return;
+                    }
+
+                case "physics":
+
+                    string phyOption = cmd.Next();
+                    string onOff = cmd.Next();
+                    world = player.World;
+
+                    if (phyOption == null)
+                    {
+                        player.Message("Turn physics on in your realm. Useage: /Realm physics [Plant|Water|Gun|Fireworks] On/Off.");
+                        return;
+                    }
+                    if (onOff == null)
+                    {
+                        player.Message("&WInvalid option: /Realm Physics [Type] [On/Off]");
+                        return;
+                    }
+                    if (world.Name != player.Name)
+                    {
+                        player.Message("&WYou can only turn physics on in your realm");
+                        return;
+                    }
+
+                    switch (phyOption.ToLower())
+                    {
+                        case "water":
+                            if (onOff.ToLower() == "on")
+                            {
+                                world.EnableWaterPhysics(player, true);
+                            }
+                            if (onOff.ToLower() == "off")
+                            {
+                                world.DisableWaterPhysics(player, true);
+                            }
+                            else player.Message("&WInvalid option: /Realm Physics [Type] [On/Off]");
+                            break;
+                        case "plant":
+                            if (onOff.ToLower() == "on")
+                            {
+                                world.EnablePlantPhysics(player, true);
+                            }
+                            if (onOff.ToLower() == "off")
+                            {
+                                world.DisablePlantPhysics(player, true);
+                            }
+                            else player.Message("&WInvalid option: /Realm Physics [Type] [On/Off]");
+                            break;
+                        case "gun":
+                            if (onOff.ToLower() == "on")
+                            {
+                                world.EnableGunPhysics(player, true);
+                            }
+                            if (onOff.ToLower() == "off")
+                            {
+                                world.DisableGunPhysics(player, true);
+                            }
+                            else player.Message("&WInvalid option: /Realm Physics [Type] [On/Off]");
+                            break;
+                        case "firework":
+                        case "fireworks":
+                            if (onOff.ToLower() == "on")
+                            {
+                                world.EnableFireworkPhysics(player, true);
+                            }
+                            if (onOff.ToLower() == "off")
+                            {
+                                world.DisableFireworkPhysics(player, true);
+                            }
+                            else player.Message("&WInvalid option: /Realm Physics [Type] [On/Off]");
+                            break;
+                        default: player.Message("&WInvalid option: /Realm physics [Plant|Water|Gun|Fireworks] On/Off");
+                            break;
+                    }
+                    break;
+
+                case "join":
+
+                    string JoinCmd = cmd.Next();
+                    if (JoinCmd == null)
+                    {
+                        player.Message("Derp. Invalid Realm.");
+                        return;
+                    }
+                    else
+                    {
+                        Player target = Server.FindPlayerOrPrintMatches(player, Choice, false, true);
+                        JoinHandler(player, new Command("/goto " + JoinCmd));
+                        return;
+                    }
+
+                case "allow":
+
+                    string toAllow = cmd.Next();
+
+                    if (toAllow == null)
+                    {
+                        player.Message("Allows a player to build in your world. useage: /realm allow playername.");
+                        return;
+                    }
+
+                    PlayerInfo targetAllow = PlayerDB.FindPlayerInfoOrPrintMatches(player, toAllow);
+
+                    if (targetAllow == null)
+                    {
+                        player.Message("Please enter the name of the player you want to allow to build in your Realm.");
+                        return;
+                    }
+
+                    if (!Player.IsValidName(targetAllow.Name))
+                    {
+                        player.Message("Player not found. Please specify valid name.");
+                        return;
+                    }
+                    else
+                    {
+                        RealmHandler.RealmBuild(player, cmd, player.Name, "+" + targetAllow.Name, null);
+                        if (!Player.IsValidName(targetAllow.Name))
+                        {
+                            player.Message("Player not found. Please specify valid name.");
+                            return;
+                        }
+                    }
+                    break;
+
+                case "unallow":
+
+                    string Unallow = cmd.Next();
+
+                    if (Unallow == null)
+                    {
+                        player.Message("Stops a player from building in your world. usage: /realm unallow playername.");
+                        return;
+                    }
+                    PlayerInfo targetUnallow = PlayerDB.FindPlayerInfoOrPrintMatches(player, Unallow);
+
+
+                    if (targetUnallow == null)
+                    {
+                        player.Message("Please enter the name of the player you want to stop building in your Realm.");
+                        return;
+                    }
+
+                    if (!Player.IsValidName(targetUnallow.Name))
+                    {
+                        player.Message("Player not found. Please specify valid name.");
+                        return;
+                    }
+                    else
+                    {
+                        RealmHandler.RealmBuild(player, cmd, player.Name, "-" + targetUnallow.Name, null);
+                        if (!Player.IsValidName(targetUnallow.Name))
+                        {
+                            player.Message("Player not found. Please specify valid name.");
+                            return;
+                        }
+                    }
+                    break;
+
+                case "ban":
+
+                    string Ban = cmd.Next();
+
+                    if (Ban == null)
+                    {
+                        player.Message("Bans a player from accessing your Realm. Useage: /Realm ban playername.");
+                        return;
+                    }
+                    Player targetBan = Server.FindPlayerOrPrintMatches(player, Ban, false, true);
+
+
+                    if (targetBan == null)
+                    {
+                        player.Message("Please enter the name of the player you want to ban from your Realm.");
+                        return;
+                    }
+
+                    if (!Player.IsValidName(targetBan.Name))
+                    {
+                        player.Message("Player not found. Please specify valid name.");
+                        return;
+                    }
+                    else
+                    {
+                        RealmHandler.RealmAccess(player, cmd, player.Name, "-" + targetBan.Name);
+                        if (!Player.IsValidName(targetBan.Name))
+                        {
+                            player.Message("Player not found. Please specify valid name.");
+                            return;
+                        }
+                    }
+
+                    break;
+
+                case "unban":
+
+                    string UnBan = cmd.Next();
+
+                    if (UnBan == null)
+                    {
+                        player.Message("Unbans a player from your Realm. Useage: /Realm unban playername.");
+                        return;
+                    }
+                    PlayerInfo targetUnBan = PlayerDB.FindPlayerInfoOrPrintMatches(player, UnBan);
+
+                    if (targetUnBan == null)
+                    {
+                        player.Message("Please enter the name of the player you want to unban from your Realm.");
+                        return;
+                    }
+
+                    if (!Player.IsValidName(targetUnBan.Name))
+                    {
+                        player.Message("Player not found. Please specify valid name.");
+                        return;
+                    }
+                    else
+                    {
+                        RealmHandler.RealmAccess(player, cmd, player.Name, "+" + targetUnBan.Name);
+                        if (!Player.IsValidName(targetUnBan.Name))
+                        {
+                            player.Message("Player not found. Please specify valid name.");
+                            return;
+                        }
+                        break;
+                    }
+            }
+        }
+
+        #endregion
+
+
+        #region Spawn
+
+        static readonly CommandDescriptor CdSpawn = new CommandDescriptor {
+            Name = "Spawn",
+            Category = CommandCategory.World,
+            Help = "Teleports you to the current map's spawn.",
+            Handler = SpawnHandler
+        };
+
+        static void SpawnHandler ( Player player, Command cmd ) {
+            if ( player.World == null ) PlayerOpException.ThrowNoWorld( player );
+            player.TeleportTo( player.World.LoadMap().Spawn );
+        }
+
+        #endregion
+
+
+        #region WorldLock
 
         static readonly CommandDescriptor CdWorldLock = new CommandDescriptor {
             Name = "WLock",
@@ -2320,6 +2518,10 @@ namespace fCraft {
             }
         }
 
+#endregion
+
+
+        #region WorldUnlock
 
         static readonly CommandDescriptor CdWorldUnlock = new CommandDescriptor {
             Name = "WUnlock",
@@ -2371,22 +2573,7 @@ namespace fCraft {
         #endregion
 
 
-        #region Spawn
-
-        static readonly CommandDescriptor CdSpawn = new CommandDescriptor {
-            Name = "Spawn",
-            Category = CommandCategory.World,
-            Help = "Teleports you to the current map's spawn.",
-            Handler = SpawnHandler
-        };
-
-        static void SpawnHandler ( Player player, Command cmd ) {
-            if ( player.World == null ) PlayerOpException.ThrowNoWorld( player );
-            player.TeleportTo( player.World.LoadMap().Spawn );
-        }
-
-        #endregion
-
+        #region WorldSet
         static readonly CommandDescriptor CdWorldSet = new CommandDescriptor {
             Name = "WSet",
             Category = CommandCategory.World,
@@ -2555,6 +2742,9 @@ namespace fCraft {
                     throw new Exception( "Unexpected BackupEnabledState value: " + world.BackupEnabledState );
             }
         }
+
+        #endregion
+
 
         #region Worlds
 
@@ -3831,6 +4021,67 @@ namespace fCraft {
             }
         }
 
+        #endregion
+
+
+        #region WorldSearch
+        static readonly CommandDescriptor CdWorldSearch = new CommandDescriptor
+        {
+            Name = "Worldsearch",
+            Aliases = new[] { "ws" },
+            Category = CommandCategory.World,
+            IsConsoleSafe = true,
+            Permissions = new[] { Permission.Chat },
+            Usage = "/Worldsearch WorldName",
+            Help = "An easy way to search through a big list of worlds",
+            Handler = WorldSearchHandler
+        };
+
+        static void WorldSearchHandler(Player player, Command cmd)
+        {
+            string worldName = cmd.Next();
+            if (worldName == null)
+            {
+                CdWorldSearch.PrintUsage(player);
+                return;
+            }
+            if (worldName.Length < 2)
+            {
+                CdWorldSearch.PrintUsage(player);
+                return;
+            }
+            else
+            {
+                worldName = worldName.ToLower();
+                var WorldNames = WorldManager.Worlds
+                                         .Where(w => w.Name.ToLower().Contains(worldName)).ToArray();
+
+                if (WorldNames.Length <= 30)
+                {
+                    player.MessageManyMatches("worlds", WorldNames);
+                }
+                else
+                {
+                    int offset;
+                    if (!cmd.NextInt(out offset)) offset = 0;
+
+                    if (offset >= WorldNames.Count())
+                        offset = Math.Max(0, WorldNames.Length - 30);
+
+                    World[] WorldPart = WorldNames.Skip(offset).Take(30).ToArray();
+                    player.MessageManyMatches("worlds", WorldPart);
+
+                    if (offset + WorldNames.Length < WorldNames.Length)
+                        player.Message("Showing {0}-{1} (out of {2}). Next: &H/List {3} {4}",
+                                        offset + 1, offset + WorldPart.Length, WorldNames.Length,
+                                        "worldsearch", offset + WorldPart.Length);
+                    else
+                        player.Message("Showing matches {0}-{1} (out of {2}).",
+                                        offset + 1, offset + WorldPart.Length, WorldNames.Length);
+                    return;
+                }
+            }
+        }
         #endregion
 
 
