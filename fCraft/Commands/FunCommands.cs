@@ -29,9 +29,9 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdLife );
             CommandManager.RegisterCommand( CdPossess );
             CommandManager.RegisterCommand( CdUnpossess );
-            CommandManager.RegisterCommand(CdChangeModel);
+            CommandManager.RegisterCommand( CdChangeModel);
+            CommandManager.RegisterCommand( CdChangeWeather );
         }
-
         static string[] acceptedModels = 
             {
                 "chicken",
@@ -235,7 +235,7 @@ namespace fCraft {
         static readonly CommandDescriptor CdChangeModel = new CommandDescriptor
         {
             Name = "Model",
-            Aliases = new string[] { "model, disguise, changemodel" },
+            Aliases = new string[] { "model", "disguise" },
             Category = CommandCategory.Moderation,
             Permissions = new[] { Permission.Bring },
             Usage = "&1/Model [Player] [Model]",
@@ -272,8 +272,64 @@ namespace fCraft {
                 player.Message("This player is offline!");
                 return;
             }
-            player.Message("Changed model of " + p.ClassyName + " from " + p.PlayerObject.Model + " to " + model);
+            player.Message("Changed model of " + p.ClassyName + " &efrom " + p.PlayerObject.Model + " to " + model);
             p.PlayerObject.Model = model;
+        }
+        #endregion 
+
+
+        #region ChangeWeather
+        static readonly CommandDescriptor CdChangeWeather = new CommandDescriptor
+        {
+            Name = "ChangeWeather",
+            Aliases = new string[] { "weather", "setweather" },
+            Category = CommandCategory.Moderation,
+            Permissions = new[] { Permission.Bring },
+            Usage = "&1/Weather [Type] [World]",
+            Help = "&1Change the weather of a world.\n" +
+            "&1Valid weather: &esun, rain, snow",
+            Handler = ChangeWeatherHandler
+        };
+        static void ChangeWeatherHandler(Player player, Command cmd)
+        {
+            if (!cmd.HasNext)
+            {
+                CdChangeModel.PrintUsage(player);
+                return;
+            }
+            string worldName = cmd.Next();
+            string weather = cmd.NextAll();
+            
+            World world = WorldManager.FindWorldOrPrintMatches( player, worldName );
+            if ( world == null ) return;
+            if  (weather == "sun")
+            {
+                player.Message("Changed the weather of " + world.ClassyName + "&e to sun");
+                foreach (Player p in world.Players)
+                {
+                    world.Players.Send(Packet.EnvWeatherType(0));
+                }
+            }
+            if (weather == "rain")
+            {
+                player.Message("Changed the weather of " + world.ClassyName + "&e to rain");
+                foreach (Player p in world.Players)
+                {
+                    world.Players.Send(Packet.EnvWeatherType(1));
+                }
+            }
+            if (weather == "snow")
+            {
+                player.Message("Changed the weather of " + world.ClassyName + "&e to snow");
+                foreach (Player p in world.Players)
+                {
+                    world.Players.Send(Packet.EnvWeatherType(2));
+                }
+            }
+            else
+            {
+                player.Message("Invalid weather type. Type /help weather");
+                return;
             }
         }
         #endregion 
