@@ -32,19 +32,6 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdChangeModel);
             CommandManager.RegisterCommand( CdChangeWeather );
         }
-        static string[] acceptedModels = 
-            {
-                "chicken",
-                "creeper",
-                "croc",
-                "humanoid",
-                "pig",
-                "printer",
-                "sheep",
-                "skeleton",
-                "spider",
-                "zombie"
-            };
 
         #region Possess
 
@@ -234,47 +221,96 @@ namespace fCraft {
         #region ChangeModel
         static readonly CommandDescriptor CdChangeModel = new CommandDescriptor
         {
-            Name = "Model",
+            Name = "ChangeModel",
             Aliases = new string[] { "model", "disguise" },
             Category = CommandCategory.Moderation,
             Permissions = new[] { Permission.Bring },
-            Usage = "&1/Model [Player] [Model]",
-            Help = "&1Change the Model of [Player]!\n" +
-            "&1Valid models: &echicken, creeper, croc, steve, pig, sheep, skeleton, spider, zombie!",
+            Usage = "/Model [Model] [Player]",
+            Help = "Change the Model of [Player]!\n" +
+            "Valid models: &echicken, creeper, croc, steve, pig, sheep, skeleton, spider, zombie.",
             Handler = ModelHandler
         };
         static void ModelHandler(Player player, Command cmd)
         {
-            if (!cmd.HasNext)
+            string modelName = cmd.Next();
+            string targetName = cmd.Next();
+            // make sure that both parameters are given (and no extra ones)
+            if (String.IsNullOrEmpty(modelName))
             {
                 CdChangeModel.PrintUsage(player);
                 return;
             }
-            string target = cmd.Next();
-            if (!cmd.HasNext)
+            if (targetName == null)
             {
-                CdChangeModel.PrintUsage(player);
-                return;
+                targetName = player.Name;
             }
-            string model = cmd.NextAll();
-            PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, target);
+            PlayerInfo p = PlayerDB.FindPlayerInfoOrPrintMatches(player, targetName);
             if (p == null)
             {
                 return;
             }
-            if (!acceptedModels.Contains(model))
+            Block block;
+            if (GetBlockName(modelName, false, out block))
             {
-                player.Message(model + " is not a vald model. Type /help model to see valid models.");
+                // block name is given, send its numeric ID in the ChangeModel packet
+                string newModel = ((int)block).ToString();
+                if (targetName == player.Name)
+                {
+                    player.Message("Your model has changed from " + p.PlayerObject.Model + "&S to " + newModel);
+                    p.PlayerObject.Model = newModel;
+                    return;
+                }
+                player.Message(p.ClassyName + "&S's model has changed from " + p.PlayerObject.Model + "&S to " + newModel);
+                p.PlayerObject.Model = newModel;
                 return;
             }
-            if (p.PlayerObject == null)
+            acceptedModels model;
+            if (EnumUtil.TryParse(modelName, out model, true))
             {
-                player.Message("This player is offline!");
+                string newModel = model.ToString().ToLower();
+                if (targetName == player.Name)
+                {
+                    player.Message("Your model has changed from " + p.PlayerObject.Model + "&S to " + newModel);
+                    p.PlayerObject.Model = newModel;
+                    return;
+                }
+                player.Message(p.ClassyName + "&S's model has changed from " + p.PlayerObject.Model + "&S to " + newModel);
+                p.PlayerObject.Model = newModel;
                 return;
             }
-            player.Message("Changed model of " + p.ClassyName + " &efrom " + p.PlayerObject.Model + " to " + model);
-            p.PlayerObject.Model = model;
+            else
+            {
+                CdChangeModel.PrintUsage(player);
+               
+            }
         }
+        enum acceptedModels
+        {
+            chicken,
+            creeper,
+            croc,
+            humanoid,
+            pig,
+            printer,
+            sheep,
+            skeleton,
+            spider,
+            zombie
+        };
+
+        static bool GetBlockName( string blockName, bool allowNoneBlock, out Block block)
+        {
+            if (blockName == null) throw new ArgumentNullException("blockName");
+            if (Map.BlockNames.TryGetValue(blockName.ToLower(), out block))
+            {
+               return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         #endregion 
 
 
@@ -292,45 +328,38 @@ namespace fCraft {
         };
         static void ChangeWeatherHandler(Player player, Command cmd)
         {
-            if (!cmd.HasNext)
-            {
-                CdChangeModel.PrintUsage(player);
-                return;
-            }
             string worldName = cmd.Next();
-            string weather = cmd.NextAll();
-            
-            World world = WorldManager.FindWorldOrPrintMatches( player, worldName );
-            if ( world == null ) return;
-            if  (weather == "sun")
+            string weatherName = cmd.Next();
+
+            // make sure that both parameters are given (and no extra ones)
+            if (String.IsNullOrEmpty(worldName) || String.IsNullOrEmpty(weatherName) || cmd.HasNext)
             {
-                player.Message("Changed the weather of " + world.ClassyName + "&e to sun");
-                foreach (Player p in world.Players)
-                {
-                    world.Players.Send(Packet.EnvWeatherType(0));
-                }
-            }
-            if (weather == "rain")
-            {
-                player.Message("Changed the weather of " + world.ClassyName + "&e to rain");
-                foreach (Player p in world.Players)
-                {
-                    world.Players.Send(Packet.EnvWeatherType(1));
-                }
-            }
-            if (weather == "snow")
-            {
-                player.Message("Changed the weather of " + world.ClassyName + "&e to snow");
-                foreach (Player p in world.Players)
-                {
-                    world.Players.Send(Packet.EnvWeatherType(2));
-                }
-            }
-            else
-            {
-                player.Message("Invalid weather type. Type /help weather");
+                CdChangeWeather.PrintUsage(player);
                 return;
             }
+
+            // parse weather name
+            WeatherType weather;
+            if (!EnumUtil.TryParse(weatherName, out weather, true))
+            {
+                player.Message("Unrecognized weather type: {0}", weatherName);
+                CdChangeWeather.PrintUsage(player);
+                return;
+            }
+
+            // find world by name
+            World world = WorldManager.FindWorldOrPrintMatches(player, worldName);
+            if (world == null) return;
+
+            player.Message("Changed weather of {0}&S to {1}", world.ClassyName, weather);
+            world.Players.Send(Packet.EnvWeatherType((int)weather));
+        }
+
+        enum WeatherType
+        {
+            Sun = 0,
+            Rain = 1,
+            Snow = 2
         }
         #endregion 
 

@@ -515,8 +515,8 @@ namespace fCraft {
         }
 
 
-        static readonly Dictionary<string, Block> BlockNames = new Dictionary<string, Block>();
-        static readonly Dictionary<Block, string> BlockEdgeTextures = new Dictionary<Block, string>();
+        public static readonly Dictionary<string, Block> BlockNames = new Dictionary<string, Block>();
+        public static readonly Dictionary<Block, string> BlockEdgeTextures = new Dictionary<Block, string>();
 
         static Map() {
             // add default names for blocks, and their numeric codes
