@@ -26,8 +26,6 @@ namespace fCraft {
             FunCommands.Init();
             MathCommands.Init();
             GameHandlers.Init();
-            GameMain.Init();
-            Team.Init();
 
             Logger.Log( LogType.Debug,
                         "CommandManager: {0} commands registered ({1} hidden, {2} aliases)",

@@ -3,7 +3,7 @@
 //The above copyright notice and this permission notice shall be included in all copies or substantial portions of the software.
 //THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-// Copyright (c) 2013 Michael Cummings <michael.cummings.97@outlook.com>
+// Modifications Copyright (c) 2013 Michael Cummings <michael.cummings.97@outlook.com>
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -41,9 +41,16 @@ namespace fCraft
     {
         internal static void Init()
         {
-            //CommandManager.RegisterCommand(CdTeamDeathMatch);
+            ReleaseMode mode = ConfigKey.ReleaseMode.GetEnum<ReleaseMode>();
+            if (mode == ReleaseMode.Dev)
+            {
+                CommandManager.RegisterCommand(CdTeamDeathMatch);
+                CommandManager.RegisterCommand(CdGame);
+                CommandManager.RegisterCommand(CdTeam);
+            }
         }
 
+        #region TeamDeathMatch
         static readonly CommandDescriptor CdTeamDeathMatch = new CommandDescriptor
                 {
                     Name = "TeamDeathMatch",
@@ -224,5 +231,326 @@ namespace fCraft
                 return;
             }
         }
+        #endregion
+
+
+        #region GameMainHandler
+        static readonly CommandDescriptor CdGame = new CommandDescriptor
+        {
+            Name = "Game",
+            Category = CommandCategory.Game,
+            Permissions = new Permission[] { Permission.ManageGame },
+            IsConsoleSafe = false,
+            Usage = "/Game [tdm] [start/stop]",
+            Handler = GameHandler
+        };
+        private static void GameHandler(Player player, Command cmd)
+        {
+            string GameMode = cmd.Next();
+            string Option = cmd.Next();
+            World world = player.World;
+
+            if (GameMode == null)
+            {
+                CdGame.PrintUsage(player);
+                return;
+            }
+            /*if (GameMode.ToLower() == "zombie")
+            {
+                if (Option.ToLower() == "start")
+                {
+                    ZombieSurvival game = new ZombieSurvival(player.World);//move to world
+                    game.Start();
+                    return;
+                }
+                else if (Option.ToLower() == "stop")
+                {
+                    ZombieSurvival.Stop(player);
+                    Server.Message("{0} &cended the game of zombie survival in the world {1}", player.ClassyName, world.ClassyName);
+                    return;
+                }
+            }*/
+            if (GameMode.ToLower() == "tdm")
+            {
+                if (Option == null)
+                {
+                    player.Message("&cYou must choose an option! &astart/stop");
+                    return;
+                }
+                if (Option.ToLower() == "start")
+                {
+                    if (world == WorldManager.MainWorld)
+                    {
+                        player.Message("Team Death Match cannot be played on the main world.");
+                        return;
+                    }
+                    if (TeamDeathMatch.isOn)
+                    {
+                        player.Message("Team Death Match is already started.");
+                        return;
+                    }
+                    if (player.World.CountPlayers(true) < 2)
+                    {
+                        player.Message("There needs to be at least &W2&S players to play Team Death Match.");
+                        return;
+                    }
+                    else
+                    {
+                        TeamDeathMatch.GetInstance(player.World);
+                        TeamDeathMatch.Start();
+                        return;
+                    }
+                }
+                if (Option.ToLower() == "stop")
+                {
+                    {
+                        if (TeamDeathMatch.isOn)
+                        {
+                            TeamDeathMatch.Stop(player);
+                            return;
+                        }
+                        else
+                        {
+                            player.Message("No games of Team DeathMatch are going on");
+                            return;
+                        }
+                    }
+                }
+            }
+            if (Updater.CurrentRelease.IsFlagged(ReleaseFlags.Dev))
+            {
+                if (GameMode.ToLower() == "minefield")
+                {
+                    if (Option == null)
+                    {
+                        player.Message("&cYou must choose an option! &astart/stop");
+                        return;
+                    }
+                    else if (Option.ToLower() == "start")
+                    {
+                        if (WorldManager.FindWorldExact("Minefield") != null)
+                        {
+                            player.Message("&WA game of Minefield is currently running and must first be stopped");
+                            return;
+                        }
+                        else
+                        {
+                            MineField.GetInstance();
+                            MineField.Start(player);
+                            return;
+                        }
+                    }
+                    else if (Option.ToLower() == "stop")
+                    {
+                        if (WorldManager.FindWorldExact("Minefield") == null)
+                        {
+                            player.Message("&WA game of Minefield is currently not running");
+                            return;
+                        }
+                        MineField.Stop(player, false);
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                CdGame.PrintUsage(player);
+                return;
+            }
+        }
+        #endregion
+
+
+        #region TeamHandler
+        static readonly CommandDescriptor CdTeam = new CommandDescriptor
+        {
+            Name = "Team",
+            Category = CommandCategory.Game,
+            Permissions = new Permission[] { Permission.Games },
+            IsConsoleSafe = false,
+            Usage = "/Team [red/blue]",
+            Handler = TeamHandler
+        };
+        private static void TeamHandler(Player player, Command cmd)
+        {
+            string teamColor = cmd.Next();
+            World world = player.World;
+            if (teamColor == null)
+            {
+                player.Message("&cYou must choose a team color!");
+                return;
+            }
+            if (!TeamDeathMatch.isOn)
+            {
+                player.Message("&cThere is currently no active game.");
+                return;
+            }
+            if (world == TeamDeathMatch.TDMworld_)
+            {
+                if (!player.isOnTDMTeam)
+                {
+                    if (teamColor == "red")
+                    {
+                        if (TeamDeathMatch.redTeamCount == 0)
+                        {
+                            player.Message("&wYou have joined the &cRed Team&w.");
+                            player.Message("&wType &H/Gun&w to begin!");
+                            player.iName = Color.Red + player.Name;
+                            player.Info.TDMoldname = player.Info.DisplayedName;
+                            player.Info.DisplayedName = "&f(" + TeamDeathMatch.redTeam + "&f) " + Color.Red + player.Name;
+                            player.Info.isOnRedTeam = true;
+                            player.Info.isOnBlueTeam = false;
+                            player.Info.isPlayingTD = true;
+                            player.entityChanged = true;
+                            player.Info.gameKills = 0;
+                            player.Info.gameDeaths = 0;
+                            player.isOnTDMTeam = true;
+                            TeamDeathMatch.redTeamCount++;
+                            RandomPosRed(player);
+                            return;
+                        }
+                        if (TeamDeathMatch.redTeamCount < TeamDeathMatch.blueTeamCount)
+                        {
+                            player.Message("&wYou have joined the &cRed Team&w.");
+                            player.Message("&wType &H/Gun&w to begin!");
+                            player.iName = Color.Red + player.Name;
+                            player.Info.TDMoldname = player.Info.DisplayedName;
+                            player.Info.DisplayedName = "&f(" + TeamDeathMatch.redTeam + "&f) " + Color.Red + player.Name;
+                            player.Info.isOnRedTeam = true;
+                            player.Info.isOnBlueTeam = false;
+                            player.Info.isPlayingTD = true;
+                            player.entityChanged = true;
+                            player.Info.gameKills = 0;
+                            player.Info.gameDeaths = 0;
+                            player.isOnTDMTeam = true;
+                            TeamDeathMatch.redTeamCount++;
+                            RandomPosRed(player);
+                            return;
+                        }
+                        else if (TeamDeathMatch.redTeamCount > TeamDeathMatch.blueTeamCount)
+                        {
+                            player.Message("&wThe &cRed Team&w is full. Joining the &1Blue Team&w.");
+                            player.Message("&wType &H/Gun&w to begin!");
+                            player.iName = Color.Blue + player.Name;
+                            player.Info.TDMoldname = player.Info.DisplayedName;
+                            player.Info.DisplayedName = "&f(" + TeamDeathMatch.blueTeam + "&f) " + Color.Blue + player.Name;
+                            player.Info.isOnRedTeam = false;
+                            player.Info.isOnBlueTeam = true;
+                            player.Info.isPlayingTD = true;
+                            player.entityChanged = true;
+                            player.Info.gameKills = 0;
+                            player.Info.gameDeaths = 0;
+                            player.isOnTDMTeam = true;
+                            TeamDeathMatch.blueTeamCount++;
+                            RandomPosRed(player);
+                        }
+                    }
+                    if (teamColor == "blue")
+                    {
+                        if (TeamDeathMatch.blueTeamCount == 0)
+                        {
+                            player.Message("&wYou have joined the &1Blue Team&w.");
+                            player.Message("&wType &H/Gun&w to begin!");
+                            player.iName = Color.Blue + player.Name;
+                            player.Info.TDMoldname = player.Info.DisplayedName;
+                            player.Info.DisplayedName = "&f(" + TeamDeathMatch.blueTeam + "&f) " + Color.Blue + player.Name;
+                            player.Info.isOnRedTeam = false;
+                            player.Info.isOnBlueTeam = true;
+                            player.Info.isPlayingTD = true;
+                            player.entityChanged = true;
+                            player.Info.gameKills = 0;
+                            player.Info.gameDeaths = 0;
+                            player.isOnTDMTeam = true;
+                            TeamDeathMatch.blueTeamCount++;
+                            RandomPosBlue(player);
+                        }
+                        if (TeamDeathMatch.blueTeamCount < TeamDeathMatch.redTeamCount)
+                        {
+                            player.Message("&wYou have joined the &1Blue Team&w.");
+                            player.Message("&wType &H/Gun&w to begin!");
+                            player.iName = Color.Blue + player.Name;
+                            player.Info.TDMoldname = player.Info.DisplayedName;
+                            player.Info.DisplayedName = "&f(" + TeamDeathMatch.blueTeam + "&f) " + Color.Blue + player.Name;
+                            player.Info.isOnRedTeam = false;
+                            player.Info.isOnBlueTeam = true;
+                            player.Info.isPlayingTD = true;
+                            player.entityChanged = true;
+                            player.Info.gameKills = 0;
+                            player.Info.gameDeaths = 0;
+                            player.isOnTDMTeam = true;
+                            TeamDeathMatch.blueTeamCount++;
+                            RandomPosBlue(player);
+                        }
+                        else if (TeamDeathMatch.blueTeamCount > TeamDeathMatch.redTeamCount)
+                        {
+                            player.Message("&wThe &cRed Team&w is full. Joining the &1Blue Team&w.");
+                            player.Message("&wType &H/Gun&w to begin!");
+                            player.iName = Color.Red + player.Name;
+                            player.Info.TDMoldname = player.Info.DisplayedName;
+                            player.Info.DisplayedName = "&f(" + TeamDeathMatch.redTeam + "&f) " + Color.Red + player.Name;
+                            player.Info.isOnRedTeam = true;
+                            player.Info.isOnBlueTeam = false;
+                            player.Info.isPlayingTD = true;
+                            player.entityChanged = true;
+                            player.Info.gameKills = 0;
+                            player.Info.gameDeaths = 0;
+                            player.isOnTDMTeam = true;
+                            TeamDeathMatch.redTeamCount++;
+                            RandomPosBlue(player);
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    player.Message("&cYou are already on a team!");
+                    return;
+                }
+            }
+            else
+            {
+                player.Message("&cYou are not in the Team Death Match world. Type &a/j {0}", TeamDeathMatch.TDMworld_);
+                return;
+            }
+        }
+        public static void RandomPosBlue(Player p)
+        {
+            Random rand = new Random();
+            int x = rand.Next(2, TeamDeathMatch.TDMworld_.Map.Width);
+            int y = rand.Next(2, TeamDeathMatch.TDMworld_.Map.Length);
+            int z1 = 0;
+            for (int z = TeamDeathMatch.TDMworld_.Map.Height - 1; z > 0; z--)
+            {
+                if (TeamDeathMatch.TDMworld_.Map.GetBlock(x, y, z) != Block.Air)
+                {
+                    z1 = z + 3;
+                    break;
+                }
+            }
+            if (p.isOnTDMTeam)
+            {
+                p.TeleportTo(new Position(x, y, z1 + 2).ToVector3I().ToPlayerCoords()); //teleport players to a random position
+            }
+        }
+        public static void RandomPosRed(Player p)
+        {
+            Random rand = new Random();
+            int x = rand.Next(2, TeamDeathMatch.TDMworld_.Map.Width);
+            int y = rand.Next(2, TeamDeathMatch.TDMworld_.Map.Length);
+            int z1 = 0;
+            for (int z = TeamDeathMatch.TDMworld_.Map.Height - 1; z > 0; z--)
+            {
+                if (TeamDeathMatch.TDMworld_.Map.GetBlock(x, y, z) != Block.Air)
+                {
+                    z1 = z + 3;
+                    break;
+                }
+            }
+            if (p.isOnTDMTeam)
+            {
+                p.TeleportTo(new Position(x, y, z1 + 2).ToVector3I().ToPlayerCoords()); //teleport players to a random position
+            }
+        }
+        #endregion
     }
 }

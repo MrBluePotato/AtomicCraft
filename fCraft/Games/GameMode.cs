@@ -6,14 +6,11 @@ using System.Text;
 namespace fCraft {
     public enum GameMode {
         NULL,
-        FFA,
-        CaptureTheFlag,
-        GunGame,
         ZombieSurvival,
-        BotSurvival,
         MineField,
         Football,
         MineChallenge,
-        TeamDeathMatch
+        TeamDeathMatch,
+        PropHunt
     }
 }
