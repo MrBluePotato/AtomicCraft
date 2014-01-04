@@ -1,4 +1,19 @@
 ﻿// Copyright 2009-2013 Matvei Stefarov <me@matvei.org>
+
+//Copyright (C) <2011 - 2013>  <Jon Baker, Glenn Mariën and Lao Tszy>
+
+//This program is free software: you can redistribute it and/or modify
+//it under the terms of the GNU General Public License as published by
+//the Free Software Foundation, either version 3 of the License, or
+//(at your option) any later version.
+
+//This program is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU General Public License for more details.
+
+//You should have received a copy of the GNU General Public License
+//along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +44,7 @@ namespace fCraft
             CommandManager.RegisterCommand(cdReview);
             CommandManager.RegisterCommand(CdAdminChat);
             CommandManager.RegisterCommand(CdCustomChat);
-            CommandManager.RegisterCommand(cdAway);
+            CommandManager.RegisterCommand(CdAway);
             CommandManager.RegisterCommand(CdHigh5);
             CommandManager.RegisterCommand(CdPoke);
             CommandManager.RegisterCommand(CdVote);
@@ -41,22 +56,7 @@ namespace fCraft
 
             Player.Moved += new EventHandler<Events.PlayerMovedEventArgs>(Player_IsBack);
         }
-        #region AtomicCraft
-
-        //Copyright (C) <2011 - 2013>  <Jon Baker, Glenn Mariën and Lao Tszy>
-
-        //This program is free software: you can redistribute it and/or modify
-        //it under the terms of the GNU General Public License as published by
-        //the Free Software Foundation, either version 3 of the License, or
-        //(at your option) any later version.
-
-        //This program is distributed in the hope that it will be useful,
-        //but WITHOUT ANY WARRANTY; without even the implied warranty of
-        //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-        //GNU General Public License for more details.
-
-        //You should have received a copy of the GNU General Public License
-        //along with this program.  If not, see <http://www.gnu.org/licenses/>.
+        #region QuitMsg
         static readonly CommandDescriptor CdQuit = new CommandDescriptor
         {
             Name = "Quitmsg",
@@ -84,7 +84,10 @@ namespace fCraft
                 player.Message("Your quit message is now set to: {0}", Msg);
             }
         }
+        #endregion
 
+
+        #region Ragequit
         static readonly CommandDescriptor CdRageQuit = new CommandDescriptor
         {
             Name = "Ragequit",
@@ -115,7 +118,10 @@ namespace fCraft
                 player.Kick(Player.Console, reason, LeaveReason.RageQuit, false, false, false);
             }
         }
+        #endregion
 
+
+        #region Bromode
         static readonly CommandDescriptor CdBroMode = new CommandDescriptor
         {
             Name = "Bromode",
@@ -170,7 +176,10 @@ namespace fCraft
                 }
             }
         }
+        #endregion
 
+
+        #region Vote
         static readonly CommandDescriptor CdVote = new CommandDescriptor
         {
             Name = "Vote",
@@ -187,7 +196,10 @@ namespace fCraft
         {
             fCraft.VoteHandler.VoteParams(player, cmd);
         }
+        #endregion
 
+
+        #region Customchat
         static readonly CommandDescriptor CdCustomChat = new CommandDescriptor
         {
             Name = ConfigKey.CustomChatName.GetString(),
@@ -221,8 +233,11 @@ namespace fCraft
                 Chat.SendCustom(player, message);
             }
         }
+        #endregion
 
-        static readonly CommandDescriptor cdAway = new CommandDescriptor
+
+        #region Away
+        static readonly CommandDescriptor CdAway = new CommandDescriptor
         {
             Name = "Away",
             Category = CommandCategory.Chat,
@@ -255,12 +270,14 @@ namespace fCraft
                 player.IsAway = true;
             }
         }
+        #endregion
 
 
+        #region HighFive
         static readonly CommandDescriptor CdHigh5 = new CommandDescriptor
         {
             Name = "High5",
-            Aliases = new string[] { "H5" },
+            Aliases = new string[] { "h5", "highfive" },
             Category = CommandCategory.Chat | CommandCategory.Fun,
             Permissions = new Permission[] { Permission.HighFive },
             IsConsoleSafe = true,
@@ -290,7 +307,10 @@ namespace fCraft
             IRC.PlayerSomethingMessage(player, "high fived", target, null);
             target.Message("{0}&S high fived you.", player.ClassyName);
         }
+        #endregion
 
+
+        #region Poke
         static readonly CommandDescriptor CdPoke = new CommandDescriptor
         {
             Name = "Poke",
@@ -336,7 +356,10 @@ namespace fCraft
                 player.Message("&8Successfully poked {0}", target.ClassyName);
             }
         }
+        #endregion
 
+
+        #region Review
         static readonly CommandDescriptor cdReview = new CommandDescriptor
         {
             Name = "Review",
@@ -371,7 +394,10 @@ namespace fCraft
             else
                 player.Message("&WThere are no players online who can review you. A member of staff needs to be online.");
         }
+        #endregion
 
+
+        #region AdminChat
         static readonly CommandDescriptor CdAdminChat = new CommandDescriptor
         {
             Name = "Adminchat",
@@ -409,6 +435,7 @@ namespace fCraft
             }
         }
         #endregion
+
 
         #region Say
 
@@ -493,7 +520,7 @@ namespace fCraft
         #endregion
 
 
-        #region Ignore / Unignore
+        #region Ignore
 
         static readonly CommandDescriptor CdIgnore = new CommandDescriptor
         {
@@ -543,8 +570,10 @@ namespace fCraft
                 return;
             }
         }
+        #endregion
 
 
+        #region Unignore
         static readonly CommandDescriptor CdUnignore = new CommandDescriptor
         {
             Name = "Unignore",
@@ -871,20 +900,21 @@ namespace fCraft
 
         #endregion
 
+
         #region GlobalChat
         static readonly CommandDescriptor CdGlobal = new CommandDescriptor
-                {
-                    Name = "Global",
-                    Category = CommandCategory.Chat,
-                    Aliases = new[] { "gl", "gc" },
-                    IsConsoleSafe = true,
-                    Permissions = new[] { Permission.Chat },
-                    Usage = "&a/Global [<message to send>/help/rules/accept/ignore/reconnect]",
-                    Help = "Sends a global message to other AtomicCraft servers",
-                    Handler = GHandler
-                };
+        {
+             Name = "Global",
+             Category = CommandCategory.Chat,
+             Aliases = new[] { "gl", "gc" },
+             IsConsoleSafe = true,
+             Permissions = new[] { Permission.Chat },
+             Usage = "&a/Global [<message to send>/help/rules/accept/ignore/reconnect]",
+             Help = "Sends a global message to other AtomicCraft servers",
+             Handler = GlobalHandler
+        };
 
-        static void GHandler(Player player, Command cmd)
+        static void GlobalHandler(Player player, Command cmd)
         {
             string Msg = cmd.NextAll();
             if (!ConfigKey.GCKey.Enabled())
@@ -909,7 +939,7 @@ namespace fCraft
                     else
                     {
                         GlobalChat.GlobalThread.GCReady = true;
-                        Server.Message("&eAttempting to connect to LegendCraft Global Chat Network. This may take up to two minutes.");
+                        Server.Message("&eAttempting to connect to AtomicCraft Global Chat Network. This may take up to two minutes.");
                         GlobalChat.Init();
                         GlobalChat.Start();
                         return;
