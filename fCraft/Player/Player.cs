@@ -39,6 +39,30 @@ namespace fCraft {
         //Team death match
         public bool isOnTDMTeam = false;
 
+        //slap, kill, hug, insult
+        public DateTime LastUsedSlap;
+        public DateTime LastUsedHug;
+        public DateTime LastUsedInsult;
+        public DateTime LastUsedKill;
+        public DateTime LastUsedLottery;
+        public bool KillWait = false;
+
+        //bromode
+        public string oldname;
+        public bool changedName = false;
+
+        public bool HasVoted = false;
+
+        //Zombie survival
+        public bool isInfected = false;
+        public bool isPlayingZombieSurvival = false;
+
+        //Prophunt
+        public bool isSeeker = false;
+        public bool isSolidBlock = false;
+        public bool isPlayingPropHunt = false;
+
+
         #region Properties
 
         public readonly bool IsSuper;

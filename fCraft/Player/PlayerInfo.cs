@@ -64,41 +64,6 @@ namespace fCraft
         public bool ArrivedLate = false;
         public bool InGame = false;
 
-        //slap, kill, hug, insult
-        public DateTime LastUsedSlap;
-        public DateTime LastUsedHug;
-        public DateTime LastUsedInsult;
-        public DateTime LastUsedKill;
-        public DateTime LastUsedLottery;
-        public bool KillWait = false;
-
-        //bromode
-        public string oldname;
-        public bool changedName = false;
-
-        public bool HasVoted = false;
-
-        //Team death match
-        public bool isPlayingTD = false;
-        public bool isOnBlueTeam = false;
-        public bool isOnRedTeam = false;
-        public int totalKillsTDM = 0;
-        public int totalDeathsTDM = 0;
-        public int gameKills = 0;
-        public int gameDeaths = 0;
-        public bool needsReversion = false;
-        public string TDMoldname;
-
-        //Zombie survival
-        public bool isInfected = false;
-        public bool isPlayingZombieSurvival = false;
-
-        //Prophunt
-        public bool isSeeker = false;
-        public bool isSolidBlock = false;
-        public bool isPlayingPropHunt = false;
-
-
         #region Rank
 
         /// <summary> Player's current rank. </summary>

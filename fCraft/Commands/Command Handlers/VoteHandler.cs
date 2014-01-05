@@ -85,8 +85,8 @@ namespace fCraft
                     VoteIsOn = false;
                     foreach (Player V in Voted)
                     {
-                        if (V.Info.HasVoted)
-                            V.Info.HasVoted = false;
+                        if (V.HasVoted)
+                            V.HasVoted = false;
                         V.Message("Your vote was cancelled");
                     }
                     Voted.Clear();
@@ -101,14 +101,14 @@ namespace fCraft
                         return;
                     }
 
-                    if (player.Info.HasVoted)
+                    if (player.HasVoted)
                     {
                         player.Message("&CYou have already voted");
                         return;
                     }
                     Voted.Add(player);
                     VotedYes++;
-                    player.Info.HasVoted = true;
+                    player.HasVoted = true;
                     player.Message("&8You have voted for 'Yes'");
                     break;
 
@@ -185,14 +185,14 @@ namespace fCraft
                         player.Message("No vote is currently running");
                         return;
                     }
-                    if (player.Info.HasVoted)
+                    if (player.HasVoted)
                     {
                         player.Message("&CYou have already voted");
                         return;
                     }
                     VotedNo++;
                     Voted.Add(player);
-                    player.Info.HasVoted = true;
+                    player.HasVoted = true;
                     player.Message("&8You have voted for 'No'");
                     break;
 
@@ -238,7 +238,7 @@ namespace fCraft
                 VoteIsOn = false;
                 foreach (Player V in Voted)
                 {
-                    V.Info.HasVoted = false;
+                    V.HasVoted = false;
                 }
             }
         }
@@ -286,7 +286,7 @@ namespace fCraft
                 TargetName = null;
                 foreach (Player V in Voted)
                 {
-                    V.Info.HasVoted = false;
+                    V.HasVoted = false;
                 }
             }
         }

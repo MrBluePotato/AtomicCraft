@@ -202,12 +202,12 @@ namespace fCraft.Utils
 
                                 if (player.Info.DisplayedName == null)
                                 {
-                                    player.Info.changedName = false; //fix for rank problems during
+                                    player.changedName = false; //fix for rank problems during
                                 }
 
                                 else
-                                    player.Info.oldname = player.Info.DisplayedName;
-                                player.Info.changedName = true; //if name is changed, true
+                                    player.oldname = player.Info.DisplayedName;
+                                player.changedName = true; //if name is changed, true
 
                                 while (!found)
                                 {
@@ -267,16 +267,16 @@ namespace fCraft.Utils
                         Logger.Log(LogType.SystemActivity, "Unregistering bro name '" + broNames[i] + "' for player '" + p.Name + "'");
                         registeredBroNames.Remove(i);
                         namesRegistered--;
-                        if (!p.Info.changedName)
+                        if (!p.changedName)
                         {
                             p.Info.DisplayedName = null;
                         }
 
-                        if (p.Info.changedName)
+                        if (p.changedName)
                         {
-                            p.Info.DisplayedName = p.Info.oldname;
-                            p.Info.oldname = null; //clears oldname if its ever removed in setinfo
-                            p.Info.changedName = false;
+                            p.Info.DisplayedName = p.oldname;
+                            p.oldname = null; //clears oldname if its ever removed in setinfo
+                            p.changedName = false;
                         }
                     }
                 }
