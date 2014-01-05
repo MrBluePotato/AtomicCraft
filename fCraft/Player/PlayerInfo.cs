@@ -93,6 +93,11 @@ namespace fCraft
         public bool isInfected = false;
         public bool isPlayingZombieSurvival = false;
 
+        //Prophunt
+        public bool isSeeker = false;
+        public bool isSolidBlock = false;
+        public bool isPlayingPropHunt = false;
+
 
         #region Rank
 

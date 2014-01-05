@@ -255,7 +255,7 @@ namespace fCraft
                 CdGame.PrintUsage(player);
                 return;
             }
-            /*if (GameMode.ToLower() == "zombie")
+            if (GameMode.ToLower() == "zombie")
             {
                 if (Option.ToLower() == "start")
                 {
@@ -269,7 +269,7 @@ namespace fCraft
                     Server.Message("{0} &cended the game of zombie survival in the world {1}", player.ClassyName, world.ClassyName);
                     return;
                 }
-            }*/
+            }
             if (GameMode.ToLower() == "tdm")
             {
                 if (Option == null)
@@ -317,8 +317,6 @@ namespace fCraft
                     }
                 }
             }
-            if (Updater.CurrentRelease.IsFlagged(ReleaseFlags.Dev))
-            {
                 if (GameMode.ToLower() == "minefield")
                 {
                     if (Option == null)
@@ -350,8 +348,21 @@ namespace fCraft
                         MineField.Stop(player, false);
                         return;
                     }
-                }
             }
+                if (GameMode.ToLower() == "prophunt")
+                {
+                    if (Option == null)
+                    {
+                        player.Message("&cYou must choose an option! &astart/stop");
+                        return;
+                    }
+                    if (Option.ToLower() == "start")
+                    {
+                        PropHunt game = new PropHunt(player.World);//move to world
+                        game.Start();
+                        return;
+                    }
+                }
             else
             {
                 CdGame.PrintUsage(player);

@@ -51,7 +51,7 @@ namespace fCraft
         public static DateTime lastChecked;
         public static int timeLeft = 0;
         public static int timeLimit = 300;
-        public static int timeDelay = 20;
+        public static int timeDelay = 10;
 
         //Values
         private const string _zomb = "&8_Infected_";
@@ -271,7 +271,7 @@ namespace fCraft
             foreach (Player p in ZombiePlayers)
             {
                 p.iName = p.Name;
-                target.Model = "steve";
+                p.Model = "steve";
                 p.Info.isInfected = false;
                 p.Info.DisplayedName = p.Info.oldname;
                 p.Info.isPlayingZombieSurvival = false;
