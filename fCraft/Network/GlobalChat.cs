@@ -534,9 +534,9 @@ namespace fCraft
 
         public static void Init()
         {
-            hostName = "irc.dal.net";
+            hostName = "irc.hetalnet.tk";
             port = 6667;
-            channelNames = new[] { "#ClassicGlobal" };
+            channelNames = new[] { "#AtomicCraft.global" };
             for (int i = 0; i < channelNames.Length; i++)
             {
                 channelNames[i] = channelNames[i].Trim();

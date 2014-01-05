@@ -236,14 +236,14 @@ namespace fCraft
             {
                 _world.Players.Message("{0}&S has been the first to get &cInfected. &9Panic!", target.ClassyName);
                 target.iName = _zomb;
-                target.ZombieHead = true;
+                target.Model = "zombie";
                 target.entityChanged = true;
                 return;
             }
             if (infector.iName == _zomb && target.iName != _zomb)
             {
                 target.iName = _zomb;
-                target.ZombieHead = true;
+                target.Model = "zombie";
                 target.entityChanged = true;
                 _world.Players.Message("{0}&S was &cInfected&S by {1}",
                     target.ClassyName, infector.ClassyName);
@@ -253,7 +253,7 @@ namespace fCraft
             else if (infector.iName != _zomb && target.iName == _zomb)
             {
                 infector.iName = _zomb;
-                infector.ZombieHead = true;
+                target.Model = "zombie";
                 infector.entityChanged = true;
                 _world.Players.Message("{0}&S was &cInfected&S by {1}",
                     infector.ClassyName, target.ClassyName);
@@ -271,7 +271,7 @@ namespace fCraft
             foreach (Player p in ZombiePlayers)
             {
                 p.iName = p.Name;
-                p.ZombieHead = false;
+                target.Model = "steve";
                 p.Info.isInfected = false;
                 p.Info.DisplayedName = p.Info.oldname;
                 p.Info.isPlayingZombieSurvival = false;

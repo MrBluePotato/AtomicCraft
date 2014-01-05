@@ -153,14 +153,11 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Drawing\DrawOps\WallsOp.cs" />
-    <Compile Include="Games\Team.cs" />
     <Compile Include="Games\Football.cs" />
     <Compile Include="Games\GameMode.cs" />
-    <Compile Include="Games\GameMain.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Games\MineChallenge.cs" />
     <Compile Include="Games\MineField.cs" />
+    <Compile Include="Games\PropHunt.cs" />
     <Compile Include="Games\Spell.cs" />
     <Compile Include="Games\ZombieSurvival.cs" />
     <Compile Include="Games\TeamDeathMatch.cs" />
