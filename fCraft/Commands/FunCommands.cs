@@ -256,11 +256,11 @@ namespace fCraft {
                 string newModel = ((int)block).ToString();
                 if (targetName == player.Name)
                 {
-                    player.Message("Your model has changed from " + p.PlayerObject.Model + "&S to " + newModel);
+                    player.Message("Your model has changed from {0} &S to {1}", p.PlayerObject.Model, newModel);
                     p.PlayerObject.Model = newModel;
                     return;
                 }
-                player.Message(p.ClassyName + "&S's model has changed from " + p.PlayerObject.Model + "&S to " + newModel);
+                player.Message(p.ClassyName + "&S's model has changed from {0} &S to {1}", p.PlayerObject.Model, newModel);
                 p.PlayerObject.Model = newModel;
                 return;
             }
@@ -270,11 +270,11 @@ namespace fCraft {
                 string newModel = model.ToString().ToLower();
                 if (targetName == player.Name)
                 {
-                    player.Message("Your model has changed from " + p.PlayerObject.Model + "&S to " + newModel);
+                    player.Message("Your model has changed from {0} &S to {1}", p.PlayerObject.Model, newModel);
                     p.PlayerObject.Model = newModel;
                     return;
                 }
-                player.Message(p.ClassyName + "&S's model has changed from " + p.PlayerObject.Model + "&S to " + newModel);
+                player.Message(p.ClassyName + "&S's model has changed from {0} &S to {1}", p.PlayerObject.Model, newModel);
                 p.PlayerObject.Model = newModel;
                 return;
             }
