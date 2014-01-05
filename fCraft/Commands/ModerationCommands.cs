@@ -1,4 +1,19 @@
 ﻿// Copyright 2009-2013 Matvei Stefarov <me@matvei.org>
+
+//Copyright (C) <2011 - 2014>  <Jon Baker, Glenn Mariën and Lao Tszy>
+
+//This program is free software: you can redistribute it and/or modify
+//it under the terms of the GNU General Public License as published by
+//the Free Software Foundation, either version 3 of the License, or
+//(at your option) any later version.
+
+//This program is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU General Public License for more details.
+
+//You should have received a copy of the GNU General Public License
+//along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -76,24 +91,9 @@ namespace fCraft {
             CommandManager.RegisterCommand(CdReport);
             CommandManager.RegisterCommand(CdReports);
         }
-        #region 800craft
-
-        //Copyright (C) <2011 - 2013>  <Jon Baker, Glenn Mariën and Lao Tszy>
-
-        //This program is free software: you can redistribute it and/or modify
-        //it under the terms of the GNU General Public License as published by
-        //the Free Software Foundation, either version 3 of the License, or
-        //(at your option) any later version.
-
-        //This program is distributed in the hope that it will be useful,
-        //but WITHOUT ANY WARRANTY; without even the implied warranty of
-        //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-        //GNU General Public License for more details.
-
-        //You should have received a copy of the GNU General Public License
-        //along with this program.  If not, see <http://www.gnu.org/licenses/>.
         public static List<string> BassText = new List<string>();
 
+        #region Title
         static readonly CommandDescriptor CdTitle = new CommandDescriptor {
             Name = "Title",
             Category = CommandCategory.Moderation,
@@ -153,7 +153,10 @@ namespace fCraft {
                                 titleName );
             }
         }
+        #endregion
 
+
+        #region Immortal
         static readonly CommandDescriptor CdImmortal = new CommandDescriptor {
             Name = "Immortal",
             Aliases = new[] { "Invincible", "God" },
@@ -175,6 +178,10 @@ namespace fCraft {
             player.Immortal = true;
             Server.Players.Message( "{0}&S is now Immortal", player.ClassyName );
         }
+        #endregion
+
+
+        #region Moderate
         static readonly CommandDescriptor CdModerate = new CommandDescriptor {
             Name = "Moderate",
             Aliases = new[] { "MuteAll", "Moderation" },
@@ -239,7 +246,10 @@ namespace fCraft {
                 }
             }
         }
+        #endregion
 
+
+        #region Kill
         static readonly CommandDescriptor CdKill = new CommandDescriptor {
             Name = "Kill",
             Category = CommandCategory.Moderation | CommandCategory.Fun,
@@ -271,7 +281,7 @@ namespace fCraft {
                 player.Message( "You suicidal bro?" );
                 return;
             }
-            double time = ( DateTime.UtcNow - player.Info.LastUsedKill ).TotalSeconds;
+            double time = ( DateTime.UtcNow - player.LastUsedKill ).TotalSeconds;
             if ( time < 10 ) {
                 player.Message( "&WYou can use /Kill again in " + Math.Round( 10 - time ) + " seconds." );
                 return;
@@ -282,7 +292,7 @@ namespace fCraft {
             } else {
                 if ( player.Can( Permission.Kill, target.Info.Rank ) ) {
                     target.TeleportTo( player.World.Map.Spawn );
-                    player.Info.LastUsedKill = DateTime.UtcNow;
+                    player.LastUsedKill = DateTime.UtcNow;
                     if ( !string.IsNullOrWhiteSpace( OReason ) ) {
                         Server.Players.CanSee( target ).Union( target ).Message( "{0}&C was &4Killed&C by {1}&W: {2}", target.ClassyName, player.ClassyName, OReason );
                     } else {
@@ -296,7 +306,10 @@ namespace fCraft {
                 }
             }
         }
+        #endregion
 
+
+        #region Slap
         static readonly CommandDescriptor CdSlap = new CommandDescriptor {
             Name = "Slap",
             IsConsoleSafe = true,
@@ -327,7 +340,7 @@ namespace fCraft {
                 player.Message( "&sYou can't slap yourself.... What's wrong with you???" );
                 return;
             }
-            double time = ( DateTime.UtcNow - player.Info.LastUsedSlap ).TotalSeconds;
+            double time = ( DateTime.UtcNow - player.LastUsedSlap ).TotalSeconds;
             if ( time < 10 ) {
                 player.Message( "&WYou can use /Slap again in " + Math.Round( 10 - time ) + " seconds." );
                 return;
@@ -339,7 +352,7 @@ namespace fCraft {
                 if ( string.IsNullOrEmpty( item ) ) {
                     Server.Players.CanSee( target ).Union( target ).Message( "{0} &Swas slapped sky high by {1}", target.ClassyName, player.ClassyName );
                     IRC.PlayerSomethingMessage( player, "slapped", target, null );
-                    player.Info.LastUsedSlap = DateTime.UtcNow;
+                    player.LastUsedSlap = DateTime.UtcNow;
                     return;
                 } else if ( item.ToLower() == "bakingtray" )
                     aMessage = String.Format( "{0} &Swas slapped by {1}&S with a Baking Tray", target.ClassyName, player.ClassyName );
@@ -352,12 +365,12 @@ namespace fCraft {
                 else {
                     Server.Players.CanSee( target ).Union( target ).Message( "{0} &Swas slapped sky high by {1}", target.ClassyName, player.ClassyName );
                     IRC.PlayerSomethingMessage( player, "slapped", target, null );
-                    player.Info.LastUsedSlap = DateTime.UtcNow;
+                    player.LastUsedSlap = DateTime.UtcNow;
                     return;
                 }
                 Server.Players.CanSee( target ).Union( target ).Message( aMessage );
                 IRC.PlayerSomethingMessage( player, "slapped", target, null );
-                player.Info.LastUsedSlap = DateTime.UtcNow;
+                player.LastUsedSlap = DateTime.UtcNow;
                 return;
             } else {
                 player.Message( "&sYou can only Slap players ranked {0}&S or lower",
@@ -365,7 +378,10 @@ namespace fCraft {
                 player.Message( "{0}&S is ranked {1}", target.ClassyName, target.Info.Rank.ClassyName );
             }
         }
+        #endregion
 
+
+        #region TPZone
         static readonly CommandDescriptor CdTPZone = new CommandDescriptor {
             Name = "Tpzone",
             IsConsoleSafe = false,
@@ -395,7 +411,10 @@ namespace fCraft {
                 player.Message( "&WTeleporting you to zone " + zone.ClassyName );
             }
         }
+        #endregion
 
+
+        #region Impersonate
         static readonly CommandDescriptor CdImpersonate = new CommandDescriptor {
             Name = "Impersonate",
             Category = CommandCategory.Moderation | CommandCategory.Fun,
@@ -431,7 +450,10 @@ namespace fCraft {
             player.iName = iName;
             player.entityChanged = true;
         }
+        #endregion
 
+
+        #region TempBan
         static readonly CommandDescriptor CdTempBan = new CommandDescriptor {
             Name = "Tempban",
             Category = CommandCategory.Moderation,
@@ -506,7 +528,10 @@ namespace fCraft {
                                 target.BannedUntil.Subtract( DateTime.UtcNow ).ToMiniString() );
             }
         }
+        #endregion
 
+
+        #region Basscannon
         static readonly CommandDescriptor CdBasscannon = new CommandDescriptor {
             Name = "Basscannon",
             Category = CommandCategory.Moderation | CommandCategory.Fun,
@@ -563,7 +588,10 @@ namespace fCraft {
                 player.Message( "{0}&S is ranked {1}", target.ClassyName, target.Info.Rank.ClassyName );
             }
         }
+        #endregion
 
+
+        #region Warn
         static readonly CommandDescriptor CdWarn = new CommandDescriptor {
             Name = "Warn",
             Category = CommandCategory.Moderation,
@@ -609,7 +637,10 @@ namespace fCraft {
                 player.Message( "{0}&S is ranked {1}", target.ClassyName, target.Info.Rank.ClassyName );
             }
         }
+        #endregion
 
+
+        #region Unwarn
         static readonly CommandDescriptor CdUnWarn = new CommandDescriptor {
             Name = "Unwarn",
             Category = CommandCategory.Moderation,
@@ -644,8 +675,10 @@ namespace fCraft {
                 player.Message( "{0}&S is ranked {1}", target.ClassyName, target.Info.Rank.ClassyName );
             }
         }
+        #endregion
 
 
+        #region Disconnect
         static readonly CommandDescriptor CdDisconnect = new CommandDescriptor {
             Name = "Disconnect",
             Category = CommandCategory.Moderation,
@@ -685,6 +718,7 @@ namespace fCraft {
             }
         }
         #endregion
+
 
         #region Ban / Unban
 
@@ -1973,7 +2007,6 @@ namespace fCraft {
         #endregion
 
 
-
         #region Pay
 
         static readonly CommandDescriptor CdPay = new CommandDescriptor
@@ -2062,6 +2095,7 @@ namespace fCraft {
             }
         }
         #endregion
+
 
         #region Economy
 
@@ -2478,7 +2512,7 @@ namespace fCraft {
                                     player.Message("&sAre you feeling lonley...");
                                     return;
                                 }
-                                double time = (DateTime.UtcNow - player.Info.LastUsedHug).TotalSeconds;
+                                double time = (DateTime.UtcNow - player.LastUsedHug).TotalSeconds;
                                 if (time < 10)
                                 {
                                     player.Message("&WYou can use /Hug again in " + Math.Round(10 - time) + " seconds.");
@@ -2492,7 +2526,7 @@ namespace fCraft {
                                 {
                                     Server.Players.CanSee(target).Union(target).Message("{0} &Swas hugged by {1}", target.ClassyName, player.ClassyName);
                                     IRC.PlayerSomethingMessage(player, "hugged", target, null);
-                                    player.Info.LastUsedHug = DateTime.UtcNow;
+                                    player.LastUsedHug = DateTime.UtcNow;
                                     player.Info.Money = pNewMoney;
                                     return;
                                 }
@@ -2551,11 +2585,12 @@ namespace fCraft {
                 "{0}&s smashed {1}&s over the head with their vintage record.",
                 "{0}&s dropped a piano on {1}&s.",
                 "{0}&s burned {1}&s with a cigarette.",
-                "{0}&s incinerated {1}&s with a Kamehameha!"
+                "{0}&s incinerated {1}&s with a Kamehameha!",
+                "{0}&s had sex with {1}&s's mother."
             };
 
                                 int index = randomizer.Next(0, insults.Count); // (0, 18)
-                                double time = (DateTime.Now - player.Info.LastUsedInsult).TotalSeconds;
+                                double time = (DateTime.Now - player.LastUsedInsult).TotalSeconds;
                                 if (target == null)
                                     return;
                                 if (target == player)
@@ -2573,7 +2608,7 @@ namespace fCraft {
                                 {
                                     Server.Message(insults[index], player.ClassyName, target.ClassyName);
                                     IRC.PlayerSomethingMessage(player, "insulted", target, null);
-                                    player.Info.LastUsedInsult = DateTime.Now;
+                                    player.LastUsedInsult = DateTime.Now;
                                     //Taking the money...
                                     player.Info.Money = pNewMoney;
                                     return;
@@ -2595,7 +2630,7 @@ namespace fCraft {
                         }
                         else
                         {
-                            double time = ( DateTime.UtcNow - player.Info.LastUsedLottery ).TotalMinutes;
+                            double time = ( DateTime.UtcNow - player.LastUsedLottery ).TotalMinutes;
                             if (time < ConfigKey.LottoTimeKey.GetInt())
                             {
                                 player.Message("&eYou can play the lottery again in &c" + Math.Round(ConfigKey.LottoTimeKey.GetInt() - time) + " &eminutes.");
@@ -2613,7 +2648,7 @@ namespace fCraft {
                                 player.Message("&eYou won &C{0} &e" + ConfigKey.CurrencyKeyPl.GetString() + " &efrom the lottery!", num);
                                 Server.Players.Except(player).Message("&e{0} won &C{1} &e" + ConfigKey.CurrencyKeyPl.GetString() + " &efrom the lottery!", player.ClassyName, num);
                                 player.Info.Money = pNewMoney;
-                                player.Info.LastUsedLottery = DateTime.UtcNow;
+                                player.LastUsedLottery = DateTime.UtcNow;
                                 return;
                             }
                         }
@@ -2639,7 +2674,7 @@ namespace fCraft {
                                 player.Message("&sWhy would you do that to yourself?");
                                 return;
                             }
-                            double time = (DateTime.UtcNow - player.Info.LastUsedHug).TotalSeconds;
+                            double time = (DateTime.UtcNow - player.LastUsedHug).TotalSeconds;
                             if (time < 10)
                             {
                                 player.Message("&WYou can use &a/" + ConfigKey.CustomKey1.GetString() + " &eagain in " + Math.Round(10 - time) + " seconds.");
@@ -2653,7 +2688,7 @@ namespace fCraft {
                             {
                                 Server.Players.CanSee(target).Union(target).Message("{0} &S" + ConfigKey.ActionKey1.GetString() + " {1}", player.ClassyName, target.ClassyName);
                                 IRC.PlayerSomethingMessage(player, ConfigKey.ActionKey1.GetString(), target, null);
-                                player.Info.LastUsedHug = DateTime.UtcNow;
+                                player.LastUsedHug = DateTime.UtcNow;
                                 player.Info.Money = pNewMoney;
                                 return;
                             }
@@ -2680,7 +2715,7 @@ namespace fCraft {
                                 player.Message("&sWhy would you do that to yourself?");
                                 return;
                             }
-                            double time = (DateTime.UtcNow - player.Info.LastUsedHug).TotalSeconds;
+                            double time = (DateTime.UtcNow - player.LastUsedHug).TotalSeconds;
                             if (time < 10)
                             {
                                 player.Message("&WYou can use &a/" + ConfigKey.CustomKey2.GetString() + " &eagain in " + Math.Round(10 - time) + " seconds.");
@@ -2694,7 +2729,7 @@ namespace fCraft {
                             {
                                 Server.Players.CanSee(target).Union(target).Message("{0} &S" + ConfigKey.ActionKey2.GetString() + " {1}", player.ClassyName, target.ClassyName);
                                 IRC.PlayerSomethingMessage(player, ConfigKey.ActionKey2.GetString(), target, null);
-                                player.Info.LastUsedHug = DateTime.UtcNow;
+                                player.LastUsedHug = DateTime.UtcNow;
                                 player.Info.Money = pNewMoney;
                                 return;
                             }
@@ -2721,7 +2756,7 @@ namespace fCraft {
                                 player.Message("&sWhy would you do that to yourself?");
                                 return;
                             }
-                            double time = (DateTime.UtcNow - player.Info.LastUsedHug).TotalSeconds;
+                            double time = (DateTime.UtcNow - player.LastUsedHug).TotalSeconds;
                             if (time < 10)
                             {
                                 player.Message("&WYou can use &a/" + ConfigKey.CustomKey3.GetString() + " &eagain in " + Math.Round(10 - time) + " seconds.");
@@ -2735,7 +2770,7 @@ namespace fCraft {
                             {
                                 Server.Players.CanSee(target).Union(target).Message("{0} &S" + ConfigKey.ActionKey3.GetString() + " {1}", player.ClassyName, target.ClassyName);
                                 IRC.PlayerSomethingMessage(player, ConfigKey.ActionKey3.GetString(), target, null);
-                                player.Info.LastUsedHug = DateTime.UtcNow;
+                                player.LastUsedHug = DateTime.UtcNow;
                                 player.Info.Money = pNewMoney;
                                 return;
                             }
@@ -2762,7 +2797,7 @@ namespace fCraft {
                                 player.Message("&sWhy would you do that to yourself?");
                                 return;
                             }
-                            double time = (DateTime.UtcNow - player.Info.LastUsedHug).TotalSeconds;
+                            double time = (DateTime.UtcNow - player.LastUsedHug).TotalSeconds;
                             if (time < 10)
                             {
                                 player.Message("&WYou can use &a/" + ConfigKey.CustomKey4.GetString() + " &eagain in " + Math.Round(10 - time) + " seconds.");
@@ -2776,7 +2811,7 @@ namespace fCraft {
                             {
                                 Server.Players.CanSee(target).Union(target).Message("{0} &S" + ConfigKey.ActionKey4.GetString() + " {1}", player.ClassyName, target.ClassyName);
                                 IRC.PlayerSomethingMessage(player, ConfigKey.ActionKey4.GetString(), target, null);
-                                player.Info.LastUsedHug = DateTime.UtcNow;
+                                player.LastUsedHug = DateTime.UtcNow;
                                 player.Info.Money = pNewMoney;
                                 return;
                             }
@@ -2918,6 +2953,7 @@ namespace fCraft {
         }
 
         #endregion
+
 
         #region Freeze stuff
         // freeze target if player is allowed to do so
