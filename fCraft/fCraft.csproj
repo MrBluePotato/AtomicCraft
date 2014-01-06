@@ -160,7 +160,6 @@
     <Compile Include="Games\PropHunt.cs" />
     <Compile Include="Games\Spell.cs" />
     <Compile Include="Games\ZombieSurvival.cs" />
-    <Compile Include="Games\TeamDeathMatch.cs" />
     <Compile Include="Games\GameHandlers.cs" />
     <Compile Include="MapConversion\MapFCMv3.cs" />
     <Compile Include="MessageBlocks\MessageBlock.cs" />

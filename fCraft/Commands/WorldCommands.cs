@@ -1,6 +1,6 @@
-﻿// Copyright 2009-2013 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
 
-//Copyright (C) <2011 - 2013>  <Jon Baker, Glenn Mariën and Lao Tszy>
+//Copyright (C) <2011 - 2014>  <Jon Baker, Glenn Mariën and Lao Tszy>
 
 //This program is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
@@ -754,7 +754,7 @@ namespace fCraft {
                 return;
             }
             #region 800craft
-            //Copyright (C) <2011 - 2013> <Jon Baker> using open source texture packs from various sources
+            //Copyright (C) <2011 - 2014> <Jon Baker> using open source texture packs from various sources
             if ( variable.ToLower() == "terrain" ) {
                 if ( valueText == null ) {
                     player.Message( "&A/Env [WorldName] terrain [Normal, arbot, cool, deadly, shroom, prometheus, woodpunk, fall, snow, tron, " +

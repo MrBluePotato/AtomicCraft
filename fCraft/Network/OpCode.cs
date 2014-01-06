@@ -1,4 +1,4 @@
-﻿// Copyright 2009-2013 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
 
 // Modifications Copyright (c) 2013 Michael Cummings <michael.cummings.97@outlook.com>
 // All rights reserved.

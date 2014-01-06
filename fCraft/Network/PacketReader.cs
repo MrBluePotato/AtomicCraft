@@ -1,4 +1,4 @@
-﻿// Part of FemtoCraft | Copyright 2012-2013 Matvei Stefarov <me@matvei.org>
+﻿// Part of FemtoCraft | Copyright 2012-2014 Matvei Stefarov <me@matvei.org>
 
 using System.IO;
 using System.Net;

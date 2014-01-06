@@ -1,4 +1,4 @@
-﻿// Copyright 2009-2013 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
 
 //Copyright (C) <2011 - 2014>  <Jon Baker, Glenn Mariën and Lao Tszy>
 
@@ -2099,7 +2099,7 @@ namespace fCraft {
 
         #region Economy
 
-//Economy (c)2012-2013 LeChosenOne
+//Economy (c)2012-2014 LeChosenOne
 
 // Modifications Copyright (c) 2013 Michael Cummings <michael.cummings.97@outlook.com>
 // All rights reserved.
