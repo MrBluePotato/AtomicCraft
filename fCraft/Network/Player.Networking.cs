@@ -384,10 +384,15 @@ namespace fCraft
             if (delta.IsZero) return;
 
             bool rotChanged = (delta.R != 0) || (delta.L != 0);
+            bool posChanged = (delta.X != 0) || (delta.Y != 0) || (delta.Z != 0);
 
             // only reset the timer if player rotated
             // if player is just pushed around, rotation does not change (and timer should not reset)
-            if (rotChanged) ResetIdleTimer();
+            //If the player is playing prophunt, rotating will not reset the timer
+            if (rotChanged && !this.isPlayingPropHunt) ResetIdleTimer();
+
+            //If the player is a solid block and they moved, the timer will reset
+            if (posChanged && this.isSolidBlock) ResetIdleTimer();
 
             if (Info.IsFrozen)
             {
@@ -784,7 +789,7 @@ namespace fCraft
             }
 
             // Negotiate protocol extensions, if needed
-            //From FemtoCraft | Copyright 2012-2013 Matvei Stefarov <me@matvei.org>
+            //From FemtoCraft | Copyright 2012-2014 Matvei Stefarov <me@matvei.org>
 
             if (Config.ProtocolExtension && checkCPE == 0x42)
             {
