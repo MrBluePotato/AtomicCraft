@@ -184,7 +184,7 @@ namespace fCraft
 
         void SendBlockPermissions()
         {
-            Send(Packet.MakeSetBlockPermission(Block.Admincrete, Can(Permission.PlaceAdmincrete), Can(Permission.DeleteAdmincrete)));
+            Send(Packet.MakeSetBlockPermission(Block.Bedrock, Can(Permission.PlaceAdmincrete), Can(Permission.DeleteAdmincrete)));
         }
     }
 
@@ -251,7 +251,7 @@ namespace fCraft
             return packet;
         }
 
-                [Pure]
+        [Pure]
         public static Packet MakeSetTextHotKey([NotNull] string label, [NotNull] string action, int keyCode,
                                                byte keyMods)
         {

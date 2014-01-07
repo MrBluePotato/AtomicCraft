@@ -13,7 +13,7 @@ namespace fCraft {
         Cobblestone = 4,
         Plank = 5,
         Sapling = 6,
-        Admincrete = 7,
+        Bedrock = 7,
         Water = 8,
         StillWater = 9,
         Lava = 10,

@@ -20,22 +20,26 @@ using System.Text;
 using RandomMaze;
 using System.Threading;
 
-namespace fCraft {
-    internal static class FunCommands {
-        internal static void Init () {
-            CommandManager.RegisterCommand( CdRandomMaze );
-            CommandManager.RegisterCommand( CdMazeCuboid );
-            CommandManager.RegisterCommand( CdFirework );
-            CommandManager.RegisterCommand( CdLife );
-            CommandManager.RegisterCommand( CdPossess );
-            CommandManager.RegisterCommand( CdUnpossess );
-            CommandManager.RegisterCommand( CdChangeModel);
-            CommandManager.RegisterCommand( CdChangeWeather );
+namespace fCraft
+{
+    internal static class FunCommands
+    {
+        internal static void Init()
+        {
+            CommandManager.RegisterCommand(CdRandomMaze);
+            CommandManager.RegisterCommand(CdMazeCuboid);
+            CommandManager.RegisterCommand(CdFirework);
+            CommandManager.RegisterCommand(CdLife);
+            CommandManager.RegisterCommand(CdPossess);
+            CommandManager.RegisterCommand(CdUnpossess);
+            CommandManager.RegisterCommand(CdChangeModel);
+            CommandManager.RegisterCommand(CdChangeWeather);
         }
 
         #region Possess
 
-        static readonly CommandDescriptor CdPossess = new CommandDescriptor {
+        static readonly CommandDescriptor CdPossess = new CommandDescriptor
+        {
             Name = "Possess",
             Category = CommandCategory.Fun,
             Permissions = new[] { Permission.Possess },
@@ -43,40 +47,47 @@ namespace fCraft {
             Handler = PossessHandler
         };
 
-        static void PossessHandler ( Player player, Command cmd ) {
+        static void PossessHandler(Player player, Command cmd)
+        {
             string targetName = cmd.Next();
-            if ( targetName == null ) {
-                CdPossess.PrintUsage( player );
+            if (targetName == null)
+            {
+                CdPossess.PrintUsage(player);
                 return;
             }
-            Player target = Server.FindPlayerOrPrintMatches( player, targetName, false, true );
-            if ( target == null ) return;
-            if ( target.Immortal ) {
-                player.Message( "You cannot possess {0}&S, they are immortal", target.ClassyName );
+            Player target = Server.FindPlayerOrPrintMatches(player, targetName, false, true);
+            if (target == null) return;
+            if (target.Immortal)
+            {
+                player.Message("You cannot possess {0}&S, they are immortal", target.ClassyName);
                 return;
             }
-            if ( target == player ) {
-                player.Message( "You cannot possess yourself." );
-                return;
-            }
-
-            if ( !player.Can( Permission.Possess, target.Info.Rank ) ) {
-                player.Message( "You may only possess players ranked {0}&S or lower.",
-                player.Info.Rank.GetLimit( Permission.Possess ).ClassyName );
-                player.Message( "{0}&S is ranked {1}",
-                                target.ClassyName, target.Info.Rank.ClassyName );
+            if (target == player)
+            {
+                player.Message("You cannot possess yourself.");
                 return;
             }
 
-            if ( !player.Possess( target ) ) {
-                player.Message( "Already possessing {0}", target.ClassyName );
+            if (!player.Can(Permission.Possess, target.Info.Rank))
+            {
+                player.Message("You may only possess players ranked {0}&S or lower.",
+                player.Info.Rank.GetLimit(Permission.Possess).ClassyName);
+                player.Message("{0}&S is ranked {1}",
+                                target.ClassyName, target.Info.Rank.ClassyName);
+                return;
+            }
+
+            if (!player.Possess(target))
+            {
+                player.Message("Already possessing {0}", target.ClassyName);
             }
         }
         #endregion
 
 
         #region Unpossess
-        static readonly CommandDescriptor CdUnpossess = new CommandDescriptor {
+        static readonly CommandDescriptor CdUnpossess = new CommandDescriptor
+        {
             Name = "unpossess",
             Category = CommandCategory.Fun,
             Permissions = new[] { Permission.Possess },
@@ -85,17 +96,20 @@ namespace fCraft {
             Handler = UnpossessHandler
         };
 
-        static void UnpossessHandler ( Player player, Command cmd ) {
+        static void UnpossessHandler(Player player, Command cmd)
+        {
             string targetName = cmd.Next();
-            if ( targetName == null ) {
-                CdUnpossess.PrintUsage( player );
+            if (targetName == null)
+            {
+                CdUnpossess.PrintUsage(player);
                 return;
             }
-            Player target = Server.FindPlayerOrPrintMatches( player, targetName, true, true );
-            if ( target == null ) return;
+            Player target = Server.FindPlayerOrPrintMatches(player, targetName, true, true);
+            if (target == null) return;
 
-            if ( !player.StopPossessing( target ) ) {
-                player.Message( "You are not currently possessing anyone." );
+            if (!player.StopPossessing(target))
+            {
+                player.Message("You are not currently possessing anyone.");
             }
         }
 
@@ -103,7 +117,8 @@ namespace fCraft {
 
 
         #region Life
-        static readonly CommandDescriptor CdLife = new CommandDescriptor {
+        static readonly CommandDescriptor CdLife = new CommandDescriptor
+        {
             Name = "Life",
             Category = CommandCategory.Fun,
             Permissions = new[] { Permission.DrawAdvanced },
@@ -135,7 +150,8 @@ namespace fCraft {
 
 
         #region Firework
-        static readonly CommandDescriptor CdFirework = new CommandDescriptor {
+        static readonly CommandDescriptor CdFirework = new CommandDescriptor
+        {
             Name = "Firework",
             Category = CommandCategory.Fun,
             Permissions = new[] { Permission.Fireworks },
@@ -149,22 +165,27 @@ namespace fCraft {
             Handler = FireworkHandler
         };
 
-        static void FireworkHandler ( Player player, Command cmd ) {
-            if ( player.fireworkMode ) {
+        static void FireworkHandler(Player player, Command cmd)
+        {
+            if (player.fireworkMode)
+            {
                 player.fireworkMode = false;
-                player.Message( "Firework Mode has been turned off." );
+                player.Message("Firework Mode has been turned off.");
                 return;
-            } else {
+            }
+            else
+            {
                 player.fireworkMode = true;
-                player.Message( "Firework Mode has been turned on. " +
-                    "All Gold blocks are now being replaced with Fireworks." );
+                player.Message("Firework Mode has been turned on. " +
+                    "All Gold blocks are now being replaced with Fireworks.");
             }
         }
         #endregion
 
 
         #region RandomMaze
-        static readonly CommandDescriptor CdRandomMaze = new CommandDescriptor {
+        static readonly CommandDescriptor CdRandomMaze = new CommandDescriptor
+        {
             Name = "RandomMaze",
             Aliases = new string[] { "3dmaze" },
             Category = CommandCategory.Fun,
@@ -192,7 +213,8 @@ namespace fCraft {
 
 
         #region MazeCuboid
-        static readonly CommandDescriptor CdMazeCuboid = new CommandDescriptor {
+        static readonly CommandDescriptor CdMazeCuboid = new CommandDescriptor
+        {
             Name = "MazeCuboid",
             Aliases = new string[] { "Mc", "Mz", "Maze" },
             Category = CommandCategory.Fun,
@@ -281,7 +303,7 @@ namespace fCraft {
             else
             {
                 CdChangeModel.PrintUsage(player);
-               
+
             }
         }
         enum acceptedModels
@@ -298,12 +320,12 @@ namespace fCraft {
             zombie
         };
 
-        static bool GetBlockName( string blockName, bool allowNoneBlock, out Block block)
+        static bool GetBlockName(string blockName, bool allowNoneBlock, out Block block)
         {
             if (blockName == null) throw new ArgumentNullException("blockName");
             if (Map.BlockNames.TryGetValue(blockName.ToLower(), out block))
             {
-               return true;
+                return true;
             }
             else
             {
@@ -311,7 +333,7 @@ namespace fCraft {
             }
         }
 
-        #endregion 
+        #endregion
 
 
         #region ChangeWeather
@@ -361,7 +383,7 @@ namespace fCraft {
             Rain = 1,
             Snow = 2
         }
-        #endregion 
+        #endregion
 
 
 

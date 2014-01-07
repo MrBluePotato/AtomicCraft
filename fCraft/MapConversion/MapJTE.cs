@@ -27,8 +27,8 @@ namespace fCraft.MapConversion {
             Mapping[242] = (byte)Block.RedWool;         // godfire
             Mapping[241] = (byte)Block.TNT;         // nuke
             Mapping[240] = (byte)Block.Lava;        // lavavator
-            Mapping[239] = (byte)Block.Admincrete;  // instawall
-            Mapping[238] = (byte)Block.Admincrete;  // spleef
+            Mapping[239] = (byte)Block.Bedrock;  // instawall
+            Mapping[238] = (byte)Block.Bedrock;  // spleef
             Mapping[237] = (byte)Block.GreenWool;       // resetspleef
             Mapping[236] = (byte)Block.RedWool;         // deletespleef
             Mapping[235] = (byte)Block.Sponge;      // godsponge

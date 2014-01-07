@@ -86,52 +86,52 @@ namespace fCraft
                     return;
                 }
             }
-                if (GameMode.ToLower() == "minefield")
+            if (GameMode.ToLower() == "minefield")
+            {
+                if (Option == null)
                 {
-                    if (Option == null)
-                    {
-                        player.Message("&cYou must choose an option! &astart/stop");
-                        return;
-                    }
-                    else if (Option.ToLower() == "start")
-                    {
-                        if (WorldManager.FindWorldExact("Minefield") != null)
-                        {
-                            player.Message("&WA game of Minefield is currently running and must first be stopped");
-                            return;
-                        }
-                        else
-                        {
-                            MineField.GetInstance();
-                            MineField.Start(player);
-                            return;
-                        }
-                    }
-                    else if (Option.ToLower() == "stop")
-                    {
-                        if (WorldManager.FindWorldExact("Minefield") == null)
-                        {
-                            player.Message("&WA game of Minefield is currently not running");
-                            return;
-                        }
-                        MineField.Stop(player, false);
-                        return;
-                    }
-            }
-                if (GameMode.ToLower() == "prophunt")
+                    player.Message("&cYou must choose an option! &astart/stop");
+                    return;
+                }
+                else if (Option.ToLower() == "start")
                 {
-                    if (Option == null)
+                    if (WorldManager.FindWorldExact("Minefield") != null)
                     {
-                        player.Message("&cYou must choose an option! &astart/stop");
+                        player.Message("&WA game of Minefield is currently running and must first be stopped");
                         return;
                     }
-                    if (Option.ToLower() == "start")
+                    else
                     {
-                        PropHunt game = new PropHunt(player.World);//move to world
-                        game.Start();
+                        MineField.GetInstance();
+                        MineField.Start(player);
                         return;
                     }
                 }
+                else if (Option.ToLower() == "stop")
+                {
+                    if (WorldManager.FindWorldExact("Minefield") == null)
+                    {
+                        player.Message("&WA game of Minefield is currently not running");
+                        return;
+                    }
+                    MineField.Stop(player, false);
+                    return;
+                }
+            }
+            if (GameMode.ToLower() == "prophunt")
+            {
+                if (Option == null)
+                {
+                    player.Message("&cYou must choose an option! &astart/stop");
+                    return;
+                }
+                if (Option.ToLower() == "start")
+                {
+                    PropHunt game = new PropHunt(player.World);//move to world
+                    game.Start();
+                    return;
+                }
+            }
             else
             {
                 CdGame.PrintUsage(player);
