@@ -64,6 +64,7 @@ namespace fCraft
         public bool isSolidBlock = false;
         public bool isPlayingPropHunt = false;
         public bool isPropHuntSeeker = false;
+        public bool isTagged = false;
         public Vector3I prophuntLastSolidPos { get; set; }
 
         #region Properties
@@ -1476,13 +1477,13 @@ namespace fCraft
             }
 
             // check special blocktypes
-            if (newBlock == Block.Admincrete && !Can(Permission.PlaceAdmincrete))
+            if (newBlock == Block.Bedrock && !Can(Permission.PlaceAdmincrete))
             {
                 result = CanPlaceResult.BlocktypeDenied;
                 goto eventCheck;
             }
             // check admincrete-related permissions
-            if (oldBlock == Block.Admincrete && !Can(Permission.DeleteAdmincrete))
+            if (oldBlock == Block.Bedrock && !Can(Permission.DeleteAdmincrete))
             {
                 result = CanPlaceResult.BlocktypeDenied;
                 goto eventCheck;
@@ -1973,7 +1974,7 @@ namespace fCraft
         /// <summary> Resets the IdleTimer to 0. </summary>
         public void ResetIdleTimer()
         {
-            if (this.isSolidBlock && this.isPlayingPropHunt)
+            if (this.isSolidBlock && !this.isTagged)
             {
                 //Remove the players block
                 Block airBlock = Block.Air;

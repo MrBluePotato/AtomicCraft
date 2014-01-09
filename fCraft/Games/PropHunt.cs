@@ -61,11 +61,6 @@ namespace fCraft
         {
             _world.gameMode = GameMode.PropHunt;
             startTime = DateTime.UtcNow;
-            foreach (Player p in _world.Players)
-            {
-                p.Model = blockId[randBlock.Next(0, blockId.Length)];
-
-            }
         }
 
         public void Interval(SchedulerTask task)
@@ -90,7 +85,13 @@ namespace fCraft
                         beginGame(p);
                         chooseSeeker();
                         p.isPlayingPropHunt = true;
+                        if (!p.isPropHuntSeeker)
+                        {
+                            p.Model = blockId[randBlock.Next(0, blockId.Length)];
+                        }
                     }
+
+                    Player.Clicking += PlayerClickingHandler;
 
                     isOn = true;
                     lastChecked = DateTime.UtcNow;     //used for intervals
@@ -119,7 +120,7 @@ namespace fCraft
 
             if (lastChecked != null && (DateTime.UtcNow - lastChecked).TotalSeconds > 29.9 && timeLeft <= timeLimit)
             {
-                _world.Players.Message("There are currently {0} human(s) and {1} zombie(s) left on {2}", _world.Players.Count() - _world.Players.Count(player => player.isInfected), _world.Players.Count(player => player.isInfected), _world.ClassyName);
+                _world.Players.Message("There are currently {0} block(s) and {1} seeker(s) left on {2}", _world.Players.Count() - _world.Players.Count(player => player.isInfected), _world.Players.Count(player => player.isPropHuntSeeker), _world.ClassyName);
             }
         }
 
@@ -162,13 +163,51 @@ namespace fCraft
             }
         }
 
+        // Avoid re-defining the list every time your handler is called. Make it static!
+        static Block[] clickableBlocks = {
+            Block.Stone, Block.Grass, Block.Dirt, Block.Cobblestone,
+            Block.Plank, Block.Bedrock, Block.Sand, Block.Gravel,
+            Block.Log, Block.Sponge, Block.Crate, Block.StoneBrick };
+
+        static void PlayerClickingHandler(object sender, fCraft.Events.PlayerClickingEventArgs e)
+        {
+            // if player clicked a non-air block
+            if (e.Action == ClickAction.Delete)
+            {
+                Block currentBlock = e.Player.WorldMap.GetBlock(e.Coords);
+                // Check if currentBlock is on the list
+                if (clickableBlocks.Contains(currentBlock))
+                {
+                    foreach (Player p in _world.Players)
+                    {
+                        if (p.prophuntLastSolidPos == e.Coords)
+                        {
+                            //Remove the players block
+                            Block airBlock = Block.Air;
+                            BlockUpdate blockUpdate = new BlockUpdate(null, p.prophuntLastSolidPos, airBlock);
+                            p.World.Map.QueueUpdate(blockUpdate);
+
+                            //Do the other stuff
+                            p.Message("&cA seeker has found you! Run away!");
+                            p.isTagged = true;
+                            p.ResetIdleTimer();
+                            p.isSolidBlock = false;
+                            p.Info.IsHidden = false;
+                            Player.RaisePlayerHideChangedEvent(p);
+                        }
+                    }
+                    e.Cancel = true;
+                }
+            }
+        }
+
         static void CheckIdles(SchedulerTask task)
         {
             Player[] tempPlayerList = _world.Players;
             for (int i = 0; i < tempPlayerList.Length; i++)
             {
                 Player player = tempPlayerList[i];
-                if (player.IdleTime.TotalSeconds <= 0) continue;
+                if (player.IdleTime.TotalSeconds < 5) continue;
 
                 if (player.IdleTime.TotalSeconds >= 5 && !player.isPropHuntSeeker)
                 {
@@ -203,6 +242,5 @@ namespace fCraft
                 }
             }
         }
-
     }
 }
