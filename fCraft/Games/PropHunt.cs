@@ -54,28 +54,42 @@ namespace fCraft
             startTime = DateTime.UtcNow;
             _world = world;
             task_ = new SchedulerTask(Interval, true).RunForever(TimeSpan.FromSeconds(1));
-
-            checkIdlesTask = Scheduler.NewTask(CheckIdles).RunForever(CheckIdlesInterval);
         }
         public void Start()
         {
-            if (_world.Players.Count() < 4) //in case players leave the world or disconnect during the start delay
+            /*if (_world.Players.Count() < 4) //in case players leave the world or disconnect during the start delay
             {
                 _world.Players.Message("&WPropHunt&s requires at least 4 people to play.");
                 return;
-            }
+            }*/
             _world.gameMode = GameMode.PropHunt;
             startTime = DateTime.UtcNow;
+            _world.Players.Message("&WPropHunt &S is starting in {0} seconds!", timeDelay);
         }
 
         public void Interval(SchedulerTask task)
         {
+#if DEBUG
+            Server.Message("Interval started!");
+#endif
             //check to stop Interval
-            if (_world.gameMode != GameMode.PropHunt || _world == null)
+            if (_world == null)
             {
                 _world = null;
                 task.Stop();
                 return;
+#if DEBUG
+                Server.Message("World was null");
+#endif
+            }
+            if (_world.gameMode != GameMode.PropHunt)
+            {
+                _world = null;
+                task.Stop();
+                return;
+#if DEBUG
+                Server.Message("Gamemode was not prophunt");
+#endif
             }
             if (!isOn)
             {
@@ -92,13 +106,15 @@ namespace fCraft
                         }
                     }
 
-                    Player.Moved += PlayerMovedHandler;
+                    Player.Moving += PlayerMovingHandler;
                     Player.Clicking += PlayerClickingHandler;
+
+                    checkIdlesTask = Scheduler.NewTask(CheckIdles).RunForever(CheckIdlesInterval);
 
                     isOn = true;
                     lastChecked = DateTime.UtcNow;     //used for intervals
 
-#if (debug)
+#if DEBUG
                     Server.Message("It is on and stuff...");
 #endif
                     return;
@@ -132,7 +148,7 @@ namespace fCraft
             player.isPlayingPropHunt = true;
             PropHuntPlayers.Add(player);
             Server.Message("&WPropHunt is starting!");
-#if (debug)
+#if DEBUG
             Server.Message("Beginning game....");
 #endif
         }
@@ -192,7 +208,7 @@ namespace fCraft
             Block.Plank, Block.Bedrock, Block.Sand, Block.Gravel,
             Block.Log, Block.Sponge, Block.Crate, Block.StoneBrick };
 
-        static void PlayerClickingHandler(object sender, fCraft.Events.PlayerClickingEventArgs e)
+        public static void PlayerClickingHandler(object sender, fCraft.Events.PlayerClickingEventArgs e)
         {
             // if player clicked a non-air block
             if (e.Action == ClickAction.Delete)
@@ -203,7 +219,7 @@ namespace fCraft
                 {
                     foreach (Player p in _world.Players)
                     {
-                        if (p.prophuntSolidPos == e.Coords)
+                        if (p.prophuntSolidPos == e.Coords && p.isSolidBlock)
                         {
                             //Remove the players block
                             Block airBlock = Block.Air;
@@ -225,7 +241,7 @@ namespace fCraft
         }
 
         // Checks if the seeker tagged a player, after they broke the block form
-        static void PlayerMovedHandler(object sender, fCraft.Events.PlayerMovingEventArgs e)
+        public static void PlayerMovingHandler(object sender, fCraft.Events.PlayerMovingEventArgs e)
         {
             if (e.Player.isPropHuntSeeker)
             {
@@ -237,9 +253,12 @@ namespace fCraft
                     foreach (Player p in _world.Players)
                     {
                         Vector3I pos = p.Position.ToBlockCoords(); // Converts to block coords
-                        if (!p.isPropHuntSeeker)
+                        if (e.NewPosition.DistanceSquaredTo(pos.ToPlayerCoords()) <= 48 * 48)
                         {
-                            makeSeeker(p);
+                            if (!p.isPropHuntSeeker && !p.isSolidBlock)
+                            {
+                                makeSeeker(p);
+                            }
                         }
                     }
                 }
@@ -260,7 +279,7 @@ namespace fCraft
             }
         }
 
-        static void CheckIdles(SchedulerTask task)
+       public static void CheckIdles(SchedulerTask task)
         {
             Player[] tempPlayerList = _world.Players;
             for (int i = 0; i < tempPlayerList.Length; i++)
@@ -268,12 +287,12 @@ namespace fCraft
                 Player player = tempPlayerList[i];
                 if (player.IdleTime.TotalSeconds < 5) continue;
 
-                if (player.IdleTime.TotalSeconds >= 5 && !player.isPropHuntSeeker)
+                if (player.IdleTime.TotalSeconds >= 5)
                 {
-                    if (!player.isSolidBlock)
+                    if (!player.isSolidBlock && !player.isPropHuntSeeker)
                     {
                         //Debug message to easily alert when player is idle
-#if (debug)
+#if DEBUG
                         Server.Message("{0} is idle!", player.ClassyName);
 #endif
                         player.Info.IsHidden = true;
