@@ -60,12 +60,11 @@ namespace fCraft
         public bool isPlayingZombieSurvival = false;
 
         //Prophunt
-        public bool isSeeker = false;
         public bool isSolidBlock = false;
         public bool isPlayingPropHunt = false;
         public bool isPropHuntSeeker = false;
-        public bool isTagged = false;
-        public Vector3I prophuntLastSolidPos { get; set; }
+        public bool isPropHuntTagged = false;
+        public Vector3I prophuntSolidPos { get; set; }
 
         #region Properties
 
@@ -1974,11 +1973,11 @@ namespace fCraft
         /// <summary> Resets the IdleTimer to 0. </summary>
         public void ResetIdleTimer()
         {
-            if (this.isSolidBlock && !this.isTagged)
+            if (this.isSolidBlock && !this.isPropHuntTagged)
             {
                 //Remove the players block
                 Block airBlock = Block.Air;
-                BlockUpdate blockUpdate = new BlockUpdate(null, this.prophuntLastSolidPos, airBlock);
+                BlockUpdate blockUpdate = new BlockUpdate(null, this.prophuntSolidPos, airBlock);
                 this.World.Map.QueueUpdate(blockUpdate);
 
                 //Do the other stuff

@@ -59,6 +59,11 @@ namespace fCraft
         }
         public void Start()
         {
+            if (_world.Players.Count() < 4) //in case players leave the world or disconnect during the start delay
+            {
+                _world.Players.Message("&WPropHunt&s requires at least 4 people to play.");
+                return;
+            }
             _world.gameMode = GameMode.PropHunt;
             startTime = DateTime.UtcNow;
         }
@@ -74,10 +79,6 @@ namespace fCraft
             }
             if (!isOn)
             {
-                if (_world.Players.Count() < 2) //in case players leave the world or disconnect during the start delay
-                {
-                    _world.Players.Message("&WPropHunt&s requires at least (4) people to play.");
-                }
                 if (startTime != null && (DateTime.UtcNow - startTime).TotalSeconds > timeDelay)
                 {
                     foreach (Player p in _world.Players)
@@ -91,6 +92,7 @@ namespace fCraft
                         }
                     }
 
+                    Player.Moved += PlayerMovedHandler;
                     Player.Clicking += PlayerClickingHandler;
 
                     isOn = true;
@@ -142,10 +144,105 @@ namespace fCraft
             int randSeeker = randNumber.Next(0, _world.Players.Length);
             Player seeker = _world.Players[randSeeker];
 
-            if (_world.Players.Count(player => player.isSeeker) == 0)
+            if (_world.Players.Count(player => player.isPropHuntSeeker) == 0)
             {
                 seeker.Message("&cYou were chosen as the seeker!");
                 seeker.isPropHuntSeeker = true;
+            }
+        }
+
+        //Called when the seeker tags a player (turns player into seeker)
+        public static void makeSeeker(Player p)
+        {
+            p.isPropHuntTagged = false;
+            p.Message("&cYou were tagged! You are now a seeker!");
+            p.Model = "steve";
+            p.isPropHuntSeeker = true;
+        }
+
+        //Resets player and map settings from the game
+        public static void revertGame()
+        {
+            foreach (Player p in _world.Players)
+            {
+                p.isPlayingPropHunt = false;
+                if (!p.isPropHuntSeeker)
+                {
+                    p.isSolidBlock = false;
+                    p.Model = "steve";
+                }
+                if (p.isPropHuntTagged)
+                {
+                    p.isPropHuntTagged = false;
+                }
+                p.isPropHuntSeeker = false;
+            }
+            isOn = false;
+
+            _world.gameMode = GameMode.NULL;
+            _world = null;
+
+            instance = null;
+            task_.Stop();
+        }
+
+        // Avoid re-defining the list every time your handler is called. Make it static!
+        static Block[] clickableBlocks = {
+            Block.Stone, Block.Grass, Block.Dirt, Block.Cobblestone,
+            Block.Plank, Block.Bedrock, Block.Sand, Block.Gravel,
+            Block.Log, Block.Sponge, Block.Crate, Block.StoneBrick };
+
+        static void PlayerClickingHandler(object sender, fCraft.Events.PlayerClickingEventArgs e)
+        {
+            // if player clicked a non-air block
+            if (e.Action == ClickAction.Delete)
+            {
+                Block currentBlock = e.Player.WorldMap.GetBlock(e.Coords); // Gets the blocks coords
+                // Check if currentBlock is on the list
+                if (clickableBlocks.Contains(currentBlock))
+                {
+                    foreach (Player p in _world.Players)
+                    {
+                        if (p.prophuntSolidPos == e.Coords)
+                        {
+                            //Remove the players block
+                            Block airBlock = Block.Air;
+                            BlockUpdate blockUpdate = new BlockUpdate(null, p.prophuntSolidPos, airBlock);
+                            p.World.Map.QueueUpdate(blockUpdate);
+
+                            //Do the other stuff
+                            p.Message("&cA seeker has found you! Run away!");
+                            p.isPropHuntTagged = true;
+                            p.ResetIdleTimer();
+                            p.isSolidBlock = false;
+                            p.Info.IsHidden = false;
+                            Player.RaisePlayerHideChangedEvent(p);
+                        }
+                    }
+                    e.Cancel = true;
+                }
+            }
+        }
+
+        // Checks if the seeker tagged a player, after they broke the block form
+        static void PlayerMovedHandler(object sender, fCraft.Events.PlayerMovingEventArgs e)
+        {
+            if (e.Player.isPropHuntSeeker)
+            {
+                Vector3I oldPos = new Vector3I(e.OldPosition.X / 32, e.OldPosition.Y / 32, e.OldPosition.Z / 32); // Get the position of the player
+                Vector3I newPos = new Vector3I(e.NewPosition.X / 32, e.NewPosition.Y / 32, e.NewPosition.Z / 32);
+
+                if (oldPos.X != newPos.X || oldPos.Y != newPos.Y || oldPos.Z != newPos.Z) // Check if the positions are not the same (player moved)
+                {
+                    foreach (Player p in _world.Players)
+                    {
+                        Vector3I pos = p.Position.ToBlockCoords(); // Converts to block coords
+                        if (!p.isPropHuntSeeker)
+                        {
+                            makeSeeker(p);
+                        }
+                    }
+                }
             }
         }
 
@@ -160,44 +257,6 @@ namespace fCraft
                 if (value.Ticks < 0) throw new ArgumentException("CheckIdlesInterval may not be negative.");
                 checkIdlesInterval = value;
                 if (checkIdlesTask != null) checkIdlesTask.Interval = checkIdlesInterval;
-            }
-        }
-
-        // Avoid re-defining the list every time your handler is called. Make it static!
-        static Block[] clickableBlocks = {
-            Block.Stone, Block.Grass, Block.Dirt, Block.Cobblestone,
-            Block.Plank, Block.Bedrock, Block.Sand, Block.Gravel,
-            Block.Log, Block.Sponge, Block.Crate, Block.StoneBrick };
-
-        static void PlayerClickingHandler(object sender, fCraft.Events.PlayerClickingEventArgs e)
-        {
-            // if player clicked a non-air block
-            if (e.Action == ClickAction.Delete)
-            {
-                Block currentBlock = e.Player.WorldMap.GetBlock(e.Coords);
-                // Check if currentBlock is on the list
-                if (clickableBlocks.Contains(currentBlock))
-                {
-                    foreach (Player p in _world.Players)
-                    {
-                        if (p.prophuntLastSolidPos == e.Coords)
-                        {
-                            //Remove the players block
-                            Block airBlock = Block.Air;
-                            BlockUpdate blockUpdate = new BlockUpdate(null, p.prophuntLastSolidPos, airBlock);
-                            p.World.Map.QueueUpdate(blockUpdate);
-
-                            //Do the other stuff
-                            p.Message("&cA seeker has found you! Run away!");
-                            p.isTagged = true;
-                            p.ResetIdleTimer();
-                            p.isSolidBlock = false;
-                            p.Info.IsHidden = false;
-                            Player.RaisePlayerHideChangedEvent(p);
-                        }
-                    }
-                    e.Cancel = true;
-                }
             }
         }
 
@@ -227,7 +286,7 @@ namespace fCraft
                         Vector3I Pos = new Vector3I(player.Position.X / 32, player.Position.Y / 32, (player.Position.Z - 32) / 32);
 
                         //Saves the player pos when they were solid for later removing the block
-                        player.prophuntLastSolidPos = Pos;
+                        player.prophuntSolidPos = Pos;
 
                         //Converts player's model block into Block.*blockname*
                         Block playerBlock = Map.GetBlockByName(player.Model);
