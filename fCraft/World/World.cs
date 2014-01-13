@@ -27,6 +27,9 @@ namespace fCraft
         /// Can be assigned directly. </summary>
         public bool IsHidden { get; set; }
 
+        /// <summary> Whether the world is playable for PropHunt</summary>
+        public bool IsPropHunt { get; set; }
+
         //custom
         public bool IsRealm { get; set; }
 

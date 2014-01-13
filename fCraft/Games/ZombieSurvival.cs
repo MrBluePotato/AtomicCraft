@@ -70,7 +70,7 @@ namespace fCraft
         public void Start()
         {
             startTime = DateTime.UtcNow;
-            if (!ConfigKey.IsNormal.Enabled())
+            /*if (!ConfigKey.IsNormal.Enabled())
             {
                 var files = Directory.GetFiles("maps", "*.*").Where(name => !name.EndsWith(".lvlqonly")).ToArray();
                 string zombieLevel = Path.GetFileNameWithoutExtension(files[rand.Next(files.Length - 1)]);
@@ -87,7 +87,7 @@ namespace fCraft
                 _world.gameMode = GameMode.ZombieSurvival; //set the game mode
                 Scheduler.NewTask(t => _world.Players.Message("&WZombie survival &fwill be starting in {0} seconds: &WGet ready!", timeDelay))
                 .RunRepeating(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(10), 1);
-            }
+            }*/
         }
 
         public static void Stop(Player p) //for stopping the game early
@@ -142,7 +142,7 @@ namespace fCraft
             {
                 if (_world.Players.Count() < 2) //in case players leave the world or disconnect during the start delay
                 {
-                    if (!ConfigKey.IsNormal.Enabled())
+                    /*if (!ConfigKey.IsNormal.Enabled())
                     {
                         return;
                     }
@@ -150,7 +150,7 @@ namespace fCraft
                     {
                         _world.Players.Message("&WZombie Survival&s requires at least 4 people to play.");
                         return;
-                    }
+                    }*/
                 }
                 if (startTime != null && (DateTime.UtcNow - startTime).TotalSeconds > timeDelay)
                 {
@@ -215,7 +215,7 @@ namespace fCraft
 
         public void chooseInfected()
         {
-            if ((!ConfigKey.IsNormal.Enabled()) && (WorldManager.MainWorld.Players.Count() < 1))
+            /*if ((!ConfigKey.IsNormal.Enabled()) && (WorldManager.MainWorld.Players.Count() < 1))
             {
                 Server.Message("&cStill gotta figure out what to do here...");
                 return;
@@ -228,7 +228,7 @@ namespace fCraft
                 int num = rand.Next(min, max);
                 Player p = _world.Players[num];
                 ToZombie(null, p);
-            }
+            }*/
         }
         public void ToZombie(Player infector, Player target)
         {

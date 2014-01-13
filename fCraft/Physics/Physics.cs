@@ -102,7 +102,7 @@ namespace fCraft
             }
             return root;
         }
-        
+
 
         public static void LoadSettings(XElement el, World world)
         {
@@ -167,7 +167,8 @@ namespace fCraft
         public static void PlayerPlacingPhysics(object sender, PlayerPlacingBlockEventArgs e)
         {
             World world = e.Player.World;
-            if (e.Result != CanPlaceResult.Allowed){
+            if (e.Result != CanPlaceResult.Allowed)
+            {
                 return;
             }
             if (e.NewBlock == Block.Gold)

@@ -70,7 +70,7 @@ namespace fCraft.ServerGUI {
                     if ( shutdownPending ) return;
                     if ( Updater.UpdateCheck() ) {
                         if ( updaterMode == UpdaterMode.Notify ) {
-                            String updateMsg = String.Format( "An AtomicCraft update is available! Visit http://github.com/glennmr/AtomicCraft/downloads to download. " +
+                            String updateMsg = String.Format( "An AtomicCraft update is available! Visit http://github.com/MrBluePotato/AtomicCraft/downloads to download. " +
                                                               "Local version: {0}. Latest available version: {1}.",
                                                               Updater.CurrentRelease.VersionString,
                                                               Updater.WebVersionFullString );

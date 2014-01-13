@@ -1,9 +1,4 @@
-﻿//Copyright (c) < LeChosenOne, DingusBingus >
-//Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-//The above copyright notice and this permission notice shall be included in all copies or substantial portions of the software.
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-// Modifications Copyright (c) 2013 Michael Cummings <michael.cummings.97@outlook.com>
+﻿// Copyright (c) <2013 - 2014> Michael Cummings <michael.cummings.97@outlook.com>
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -45,6 +40,7 @@ namespace fCraft
             if (mode == ReleaseMode.Dev)
             {
                 CommandManager.RegisterCommand(CdGame);
+                CommandManager.RegisterCommand(CdPropHunt);
                 //CommandManager.RegisterCommand(CdTeam);
             }
         }
@@ -131,6 +127,46 @@ namespace fCraft
                     game.Start();
                     return;
                 }
+            }
+            else
+            {
+                CdGame.PrintUsage(player);
+                return;
+            }
+        }
+        #endregion
+
+
+        #region PropHunt
+        static readonly CommandDescriptor CdPropHunt = new CommandDescriptor
+        {
+            Name = "PropHunt",
+            Category = CommandCategory.Game,
+            Permissions = new Permission[] { Permission.ManageGame },
+            IsConsoleSafe = false,
+            Usage = "/PropHunt add/remove worldname",
+            Handler = PropHuntHandler
+        };
+        private static void PropHuntHandler(Player player, Command cmd)
+        {
+            string Option = cmd.Next();
+            string World = cmd.Next();
+            World world = WorldManager.FindWorldOrPrintMatches(player, World);
+
+            if (Option == null)
+            {
+                CdPropHunt.PrintUsage(player);
+                return;
+            }
+            if (Option.ToLower() == "add")
+            {
+                world.IsPropHunt = true;
+                player.Message("&c{0}&S is now a PropHunt map!", world.ClassyName);
+                WorldManager.SaveWorldList();
+            }
+            else if (Option.ToLower() == "remove")
+            {
+                // Gotta do stuff
             }
             else
             {

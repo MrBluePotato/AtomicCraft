@@ -1,4 +1,4 @@
-﻿// Modifications Copyright (c) <2013 - 2014> Michael Cummings <michael.cummings.97@outlook.com>
+﻿// Copyright (c) <2013 - 2014> Michael Cummings <michael.cummings.97@outlook.com>
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -27,14 +27,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using JetBrains.Annotations;
 
 namespace fCraft
 {
     class PropHunt
     {
-        private string[] blockId = { "1", "2", "4", "5", "7", "12", "13", "17", "19", "64", "65" };
-
-        private Random randBlock = new Random();
+        //Randoms
+        private static Random randBlock = new Random();
+        private Random randWorld = new Random();
 
         //Time stuff
         private static SchedulerTask task_;
@@ -44,34 +45,66 @@ namespace fCraft
         public static int timeLimit = 300;
         public static int timeDelay = 10;
 
+        //Stuff
         public static bool isOn = false;
         public static PropHunt instance;
         private static World _world;
-        public static List<Player> PropHuntPlayers = new List<Player>();
+        public static Game.StartMode startMode = ConfigKey.StartMode.GetEnum<Game.StartMode>();
 
+        //Lists
+        private static string[] blockId = { "1", "2", "4", "5", "7", "12", "13", "17", "19", "64", "65" };
+
+        public static List<Player> PropHuntPlayers = new List<Player>();
+        public static List<World> PropHuntWorlds = new List<World>();
+
+        //For ondemand instances of PropHunt
         public PropHunt(World world)
         {
-            startTime = DateTime.UtcNow;
             _world = world;
+            startTime = DateTime.UtcNow;
             task_ = new SchedulerTask(Interval, true).RunForever(TimeSpan.FromSeconds(1));
         }
+
+        //Used if the server starts in prophunt
+        public PropHunt()
+        {
+            foreach (World w in WorldManager.Worlds)
+            {
+                if (w.IsPropHunt)
+                {
+                    PropHunt.PropHuntWorlds.Add(w);
+                }
+            }
+#if DEBUG
+            Server.Message("stuff");
+#endif
+            if (PropHuntWorlds.Count() == 0)
+            {
+                Server.Message("&cThere are no PropHunt maps set. Please add some with /PropHunt add [mapname].");
+                return;
+            }
+            _world = PropHuntWorlds[randWorld.Next(0, PropHuntWorlds.Count)];
+
+            startTime = DateTime.UtcNow;
+            task_ = new SchedulerTask(Interval, true).RunForever(TimeSpan.FromSeconds(1));
+        }
+
         public void Start()
         {
-            /*if (_world.Players.Count() < 4) //in case players leave the world or disconnect during the start delay
+#if !(DEBUG)
+            if (_world.Players.Count() < 4) //in case players leave the world or disconnect during the start delay
             {
                 _world.Players.Message("&WPropHunt&s requires at least 4 people to play.");
                 return;
-            }*/
+            }
+#endif
             _world.gameMode = GameMode.PropHunt;
             startTime = DateTime.UtcNow;
-            _world.Players.Message("&WPropHunt &S is starting in {0} seconds!", timeDelay);
+            _world.Players.Message("&WPropHunt &S is starting in {0} seconds in world {1}", timeDelay, _world.ClassyName);
         }
 
         public void Interval(SchedulerTask task)
         {
-#if DEBUG
-            Server.Message("Interval started!");
-#endif
             //check to stop Interval
             if (_world == null)
             {
@@ -108,6 +141,7 @@ namespace fCraft
 
                     Player.Moving += PlayerMovingHandler;
                     Player.Clicking += PlayerClickingHandler;
+                    Player.Connected += PlayerConnectedHandler;
 
                     checkIdlesTask = Scheduler.NewTask(CheckIdles).RunForever(CheckIdlesInterval);
 
@@ -265,6 +299,36 @@ namespace fCraft
             }
         }
 
+        //Used if the server starts prophunt on launch. This brings the player to the world that the game is in.
+        public static void PlayerConnectedHandler(object sender, fCraft.Events.PlayerConnectedEventArgs e)
+        {
+            if (PropHunt.startMode == Game.StartMode.PropHunt)
+            {
+                e.StartingWorld = _world;
+                e.Player.Model = blockId[randBlock.Next(0, blockId.Length)];
+                foreach (Player p in Server.Players)
+                {
+                    if (p.isPropHuntSeeker == true)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        if (Server.Players.Count() < 2)
+                        {
+                            chooseSeeker();
+                            return;
+                        }
+                        else
+                        {
+                            Server.Message("&cThere are not enough players online to being PropHunt. Please try again later.");
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
         // checks for idle players
         static SchedulerTask checkIdlesTask;
         static TimeSpan checkIdlesInterval = TimeSpan.FromSeconds(1);
@@ -279,7 +343,7 @@ namespace fCraft
             }
         }
 
-       public static void CheckIdles(SchedulerTask task)
+        public static void CheckIdles(SchedulerTask task)
         {
             Player[] tempPlayerList = _world.Players;
             for (int i = 0; i < tempPlayerList.Length; i++)

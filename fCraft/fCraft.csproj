@@ -154,6 +154,7 @@
     </Compile>
     <Compile Include="Drawing\DrawOps\WallsOp.cs" />
     <Compile Include="Games\Football.cs" />
+    <Compile Include="Games\Game.cs" />
     <Compile Include="Games\GameMode.cs" />
     <Compile Include="Games\MineChallenge.cs" />
     <Compile Include="Games\MineField.cs" />

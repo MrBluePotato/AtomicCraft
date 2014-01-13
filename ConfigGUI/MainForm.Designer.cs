@@ -25,8 +25,8 @@
         /// </summary>
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.tabSavingAndBackup = new System.Windows.Forms.TabPage();
             this.gDataBackup = new System.Windows.Forms.GroupBox();
@@ -143,7 +143,6 @@
             this.xRankPrefixesInList = new System.Windows.Forms.CheckBox();
             this.xRankPrefixesInChat = new System.Windows.Forms.CheckBox();
             this.xRankColorsInChat = new System.Windows.Forms.CheckBox();
-            this.chatPreview = new fCraft.ConfigGUI.ChatPreview();
             this.tabs = new System.Windows.Forms.TabControl();
             this.tabGeneral = new System.Windows.Forms.TabPage();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
@@ -354,6 +353,10 @@
             this.bResetAll = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.bApply = new System.Windows.Forms.Button();
+            this.groupBox9 = new System.Windows.Forms.GroupBox();
+            this.cStartMode = new System.Windows.Forms.ComboBox();
+            this.label29 = new System.Windows.Forms.Label();
+            this.chatPreview = new fCraft.ConfigGUI.ChatPreview();
             this.tabSavingAndBackup.SuspendLayout();
             this.gDataBackup.SuspendLayout();
             this.gSaving.SuspendLayout();
@@ -436,6 +439,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.Price1)).BeginInit();
             this.groupBox4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.StartAmount)).BeginInit();
+            this.groupBox9.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabSavingAndBackup
@@ -1751,13 +1755,6 @@
             this.xRankColorsInChat.Text = "Show rank colors.";
             this.xRankColorsInChat.UseVisualStyleBackColor = true;
             // 
-            // chatPreview
-            // 
-            this.chatPreview.Location = new System.Drawing.Point(7, 256);
-            this.chatPreview.Name = "chatPreview";
-            this.chatPreview.Size = new System.Drawing.Size(637, 241);
-            this.chatPreview.TabIndex = 2;
-            // 
             // tabs
             // 
             this.tabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -1784,6 +1781,7 @@
             // tabGeneral
             // 
             this.tabGeneral.BackColor = System.Drawing.SystemColors.Control;
+            this.tabGeneral.Controls.Add(this.groupBox9);
             this.tabGeneral.Controls.Add(this.groupBox5);
             this.tabGeneral.Controls.Add(this.gUpdaterSettings);
             this.tabGeneral.Controls.Add(this.groupBox2);
@@ -1800,7 +1798,7 @@
             // groupBox5
             // 
             this.groupBox5.Controls.Add(this.GCcheckBox);
-            this.groupBox5.Location = new System.Drawing.Point(13, 307);
+            this.groupBox5.Location = new System.Drawing.Point(8, 307);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(636, 50);
             this.groupBox5.TabIndex = 3;
@@ -1859,9 +1857,9 @@
             this.lUpdater.AutoSize = true;
             this.lUpdater.Location = new System.Drawing.Point(6, 25);
             this.lUpdater.Name = "lUpdater";
-            this.lUpdater.Size = new System.Drawing.Size(145, 15);
+            this.lUpdater.Size = new System.Drawing.Size(149, 15);
             this.lUpdater.TabIndex = 0;
-            this.lUpdater.Text = "AtomicCraft update check";
+            this.lUpdater.Text = "AtomicCraft Update Check";
             // 
             // groupBox2
             // 
@@ -1869,7 +1867,7 @@
             this.groupBox2.Controls.Add(this.bChangelog);
             this.groupBox2.Controls.Add(this.bCredits);
             this.groupBox2.Controls.Add(this.bReadme);
-            this.groupBox2.Location = new System.Drawing.Point(334, 363);
+            this.groupBox2.Location = new System.Drawing.Point(329, 423);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(315, 55);
             this.groupBox2.TabIndex = 4;
@@ -1911,7 +1909,7 @@
             // 
             this.gHelpAndSupport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.gHelpAndSupport.Controls.Add(this.bReportABug);
-            this.gHelpAndSupport.Location = new System.Drawing.Point(13, 363);
+            this.gHelpAndSupport.Location = new System.Drawing.Point(8, 423);
             this.gHelpAndSupport.Name = "gHelpAndSupport";
             this.gHelpAndSupport.Size = new System.Drawing.Size(315, 55);
             this.gHelpAndSupport.TabIndex = 3;
@@ -2445,8 +2443,8 @@
             this.dgvWorlds.MultiSelect = false;
             this.dgvWorlds.Name = "dgvWorlds";
             this.dgvWorlds.RowHeadersVisible = false;
-            dataGridViewCellStyle4.Padding = new System.Windows.Forms.Padding(0, 1, 0, 1);
-            this.dgvWorlds.RowsDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(0, 1, 0, 1);
+            this.dgvWorlds.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dgvWorlds.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvWorlds.Size = new System.Drawing.Size(636, 325);
             this.dgvWorlds.TabIndex = 0;
@@ -2504,8 +2502,8 @@
             // dgvcBlockDB
             // 
             this.dgvcBlockDB.DataPropertyName = "BlockDBEnabled";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.dgvcBlockDB.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.dgvcBlockDB.DefaultCellStyle = dataGridViewCellStyle1;
             this.dgvcBlockDB.HeaderText = "BlockDB";
             this.dgvcBlockDB.Name = "dgvcBlockDB";
             this.dgvcBlockDB.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
@@ -4412,6 +4410,45 @@
             this.bApply.Text = "Apply";
             this.bApply.Click += new System.EventHandler(this.bApply_Click);
             // 
+            // groupBox9
+            // 
+            this.groupBox9.Controls.Add(this.cStartMode);
+            this.groupBox9.Controls.Add(this.label29);
+            this.groupBox9.Location = new System.Drawing.Point(8, 363);
+            this.groupBox9.Name = "groupBox9";
+            this.groupBox9.Size = new System.Drawing.Size(636, 54);
+            this.groupBox9.TabIndex = 3;
+            this.groupBox9.TabStop = false;
+            this.groupBox9.Text = "Server Start Mode";
+            // 
+            // cStartMode
+            // 
+            this.cStartMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cStartMode.FormattingEnabled = true;
+            this.cStartMode.Items.AddRange(new object[] {
+            "None",
+            "PropHunt"});
+            this.cStartMode.Location = new System.Drawing.Point(88, 22);
+            this.cStartMode.Name = "cStartMode";
+            this.cStartMode.Size = new System.Drawing.Size(189, 23);
+            this.cStartMode.TabIndex = 1;
+            // 
+            // label29
+            // 
+            this.label29.AutoSize = true;
+            this.label29.Location = new System.Drawing.Point(6, 25);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(76, 15);
+            this.label29.TabIndex = 0;
+            this.label29.Text = "Game Mode";
+            // 
+            // chatPreview
+            // 
+            this.chatPreview.Location = new System.Drawing.Point(7, 256);
+            this.chatPreview.Name = "chatPreview";
+            this.chatPreview.Size = new System.Drawing.Size(637, 241);
+            this.chatPreview.TabIndex = 2;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -4541,6 +4578,8 @@
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.StartAmount)).EndInit();
+            this.groupBox9.ResumeLayout(false);
+            this.groupBox9.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -4873,6 +4912,9 @@
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.Button bApply;
         private System.Windows.Forms.ComboBox sMode;
+        private System.Windows.Forms.GroupBox groupBox9;
+        private System.Windows.Forms.ComboBox cStartMode;
+        private System.Windows.Forms.Label label29;
 
     }
 }

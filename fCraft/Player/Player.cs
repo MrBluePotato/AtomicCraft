@@ -1825,8 +1825,6 @@ namespace fCraft
         [CanBeNull]
         Player possessionPlayer;
 
-        String model;
-
         #region Spectating
 
         [CanBeNull]
