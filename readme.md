@@ -7,7 +7,7 @@ The website is currently experiencing technical difficulties. A link will be pos
 
 2) Factions (0% complete)
 
-3) Full Classic Protocol Extension support [Classicube] (30% complete)
+3) Full Classic Protocol Extension support (Classicube) (30% complete)
 
 4) Web Administration Panel (0% complete)
 
