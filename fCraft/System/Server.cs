@@ -594,6 +594,12 @@ namespace fCraft
                 }
             }
 
+            if (PropHunt.isOn)
+            {
+                Logger.Log(LogType.SystemActivity, "Shutdown: Reverting PropHunt");
+                PropHunt.revertGame();
+            }
+
             Scheduler.EndShutdown();
 
             if (IsRunning)

@@ -52,7 +52,7 @@ namespace fCraft
             Name = "Game",
             Category = CommandCategory.Game,
             Permissions = new Permission[] { Permission.ManageGame },
-            IsConsoleSafe = false,
+            IsConsoleSafe = true,
             Usage = "/Game [tdm] [start/stop]",
             Handler = GameHandler
         };
@@ -61,6 +61,12 @@ namespace fCraft
             string GameMode = cmd.Next();
             string Option = cmd.Next();
             World world = player.World;
+
+            if (PropHunt.startMode != Game.StartMode.None)
+            {
+                player.Message("&cThere is already a game running!");
+                return;
+            }
 
             if (GameMode == null)
             {
@@ -143,7 +149,7 @@ namespace fCraft
             Name = "PropHunt",
             Category = CommandCategory.Game,
             Permissions = new Permission[] { Permission.ManageGame },
-            IsConsoleSafe = false,
+            IsConsoleSafe = true,
             Usage = "/PropHunt add/remove worldname",
             Handler = PropHuntHandler
         };
