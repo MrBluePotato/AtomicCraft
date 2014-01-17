@@ -1,17 +1,18 @@
 ## Download AtomicCraft
 The website is currently experiencing technical difficulties. A link will be posted soon.
 
-## Coming Soon
+## To-Do List (In order of importance)
 
-* Web administration panel
+1) PropHunt game (75% complete)
 
-* Prophunt game
+2) Factions (0% complete)
 
-* Global ban list
+3) Full Classic Protocol Extension support (Classicube) (30% complete)
 
-* Improved global chat
+4) Web Administration Panel (0% complete)
 
-* Full CPE support
+5) Improved Global Chat (10% complete)
+
 
 ## About AtomicCraft
 AtomicCraft is a branch of 800Craft, and is developed and MrBluePotato.
