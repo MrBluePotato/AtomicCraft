@@ -196,6 +196,69 @@ namespace fCraft
                     player.Message("&8You have voted for 'No'");
                     break;
 
+                case "1":
+                    if (PropHunt.isOn)
+                    {
+                        if (!PropHunt.VoteIsOn)
+                        {
+                            player.Message("Voting has not yet started.");
+                            return;
+                        }
+
+                        if (player.HasVoted)
+                        {
+                            player.Message("&CYou have already voted.");
+                            return;
+                        }
+                        PropHunt.Voted.Add(player);
+                        PropHunt.Voted1++;
+                        player.HasVoted = true;
+                        player.Message("&8You have voted for {0}.", PropHunt.world1.ClassyName);
+                    }
+                    break;
+
+                case "2":
+                    if (PropHunt.isOn)
+                    {
+                        if (!PropHunt.VoteIsOn)
+                        {
+                            player.Message("Voting has not yet started.");
+                            return;
+                        }
+
+                        if (player.HasVoted)
+                        {
+                            player.Message("&CYou have already voted.");
+                            return;
+                        }
+                        PropHunt.Voted.Add(player);
+                        PropHunt.Voted2++;
+                        player.HasVoted = true;
+                        player.Message("&8You have voted for {0}.", PropHunt.world2.ClassyName);
+                    }
+                    break;
+
+                case "3":
+                    if (PropHunt.isOn)
+                    {
+                        if (!PropHunt.VoteIsOn)
+                        {
+                            player.Message("Voting has not yet started.");
+                            return;
+                        }
+
+                        if (player.HasVoted)
+                        {
+                            player.Message("&CYou have already voted.");
+                            return;
+                        }
+                        PropHunt.Voted.Add(player);
+                        PropHunt.Voted3++;
+                        player.HasVoted = true;
+                        player.Message("&8You have voted for {0}.", PropHunt.world3.ClassyName);
+                    }
+                    break;
+
                 case "ask":
                     string AskQuestion = cmd.NextAll();
                     Question = AskQuestion;
