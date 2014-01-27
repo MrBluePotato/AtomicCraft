@@ -45,7 +45,7 @@ namespace fCraft
         public static DateTime roundEnd;
         public static int timeLeft = 0;
         public static int timeLimit = 45;
-        public static int timeDelay = 5;
+        public static int timeDelay = 10;
 
         //Bools
         public static bool isOn = false;
@@ -118,8 +118,8 @@ namespace fCraft
             _world.gameMode = GameMode.PropHunt;
             startTime = DateTime.Now;
             task_ = new SchedulerTask(Interval, true).RunForever(TimeSpan.FromMilliseconds(250));
-            //Object reference null thing - gotta figure out later cause i dont feel like it rn
-            //_world.Players.Message("&WPropHunt &S is starting in {0} seconds in world {0}", timeDelay, _world.ClassyName);
+            Logger.Log(LogType.SystemActivity, "&WPropHunt &S is starting in {0} seconds in world {0}", timeDelay, _world.ClassyName);
+            _world.Players.Message("&WPropHunt &S is starting in {0} seconds in world {0}", timeDelay, _world.ClassyName);
 #if DEBUG
             Server.Message("PropHunt is starting");
 #endif
@@ -149,8 +149,9 @@ namespace fCraft
             if (!isOn)
             {
                 //Time delay if it is the on-demand instance of the game
-                if (startTime != null && (DateTime.Now - startTime).TotalSeconds > timeDelay && startMode != Game.StartMode.PropHunt)
+                if (startTime != null && (DateTime.Now - startTime).TotalSeconds > timeDelay)
                 {
+                    timeDelay = 0;
                     foreach (Player p in _world.Players)
                     {
                         beginGame(p);
@@ -159,6 +160,8 @@ namespace fCraft
                         if (!p.isPropHuntSeeker)
                         {
                             p.Model = blockId[randBlock.Next(0, blockId.Length)];
+                            string blockName = Map.GetBlockByName(p.Model).ToString();
+                            p.Message("You are disgused as {0}", blockName);
                         }
                     }
                 }
@@ -427,11 +430,10 @@ namespace fCraft
         //Used if the server starts prophunt on launch. This brings the player to the world that the game is in.
         public static void PlayerConnectedHandler(object sender, fCraft.Events.PlayerConnectedEventArgs e)
         {
-            if (PropHunt.startMode == Game.StartMode.PropHunt && !e.Player.isPlayingPropHunt)
+            e.StartingWorld = _world;
+            if (PropHunt.startMode == Game.StartMode.PropHunt && !e.Player.isPlayingPropHunt && timeDelay == 0)
             {
-                e.StartingWorld = _world;
                 beginGame(e.Player);
-                e.Player.isPlayingPropHunt = true;
                 e.Player.Model = blockId[randBlock.Next(0, blockId.Length)];
                 foreach (Player p in Server.Players)
                 {
@@ -453,7 +455,7 @@ namespace fCraft
                         }
                     }
                 }
-                if (roundStarted)
+                if (roundStarted && timeDelay != 0)
                 {
                     e.Player.Message("You connected while a round was in progress. You have been made a seeker.");
                     e.Player.isPropHuntSeeker = true;

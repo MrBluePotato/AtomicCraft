@@ -618,7 +618,6 @@ namespace fCraft
             BlockNames["w"] = Block.Water;
 
             BlockNames["l"] = Block.Lava;
-            BlockNames["magma"] = Block.Lava;
 
             BlockNames["gold_ore"] = Block.GoldOre;
 
@@ -711,6 +710,8 @@ namespace fCraft
             BlockNames["cobbleslab"] = Block.CobblestoneSlab;
 
             BlockNames["stoneslab"] = Block.Slab;
+
+            BlockNames["doubleslab"] = Block.DoubleSlab;
 
             // add WoM file hashes for edge textures
             BlockEdgeTextures[Block.Air] = "bed8ac09b8c761527f3e205f8b85a2e22519b937";

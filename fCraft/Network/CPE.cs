@@ -155,10 +155,10 @@ namespace fCraft
 
                 // Expect CustomBlockSupportLevel reply
                 OpCode customBlockSupportLevelReply = (OpCode)reader.ReadByte();
-                //Logger.Log( "Expected: {0} / Received: {1}", OpCode.CustomBlockSupportLevel, customBlockSupportLevelReply );
+                Logger.Log(LogType.Debug, "Expected: {0} / Received: {1}", OpCode.CustomBlockSupportLevel, customBlockSupportLevelReply);
                 if (customBlockSupportLevelReply != OpCode.CustomBlockSupportLevel)
                 {
-                    Logger.Log(LogType.SystemActivity, "Player {0} from {1}: Unexpected CustomBlockSupportLevel reply ({2})",
+                    Logger.Log(LogType.Warning, "Player {0} from {1}: Unexpected CustomBlockSupportLevel reply ({2})",
                                        Name,
                                        IP,
                                        customBlockSupportLevelReply);
@@ -216,7 +216,7 @@ namespace fCraft
         [Pure]
         public static Packet MakeCustomBlockSupportLevel(byte level)
         {
-            // Logger.Log( "Send: CustomBlockSupportLevel({0})", level );
+            Logger.Log(LogType.Debug, "Send: CustomBlockSupportLevel({0})", level);
             Packet packet = new Packet(OpCode.CustomBlockSupportLevel);
             packet.Data[1] = level;
             return packet;
