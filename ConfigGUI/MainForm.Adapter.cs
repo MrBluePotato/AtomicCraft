@@ -295,8 +295,6 @@ namespace fCraft.ConfigGUI
                 tMapPath.Text = ConfigKey.MapPath.GetString();
                 xMapPath.Checked = true;
             }
-
-            xWoMEnableEnvExtensions.Checked = ConfigKey.WoMEnableEnvExtensions.Enabled();
         }
 
 
@@ -648,9 +646,6 @@ namespace fCraft.ConfigGUI
 
             if (xMapPath.Checked) ConfigKey.MapPath.TrySetValue(tMapPath.Text);
             else ConfigKey.MapPath.TrySetValue(ConfigKey.MapPath.GetDefault());
-
-            ConfigKey.WoMEnableEnvExtensions.TrySetValue(xWoMEnableEnvExtensions.Checked);
-
 
             // Security
             WriteEnum<NameVerificationMode>(cVerifyNames, ConfigKey.VerifyNames);

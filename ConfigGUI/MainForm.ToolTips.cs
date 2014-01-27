@@ -119,8 +119,6 @@ on your server.");
 
             toolTip.SetToolTip( tMapPath, ConfigKey.MapPath.GetDescription() );
             toolTip.SetToolTip( xMapPath, ConfigKey.MapPath.GetDescription() );
-
-            toolTip.SetToolTip( xWoMEnableEnvExtensions, ConfigKey.WoMEnableEnvExtensions.GetDescription() );
         }
 
 

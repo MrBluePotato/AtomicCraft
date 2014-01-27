@@ -329,7 +329,7 @@ namespace fCraft
                 return false;
             }
 #if DEBUG
-                ParseMessage( message, false );
+            ParseMessage(message, false);
 #else
             try
             {
@@ -1081,6 +1081,17 @@ namespace fCraft
             }
         }
 
+        public void JoinWorld([NotNull] World newWorld)
+        {
+            if (newWorld == null) throw new ArgumentNullException("newWorld");
+            lock (joinWorldLock)
+            {
+                useWorldSpawn = true;
+                postJoinPosition = Position.Zero;
+                forcedWorldToJoin = newWorld;
+            }
+        }
+
 
         public void JoinWorld([NotNull] World newWorld, WorldChangeReason reason, Position position)
         {
@@ -1263,7 +1274,7 @@ namespace fCraft
                 {
                     World.VisitCount++;
                 }
-            } if (!World.IsRealm && oldWorld == newWorld)
+            } if (!World.IsRealm && oldWorld == newWorld && !isPlayingPropHunt)
             {
                 Message("Rejoined world {0}", newWorld.ClassyName);
             }
@@ -1442,8 +1453,9 @@ namespace fCraft
         readonly Queue<DateTime> antiSpeedPacketLog = new Queue<DateTime>();
         DateTime antiSpeedLastNotification = DateTime.UtcNow;
 
-        public void RefreshEntity() {
-            Interlocked.Increment( ref entityVersion );
+        public void RefreshEntity()
+        {
+            Interlocked.Increment(ref entityVersion);
         }
 
         void ResetVisibleEntities()
@@ -1562,7 +1574,8 @@ namespace fCraft
                 {
                     entity.MarkedForRetention = true;
                     int otherEntityVersion = otherPlayer.entityVersion;
-                    if( entity.LastEntityVersion != otherEntityVersion ) {
+                    if (entity.LastEntityVersion != otherEntityVersion)
+                    {
                         ReAddEntity(entity, otherPlayer, otherPos);
                         entity.LastEntityVersion = otherEntityVersion;
                     }
@@ -1645,22 +1658,22 @@ namespace fCraft
         VisibleEntity AddEntity([NotNull] Player player)
         {
             if (player == null) throw new ArgumentNullException("player");
-                if (freePlayerIDs.Count > 0)
-                {
-                    var newEntity = new VisibleEntity(VisibleEntity.HiddenPosition, freePlayerIDs.Pop(), player.entityVersion);
-                    entities.Add(player, newEntity);
+            if (freePlayerIDs.Count > 0)
+            {
+                var newEntity = new VisibleEntity(VisibleEntity.HiddenPosition, freePlayerIDs.Pop(), player.entityVersion);
+                entities.Add(player, newEntity);
 #if DEBUG_MOVEMENT
                 Logger.Log( LogType.Debug, "AddEntity: {0} added {1} ({2})", Name, newEntity.Id, player.Name );
 #endif
-                    SendNow(PacketWriter.MakeAddEntity(newEntity.Id, player.ListName, newEntity.LastKnownPosition));
-                    return newEntity;
-                }
-
-                else
-                {
-                    throw new InvalidOperationException("Player.AddEntity: Ran out of entity IDs.");
-                }
+                SendNow(PacketWriter.MakeAddEntity(newEntity.Id, player.ListName, newEntity.LastKnownPosition));
+                return newEntity;
             }
+
+            else
+            {
+                throw new InvalidOperationException("Player.AddEntity: Ran out of entity IDs.");
+            }
+        }
 
         void HideEntity([NotNull] VisibleEntity entity)
         {
@@ -1781,7 +1794,7 @@ namespace fCraft
         {
             public static readonly Position HiddenPosition = new Position(0, 0, short.MinValue);
 
-            public VisibleEntity( Position newPos, sbyte newId, int newEntityVersion )
+            public VisibleEntity(Position newPos, sbyte newId, int newEntityVersion)
             {
                 Id = newId;
                 LastKnownPosition = newPos;
