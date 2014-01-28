@@ -24,6 +24,7 @@
 // ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// Part of FemtoCraft | Copyright 2012-2013 Matvei Stefarov <me@matvei.org> | See LICENSE.txt
 using System.Collections.Generic;
 using System.Text;
 using JetBrains.Annotations;
@@ -38,74 +39,37 @@ namespace fCraft
     {
         const string CustomBlocksExtName = "CustomBlocks";
         const int CustomBlocksExtVersion = 1;
-        const string BlockPermissionsExtName = "BlockPermissions";
+        const string BlockPermissionsExtName = "SetBlockPermissions";
         const int BlockPermissionsExtVersion = 1;
-        const string ClickDistanceExtName = "ClickDistance";
-        const int ClickDistanceExtVersion = 1;
-        const string HeldBlockExtName = "HeldBlock";
-        const int HeldBlockExtVersion = 1;
-        const string EmoteFixExtName = "EmoteFix";
-        const int EmoteFixExtVersion = 1;
-        const string TextHotKeyExtName = "TextHotKey";
-        const int TextHotKeyExtVersion = 1;
-        const string ExtPlayerListName = "ExtPlayerList";
-        const int ExtPlayerListVersion = 1;
-        const string EnvColorsExtName = "EnvColors";
-        const int EnvColorsExtVersion = 1;
-        const string SelectionCuboidExtName = "SelectionCuboid";
-        const int SelectionCuboidExtVersion = 1;
-        const string ChangeModelExtName = "ChangeModel";
-        const int ChangeModelExtVersion = 1;
-        const string EnvMapAppearanceExtName = "EnvMapAppearance";
-        const int EnvMapAppearanceExtVersion = 1;
-        const string EnvWeatherTypeExtName = "EnvWeatherType";
-        const int EnvWeatherTypeExtVersion = 1;
-        const string HackControlExtName = "HackControl";
-        const int HackControlExtVersion = 1;
         const byte CustomBlocksLevel = 1;
+        const string SelectionBoxExtName = "SelectionBoxExt";
+        const int SelectionBoxExtVersion = 1;
 
         // Note: if more levels are added, change UsesCustomBlocks from bool to int
-        bool UsesCustomBlocks { get; set; }
+        public bool UsesCustomBlocks { get; set; }
         public bool SupportsBlockPermissions { get; set; }
-        public bool SupportsClickDistance { get; set; }
-        public bool SupportsHeldBlock { get; set; }
-        public bool SupportsEmoteFix { get; set; }
-        public bool SupportsTextHotKey { get; set; }
-        public bool SupportsExtPlayerList { get; set; }
-        public bool SupportsEnvColors { get; set; }
-        public bool SupportsSelectionCuboid { get; set; }
-        public bool SupportsChangeModel { get; set; }
-        public bool SupportsEnvMapAppearance { get; set; }
-        public bool SupportsEnvWeatherType { get; set; }
-        public bool SupportsHackControl { get; set; }
+        public bool SelectionBoxExt { get; set; }
         string ClientName { get; set; }
 
         bool NegotiateProtocolExtension()
         {
-            // write our ExtInfo and ExtEntry packets
             this.reader = new PacketReader(this.stream);
+            // write our ExtInfo and ExtEntry packets
             writer.Write(Packet.MakeExtInfo(2).Data);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Data);
             writer.Write(Packet.MakeExtEntry(BlockPermissionsExtName, BlockPermissionsExtVersion).Data);
-            writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, ClickDistanceExtVersion).Data);
-            writer.Write(Packet.MakeExtEntry(HeldBlockExtName, HeldBlockExtVersion).Data);
-            writer.Write(Packet.MakeExtEntry(EmoteFixExtName, EmoteFixExtVersion).Data);
-            writer.Write(Packet.MakeExtEntry(TextHotKeyExtName, TextHotKeyExtVersion).Data);
-            writer.Write(Packet.MakeExtEntry(EnvColorsExtName, EnvColorsExtVersion).Data);
-            writer.Write(Packet.MakeExtEntry(SelectionCuboidExtName, SelectionCuboidExtVersion).Data);
-            writer.Write(Packet.MakeExtEntry(ChangeModelExtName, ChangeModelExtVersion).Data);
-            writer.Write(Packet.MakeExtEntry(EnvMapAppearanceExtName, EnvMapAppearanceExtVersion).Data);
-            writer.Write(Packet.MakeExtEntry(EnvWeatherTypeExtName, EnvWeatherTypeExtVersion).Data);
-            writer.Write(Packet.MakeExtEntry(HackControlExtName, HackControlExtVersion).Data);
+
+            Logger.Log(LogType.SystemActivity, "Sent ExtInfo and entry packets");
 
             // Expect ExtInfo reply from the client
             OpCode extInfoReply = (OpCode)reader.ReadByte();
-            //Logger.Log( "Expected: {0} / Received: {1}", OpCode.ExtInfo, extInfoReply );
+            Logger.Log(LogType.Debug, "Expected: {0} / Received: {1}", OpCode.ExtInfo, extInfoReply);
             if (extInfoReply != OpCode.ExtInfo)
             {
                 Logger.Log(LogType.Warning, "Player {0} from {1}: Unexpected ExtInfo reply ({2})", Name, IP, extInfoReply);
                 return false;
             }
+            //read EXT_INFO
             ClientName = reader.ReadString();
             int expectedEntries = reader.ReadInt16();
 
@@ -116,10 +80,10 @@ namespace fCraft
             {
                 // Expect ExtEntry replies (0 or more)
                 OpCode extEntryReply = (OpCode)reader.ReadByte();
-                //Logger.Log( "Expected: {0} / Received: {1}", OpCode.ExtEntry, extEntryReply );
+                Logger.Log(LogType.Debug, "Expected: {0} / Received: {1}", OpCode.ExtEntry, extEntryReply);
                 if (extEntryReply != OpCode.ExtEntry)
                 {
-                    Logger.Log(LogType.Warning, "Player {0} from {1}: Unexpected ExtEntry reply ({2})", Name, IP, extInfoReply);
+                    Logger.Log(LogType.Warning, "Player {0} from {1}: Unexpected ExtEntry reply ({2})", Name, IP, extEntryReply);
                     return false;
                 }
                 string extName = reader.ReadString();
@@ -134,6 +98,10 @@ namespace fCraft
                 {
                     SupportsBlockPermissions = true;
                     clientExts.Add(extName + " " + extVersion);
+                }
+                else if (extName == SelectionBoxExtName && extVersion == SelectionBoxExtVersion)
+                {
+                    SelectionBoxExt = true;
                 }
             }
 
@@ -171,9 +139,8 @@ namespace fCraft
             return true;
         }
 
-
         // For non-extended players, use appropriate substitution
-        void ProcessOutgoingSetBlock(ref Packet packet)
+        public void ProcessOutgoingSetBlock(ref Packet packet)
         {
             if (packet.Data[7] > (byte)Map.MaxLegalBlockType && !UsesCustomBlocks)
             {
@@ -182,7 +149,7 @@ namespace fCraft
         }
 
 
-        void SendBlockPermissions()
+        public void SendBlockPermissions()
         {
             Send(Packet.MakeSetBlockPermission(Block.Bedrock, Can(Permission.PlaceAdmincrete), Can(Permission.DeleteAdmincrete)));
         }
@@ -191,29 +158,46 @@ namespace fCraft
 
     partial struct Packet
     {
-        [Pure]
         public static Packet MakeExtInfo(short extCount)
         {
             String VersionString = "AtomicCraft " + Updater.LatestStable;
-            // Logger.Log( "Send: ExtInfo({0},{1})", Server.VersionString, extCount );
+            Logger.Log(LogType.Debug, "Send: ExtInfo({0},{1})", VersionString, extCount);
+
             Packet packet = new Packet(OpCode.ExtInfo);
             Encoding.ASCII.GetBytes(VersionString.PadRight(64), 0, 64, packet.Data, 1);
             ToNetOrder(extCount, packet.Data, 65);
             return packet;
         }
 
-        [Pure]
-        public static Packet MakeExtEntry([NotNull] string name, int version)
+        public static Packet MakeExtEntry(string name, int version)
         {
-            if (name == null) throw new ArgumentNullException("name");
-            // Logger.Log( "Send: ExtEntry({0},{1})", name, version );
+            Logger.Log(LogType.Debug, "Send: ExtEntry({0},{1})", name, version);
             Packet packet = new Packet(OpCode.ExtEntry);
             Encoding.ASCII.GetBytes(name.PadRight(64), 0, 64, packet.Data, 1);
             ToNetOrder(version, packet.Data, 65);
             return packet;
         }
 
-        [Pure]
+        public static Packet MakeAddSelectionBox(byte ID, string Label, short StartX, short StartY, short StartZ, short EndX, short EndY, short EndZ, short R, short G, short B, short A)
+        {
+            Logger.Log(LogType.Debug, "Send: MakeAddSelectionBox({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11})",
+                ID, Label, StartX, StartY, StartZ, EndX, EndY, EndZ, R, G, B, A);
+            Packet packet = new Packet(OpCode.MakeSelection);
+            packet.Data[1] = ID;
+            Encoding.ASCII.GetBytes(Label.PadRight(64), 0, 64, packet.Data, 2);
+            ToNetOrder(StartX, packet.Data, 66);
+            ToNetOrder(StartY, packet.Data, 68);
+            ToNetOrder(StartZ, packet.Data, 70);
+            ToNetOrder(EndX, packet.Data, 72);
+            ToNetOrder(EndY, packet.Data, 74);
+            ToNetOrder(EndZ, packet.Data, 76);
+            ToNetOrder(R, packet.Data, 78);
+            ToNetOrder(G, packet.Data, 80);
+            ToNetOrder(B, packet.Data, 82);
+            ToNetOrder(A, packet.Data, 84);
+            return packet;
+        }
+
         public static Packet MakeCustomBlockSupportLevel(byte level)
         {
             Logger.Log(LogType.Debug, "Send: CustomBlockSupportLevel({0})", level);
@@ -222,7 +206,6 @@ namespace fCraft
             return packet;
         }
 
-        [Pure]
         public static Packet MakeSetBlockPermission(Block block, bool canPlace, bool canDelete)
         {
             Packet packet = new Packet(OpCode.SetBlockPermissions);
@@ -233,122 +216,6 @@ namespace fCraft
         }
 
 
-        [Pure]
-        public static Packet MakeSetClickDistance(short distance)
-        {
-            if (distance < 0) throw new ArgumentOutOfRangeException("distance");
-            Packet packet = new Packet(OpCode.SetClickDistance);
-            ToNetOrder(distance, packet.Data, 1);
-            return packet;
-        }
-
-        [Pure]
-        public static Packet MakeHoldThis(Block block, bool preventChange)
-        {
-            Packet packet = new Packet(OpCode.HoldThis);
-            packet.Data[1] = (byte)block;
-            packet.Data[2] = (byte)(preventChange ? 1 : 0);
-            return packet;
-        }
-
-        [Pure]
-        public static Packet MakeSetTextHotKey([NotNull] string label, [NotNull] string action, int keyCode,
-                                               byte keyMods)
-        {
-            if (label == null) throw new ArgumentNullException("label");
-            if (action == null) throw new ArgumentNullException("action");
-            Packet packet = new Packet(OpCode.SetTextHotKey);
-            Encoding.ASCII.GetBytes(label.PadRight(64), 0, 64, packet.Data, 1);
-            Encoding.ASCII.GetBytes(action.PadRight(64), 0, 64, packet.Data, 65);
-            ToNetOrder(keyCode, packet.Data, 129);
-            packet.Data[133] = keyMods;
-            return packet;
-        }
-
-
-        [Pure]
-        public static Packet MakeExtAddPlayerName(short nameId, string playerName, string listName, string groupName,
-                                                   byte groupRank)
-        {
-            if (playerName == null) throw new ArgumentNullException("playerName");
-            if (listName == null) throw new ArgumentNullException("listName");
-            if (groupName == null) throw new ArgumentNullException("groupName");
-            Packet packet = new Packet(OpCode.ExtAddPlayerName);
-            ToNetOrder(nameId, packet.Data, 1);
-            Encoding.ASCII.GetBytes(playerName.PadRight(64), 0, 64, packet.Data, 3);
-            Encoding.ASCII.GetBytes(listName.PadRight(64), 0, 64, packet.Data, 67);
-            Encoding.ASCII.GetBytes(groupName.PadRight(64), 0, 64, packet.Data, 131);
-            packet.Data[195] = groupRank;
-            return packet;
-        }
-
-
-        [Pure]
-        public static Packet MakeExtAddEntity(byte entityId, [NotNull] string inGameName, [NotNull] string skinName)
-        {
-            if (inGameName == null) throw new ArgumentNullException("inGameName");
-            if (skinName == null) throw new ArgumentNullException("skinName");
-            Packet packet = new Packet(OpCode.ExtAddEntity);
-            packet.Data[1] = entityId;
-            Encoding.ASCII.GetBytes(inGameName.PadRight(64), 0, 64, packet.Data, 2);
-            Encoding.ASCII.GetBytes(skinName.PadRight(64), 0, 64, packet.Data, 66);
-            return packet;
-        }
-
-
-        [Pure]
-        public static Packet MakeExtRemovePlayerName(short nameId)
-        {
-            Packet packet = new Packet(OpCode.ExtRemovePlayerName);
-            ToNetOrder(nameId, packet.Data, 1);
-            return packet;
-        }
-
-
-        /*[Pure]
-        public static Packet MakeEnvSetColor(EnvVariable variable, int color)
-        {
-            Packet packet = new Packet(OpCode.EnvSetColor);
-            packet.Data[1] = (byte)variable;
-            ToNetOrder((short)((color >> 16) & 0xFF), packet.Data, 2);
-            ToNetOrder((short)((color >> 8) & 0xFF), packet.Data, 4);
-            ToNetOrder((short)(color & 0xFF), packet.Data, 6);
-            return packet;
-        }*/
-
-
-        [Pure]
-        public static Packet MakeMakeSelection(byte selectionId, [NotNull] string label, [NotNull] BoundingBox bounds,
-                                               int color, byte opacity)
-        {
-            if (label == null) throw new ArgumentNullException("label");
-            if (bounds == null) throw new ArgumentNullException("bounds");
-            Packet packet = new Packet(OpCode.MakeSelection);
-            packet.Data[1] = selectionId;
-            Encoding.ASCII.GetBytes(label.PadRight(64), 0, 64, packet.Data, 2);
-            ToNetOrder(bounds.XMin, packet.Data, 66);
-            ToNetOrder(bounds.ZMin, packet.Data, 68);
-            ToNetOrder(bounds.YMin, packet.Data, 70);
-            ToNetOrder(bounds.XMax, packet.Data, 72);
-            ToNetOrder(bounds.ZMax, packet.Data, 74);
-            ToNetOrder(bounds.YMax, packet.Data, 76);
-            packet.Data[78] = (byte)((color >> 16) & 0xFF);
-            packet.Data[79] = (byte)((color >> 8) & 0xFF);
-            packet.Data[81] = (byte)(color & 0xFF);
-            packet.Data[82] = opacity;
-            return packet;
-        }
-
-
-        [Pure]
-        public static Packet MakeRemoveSelection(byte selectionId)
-        {
-            Packet packet = new Packet(OpCode.RemoveSelection);
-            packet.Data[1] = selectionId;
-            return packet;
-        }
-
-        [Pure]
         public static Packet MakeChangeModel(byte entityId, [NotNull] string modelName)
         {
             if (modelName == null) throw new ArgumentNullException("modelName");
@@ -358,20 +225,6 @@ namespace fCraft
             return packet;
         }
 
-        [Pure]
-        public static Packet MakeEnvSetMapAppearance([NotNull] string textureUrl, Block sideBlock, Block edgeBlock,
-                                                     short sideLevel)
-        {
-            if (textureUrl == null) throw new ArgumentNullException("textureUrl");
-            Packet packet = new Packet(OpCode.EnvMapAppearance);
-            Encoding.ASCII.GetBytes(textureUrl.PadRight(64), 0, 64, packet.Data, 1);
-            packet.Data[65] = (byte)sideBlock;
-            packet.Data[66] = (byte)edgeBlock;
-            ToNetOrder(sideLevel, packet.Data, 67);
-            return packet;
-        }
-
-        [Pure]
         public static Packet EnvWeatherType(int weatherType)
         {
             Packet packet = new Packet(OpCode.EnvWeatherType);
@@ -381,7 +234,8 @@ namespace fCraft
 
         static void ToNetOrder(short number, [NotNull] byte[] arr, int offset)
         {
-            if (arr == null) throw new ArgumentNullException("arr");
+            if (arr == null)
+                throw new Exception("arr");
             arr[offset] = (byte)((number & 0xff00) >> 8);
             arr[offset + 1] = (byte)(number & 0x00ff);
         }
@@ -389,7 +243,8 @@ namespace fCraft
 
         static void ToNetOrder(int number, [NotNull] byte[] arr, int offset)
         {
-            if (arr == null) throw new ArgumentNullException("arr");
+            if (arr == null)
+                throw new ArgumentNullException("arr");
             arr[offset] = (byte)((number & 0xff000000) >> 24);
             arr[offset + 1] = (byte)((number & 0x00ff0000) >> 16);
             arr[offset + 2] = (byte)((number & 0x0000ff00) >> 8);
@@ -398,7 +253,7 @@ namespace fCraft
     }
 
 
-    sealed partial class Map
+    public sealed partial class Map
     {
         public const Block MaxCustomBlockType = Block.StoneBrick;
         readonly static Block[] FallbackBlocks = new Block[256];
@@ -433,7 +288,6 @@ namespace fCraft
         {
             return FallbackBlocks[(int)block];
         }
-
 
         public const Block MaxLegalBlockType = Block.Obsidian;
         public unsafe byte[] GetFallbackMap()
