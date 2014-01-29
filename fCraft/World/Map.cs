@@ -566,7 +566,7 @@ namespace fCraft
             {
                 for (int j = 0; j < Blocks.Length; j++)
                 {
-                    if (ptr[j] > 49)
+                    if (ptr[j] > 65)
                     {
                         ptr[j] = mapping[ptr[j]];
                         mapped = true;

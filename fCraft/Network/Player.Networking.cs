@@ -536,6 +536,9 @@ namespace fCraft
                 }
                 else
                 {
+#if DEBUG
+                    Logger.Log(LogType.Warning, "Placing block {0} at coords {1}", e.Block, coords);
+#endif
                     RaisePlayerClickedEvent(this, coords, e.Action, e.Block);
                     PlaceBlock(coords, e.Action, e.Block);
                 }
