@@ -48,7 +48,11 @@ namespace fCraft
         public static void VoteParams(Player player, Command cmd)
         {
             string option = cmd.Next();
-            if (option == null) { player.Message("Invalid param"); return; }
+            if (option == null)
+            {
+                player.Message("Invalid param");
+                return;
+            }
             switch (option)
             {
                 default:
@@ -61,7 +65,8 @@ namespace fCraft
                             return;
                         }
                         else
-                            player.Message("Last VoteKick: &CA VoteKick has started for {0}&C, reason: {1}", TargetName, VoteKickReason);
+                            player.Message("Last VoteKick: &CA VoteKick has started for {0}&C, reason: {1}", TargetName,
+                                VoteKickReason);
                         player.Message(Usage);
                         return;
                     }
@@ -160,23 +165,26 @@ namespace fCraft
                     }
 
                     VoteThread = new Thread(new ThreadStart(delegate
-                      {
-                          TargetName = target.Name;
-                          if (!Player.IsValidName(TargetName))
-                          {
-                              player.Message("Invalid name");
-                              return;
-                          }
-                          NewVote();
-                          VoteStarter = player.ClassyName;
-                          Server.Players.Message("{0}&S started a VoteKick for player: {1}", player.ClassyName, target.ClassyName);
-                          Server.Players.Message("&WReason: {0}", VoteKickReason);
-                          Server.Players.Message("&9Vote now! &S/Vote &AYes &Sor /Vote &CNo");
-                          VoteIsOn = true;
-                          Logger.Log(LogType.SystemActivity, "{0} started a votekick on player {1} reason: {2}", player.Name, target.Name, VoteKickReason);
-                          Thread.Sleep(60000);
-                          VoteKickCheck();
-                      })); VoteThread.Start();
+                    {
+                        TargetName = target.Name;
+                        if (!Player.IsValidName(TargetName))
+                        {
+                            player.Message("Invalid name");
+                            return;
+                        }
+                        NewVote();
+                        VoteStarter = player.ClassyName;
+                        Server.Players.Message("{0}&S started a VoteKick for player: {1}", player.ClassyName,
+                            target.ClassyName);
+                        Server.Players.Message("&WReason: {0}", VoteKickReason);
+                        Server.Players.Message("&9Vote now! &S/Vote &AYes &Sor /Vote &CNo");
+                        VoteIsOn = true;
+                        Logger.Log(LogType.SystemActivity, "{0} started a votekick on player {1} reason: {2}",
+                            player.Name, target.Name, VoteKickReason);
+                        Thread.Sleep(60000);
+                        VoteKickCheck();
+                    }));
+                    VoteThread.Start();
                     break;
 
                 case "no":
@@ -279,25 +287,26 @@ namespace fCraft
                     }
 
                     VoteThread = new Thread(new ThreadStart(delegate
-                      {
-                          NewVote();
-                          VoteStarter = player.ClassyName;
-                          Server.Players.Message("{0}&S Asked: {1}", player.ClassyName, Question);
-                          Server.Players.Message("&9Vote now! &S/Vote &AYes &Sor /Vote &CNo");
-                          VoteIsOn = true;
-                          Thread.Sleep(60000);
-                          VoteCheck();
-                      })); VoteThread.Start();
+                    {
+                        NewVote();
+                        VoteStarter = player.ClassyName;
+                        Server.Players.Message("{0}&S Asked: {1}", player.ClassyName, Question);
+                        Server.Players.Message("&9Vote now! &S/Vote &AYes &Sor /Vote &CNo");
+                        VoteIsOn = true;
+                        Thread.Sleep(60000);
+                        VoteCheck();
+                    }));
+                    VoteThread.Start();
                     break;
             }
         }
 
-        static void VoteCheck()
+        private static void VoteCheck()
         {
             if (VoteIsOn)
             {
                 Server.Players.Message("{0}&S Asked: {1} \n&SResults are in! Yes: &A{2} &SNo: &C{3}", VoteStarter,
-                                       Question, VotedYes, VotedNo);
+                    Question, VotedYes, VotedNo);
                 VoteIsOn = false;
                 foreach (Player V in Voted)
                 {
@@ -306,12 +315,14 @@ namespace fCraft
             }
         }
 
-        static void VoteKickCheck()
+        private static void VoteKickCheck()
         {
             if (VoteIsOn)
             {
-                Server.Players.Message("{0}&S wanted to get {1} kicked. Reason: {2} \n&SResults are in! Yes: &A{3} &SNo: &C{4}", VoteStarter,
-                                      TargetName, VoteKickReason, VotedYes, VotedNo);
+                Server.Players.Message(
+                    "{0}&S wanted to get {1} kicked. Reason: {2} \n&SResults are in! Yes: &A{3} &SNo: &C{4}",
+                    VoteStarter,
+                    TargetName, VoteKickReason, VotedYes, VotedNo);
 
                 Player target = null;
 
@@ -340,7 +351,10 @@ namespace fCraft
                 }
                 else if (VotedYes > VotedNo)
                 {
-                    Scheduler.NewTask(t => target.Kick(Player.Console, "VoteKick by: " + VoteStarter + " - " + VoteKickReason, LeaveReason.Kick, false, true, false)).RunOnce(TimeSpan.FromSeconds(3));
+                    Scheduler.NewTask(
+                        t =>
+                            target.Kick(Player.Console, "VoteKick by: " + VoteStarter + " - " + VoteKickReason,
+                                LeaveReason.Kick, false, true, false)).RunOnce(TimeSpan.FromSeconds(3));
                     Server.Players.Message("{0}&S was kicked from the server", target.ClassyName);
                 }
                 else

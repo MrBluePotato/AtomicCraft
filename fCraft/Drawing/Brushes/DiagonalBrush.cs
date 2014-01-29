@@ -1,24 +1,32 @@
 ﻿// Copyright (C) <2012> <Jon Baker> (http://au70.net)
 // Copyright 2009 - 2012 Matvei Stefarov <me@matvei.org>
+
 using System;
 using JetBrains.Annotations;
 using System.Collections.Generic;
+
 namespace fCraft.Drawing
 {
     public sealed class DiagonalBrushFactory : IBrushFactory
     {
+        private const string HelpString =
+            "Diagonal brush: Fills the area with in a diagonal pattern of 2 block types. " +
+            "If only one block name is given, leaves every other block untouched.";
+
         public static readonly DiagonalBrushFactory Instance = new DiagonalBrushFactory();
-        DiagonalBrushFactory()
+
+        private DiagonalBrushFactory()
         {
-            Aliases = new[] { "zigzag" }; 
+            Aliases = new[] {"zigzag"};
         }
+
         public string Name
         {
             get { return "Diagonal"; }
         }
+
         public string[] Aliases { get; private set; }
-        const string HelpString = "Diagonal brush: Fills the area with in a diagonal pattern of 2 block types. " +
-        "If only one block name is given, leaves every other block untouched.";
+
         public string Help
         {
             get { return HelpString; }
@@ -30,9 +38,9 @@ namespace fCraft.Drawing
             if (cmd == null) throw new ArgumentNullException("cmd");
             if (!cmd.HasNext)
             {
-                if (player.LastUsedBlockType != (Block)255)
-                    return new DiagonalBrush(new[] { player.LastUsedBlockType });
-                else return new DiagonalBrush(new[] { Block.Stone });
+                if (player.LastUsedBlockType != (Block) 255)
+                    return new DiagonalBrush(new[] {player.LastUsedBlockType});
+                else return new DiagonalBrush(new[] {Block.Stone});
             }
             Stack<Block> temp = new Stack<Block>();
             while (cmd.HasNext)
@@ -47,8 +55,6 @@ namespace fCraft.Drawing
 
     public sealed class DiagonalBrush : IBrushInstance, IBrush
     {
-        public Block[] Blocks { get; private set; }
-
         public DiagonalBrush(Block[] blocks)
         {
             Blocks = blocks;
@@ -61,6 +67,7 @@ namespace fCraft.Drawing
         }
 
         #region IBrush members
+
         public IBrushFactory Factory
         {
             get { return DiagonalBrushFactory.Instance; }
@@ -101,17 +108,19 @@ namespace fCraft.Drawing
             }
             else if (player.LastUsedBlockType != Block.Undefined)
             {
-                b = new[] { player.LastUsedBlockType, Block.Air };
+                b = new[] {player.LastUsedBlockType, Block.Air};
             }
             else
             {
-                b = new[] { Block.Stone, Block.Air };
+                b = new[] {Block.Stone, Block.Air};
             }
             return new DiagonalBrush(b);
         }
+
         #endregion
 
         #region IBrushInstance members
+
         public IBrush Brush
         {
             get { return this; }
@@ -124,27 +133,33 @@ namespace fCraft.Drawing
 
         public string InstanceDescription
         {
-            get
-            {
-                return Description;
-            }
+            get { return Description; }
         }
 
         public bool Begin([NotNull] Player player, [NotNull] DrawOperation state)
         {
             if (player == null) throw new ArgumentNullException("player");
             if (state == null) throw new ArgumentNullException("state");
-            if (Blocks.Length == 0) { player.Message("&WError: No block types given"); return false; }
+            if (Blocks.Length == 0)
+            {
+                player.Message("&WError: No block types given");
+                return false;
+            }
             return true;
         }
 
         public Block NextBlock([NotNull] DrawOperation state)
         {
             if (state == null) throw new ArgumentNullException("state");
-            return Blocks[(state.Coords.X + state.Coords.Y + state.Coords.Z) % Blocks.Length];
+            return Blocks[(state.Coords.X + state.Coords.Y + state.Coords.Z)%Blocks.Length];
         }
 
-        public void End() { }
+        public void End()
+        {
+        }
+
         #endregion
+
+        public Block[] Blocks { get; private set; }
     }
 }

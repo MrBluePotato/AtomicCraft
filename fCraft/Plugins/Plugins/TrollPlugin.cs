@@ -8,52 +8,40 @@ namespace TrollPlugin
 {
     public class Init : Plugin
     {
+        private static CommandDescriptor CdTroll = new CommandDescriptor
+        {
+            Name = "Troll",
+            Category = CommandCategory.Chat | CommandCategory.Fun,
+            Permissions = new[] {Permission.Troll},
+            IsConsoleSafe = true,
+            NotRepeatable = false,
+            Usage = "/troll player option [Message]",
+            Help = "Does a little somthin'-somethin'.\n" +
+                   " Available options: st, ac, pm, message or leave",
+            Handler = TrollHandler
+        };
+
         public void Initialize()
         {
             Logger.Log(LogType.ConsoleOutput, Name + "(v " + Version + "): Registering TrollPlugin");
             CommandManager.RegisterCustomCommand(CdTroll);
         }
 
-        static CommandDescriptor CdTroll = new CommandDescriptor
-        {
-            Name = "Troll",
-            Category = CommandCategory.Chat | CommandCategory.Fun,
-            Permissions = new[] { Permission.Troll },
-            IsConsoleSafe = true,
-            NotRepeatable = false,
-            Usage = "/troll player option [Message]",
-            Help = "Does a little somthin'-somethin'.\n" +
-            " Available options: st, ac, pm, message or leave",
-            Handler = TrollHandler
-        };
-
         //your plugin name
         public string Name
         {
-            get
-            {
-                return "TrollPlugin";
-            }
-            set
-            {
-                Name = value;
-            }
+            get { return "TrollPlugin"; }
+            set { Name = value; }
         }
 
         //your plugin version
         public string Version
         {
-            get
-            {
-                return "1.0";
-            }
-            set
-            {
-                Version = value;
-            }
+            get { return "1.0"; }
+            set { Version = value; }
         }
 
-        static void TrollHandler(Player player, Command cmd)
+        private static void TrollHandler(Player player, Command cmd)
         {
             string Name = cmd.Next();
             if (Name == null)
@@ -101,7 +89,7 @@ namespace TrollPlugin
                 case "message":
                 case "m":
                     Server.Message("{0}&S&F: {1}",
-                                      target.ClassyName, Message);
+                        target.ClassyName, Message);
                     break;
                 case "leave":
                 case "disconnect":
@@ -109,7 +97,8 @@ namespace TrollPlugin
                     Server.Players.Message("&SPlayer {0}&S left the server.",
                         target.ClassyName);
                     break;
-                default: player.Message("Invalid option. Please choose st, ac, pm, message or leave");
+                default:
+                    player.Message("Invalid option. Please choose st, ac, pm, message or leave");
                     break;
             }
         }

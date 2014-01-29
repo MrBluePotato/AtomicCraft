@@ -6,15 +6,17 @@ using System.Text;
 
 namespace fCraft
 {
-    sealed class PacketReader : BinaryReader
+    internal sealed class PacketReader : BinaryReader
     {
         public PacketReader(Stream stream) :
-            base(stream) { }
+            base(stream)
+        {
+        }
 
 
         public OpCode ReadOpCode()
         {
-            return (OpCode)ReadByte();
+            return (OpCode) ReadByte();
         }
 
 

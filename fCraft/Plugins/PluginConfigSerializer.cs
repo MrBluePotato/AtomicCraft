@@ -22,7 +22,7 @@ namespace fCraft
         {
             XmlSerializer xs = new XmlSerializer(type);
             StreamReader reader = File.OpenText(configFile);
-            PluginConfig c = (PluginConfig)xs.Deserialize(reader);
+            PluginConfig c = (PluginConfig) xs.Deserialize(reader);
             reader.Close();
             return c;
         }

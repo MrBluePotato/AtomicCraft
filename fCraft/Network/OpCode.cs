@@ -25,9 +25,11 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-namespace fCraft {
+namespace fCraft
+{
     /// <summary> Classic Protocol Extension opcodes. </summary>
-    public enum OpCode {
+    public enum OpCode
+    {
         Handshake = 0,
         Ping = 1,
         MapBegin = 2,
@@ -62,6 +64,5 @@ namespace fCraft {
         EnvMapAppearance = 30,
         EnvWeatherType = 31,
         HackControl = 32
-
     }
 }

@@ -12,6 +12,7 @@
 
 //You should have received a copy of the GNU General Public License
 //along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,10 +24,11 @@ namespace fCraft
     public class SandTask : PhysicsTask
     {
         private const int Delay = 200;
-        private Vector3I _pos;
-        private int _nextPos;
         private bool _firstMove = true;
+        private int _nextPos;
+        private Vector3I _pos;
         private Block _type;
+
         public SandTask(World world, Vector3I position, Block Type)
             : base(world)
         {
@@ -51,7 +53,8 @@ namespace fCraft
                         if (_world.Map.GetBlock(_pos.X, _pos.Y, _nextPos) == Block.Air)
                         {
                             _world.Map.QueueUpdate(new BlockUpdate(null, _pos, Block.Air));
-                            _world.Map.QueueUpdate(new BlockUpdate(null, (short)_pos.X, (short)_pos.Y, (short)_nextPos, _type));
+                            _world.Map.QueueUpdate(new BlockUpdate(null, (short) _pos.X, (short) _pos.Y,
+                                (short) _nextPos, _type));
                             _nextPos--;
                             _firstMove = false;
                             return Delay;
@@ -63,8 +66,10 @@ namespace fCraft
                     }
                     if (Physics.BlockThrough(nblock))
                     {
-                        _world.Map.QueueUpdate(new BlockUpdate(null, (short)_pos.X, (short)_pos.Y, (short)(_nextPos + 1), Block.Air));
-                        _world.Map.QueueUpdate(new BlockUpdate(null, (short)_pos.X, (short)_pos.Y, (short)_nextPos, _type));
+                        _world.Map.QueueUpdate(new BlockUpdate(null, (short) _pos.X, (short) _pos.Y,
+                            (short) (_nextPos + 1), Block.Air));
+                        _world.Map.QueueUpdate(new BlockUpdate(null, (short) _pos.X, (short) _pos.Y, (short) _nextPos,
+                            _type));
                         _nextPos--;
                     }
                 }

@@ -14,6 +14,7 @@
 //along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 //Copyright (C) <2011 - 2014> Glenn Mariën (http://project-vanilla.com)
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,7 @@ using System.Security.Policy;
 
 namespace fCraft
 {
-    class PluginManager
+    internal class PluginManager
     {
         private static PluginManager instance;
         public List<Plugin> Plugins = new List<Plugin>();
@@ -78,7 +79,8 @@ namespace fCraft
                     try
                     {
                         Type pluginType = null;
-                        String args = plugin.Substring(plugin.LastIndexOf("\\") + 1, plugin.IndexOf(".dll") - plugin.LastIndexOf("\\") - 1);
+                        String args = plugin.Substring(plugin.LastIndexOf("\\") + 1,
+                            plugin.IndexOf(".dll") - plugin.LastIndexOf("\\") - 1);
                         Assembly assembly = Assembly.LoadFile(Path.GetFullPath(plugin));
 
                         if (assembly != null)
@@ -87,13 +89,14 @@ namespace fCraft
 
                             if (pluginType != null)
                             {
-                                Plugins.Add((Plugin)Activator.CreateInstance(pluginType));
+                                Plugins.Add((Plugin) Activator.CreateInstance(pluginType));
                             }
                         }
                     }
                     catch (Exception ex)
                     {
-                        Logger.Log(LogType.Error, "PluginManager: Unable to load plugin at location " + plugin + ": " + ex);
+                        Logger.Log(LogType.Error,
+                            "PluginManager: Unable to load plugin at location " + plugin + ": " + ex);
                     }
                 }
             }

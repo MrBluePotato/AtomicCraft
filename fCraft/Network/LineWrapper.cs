@@ -1,5 +1,6 @@
 ﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
 // #define DEBUG_LINE_WRAPPER
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,17 +9,53 @@ using JetBrains.Annotations;
 
 namespace fCraft
 {
-    /// <summary> Intelligent line-wrapper for Minecraft protocol.
-    /// Splits long messages into 64-character chunks of ASCII.
-    /// Maintains colors between lines. Wraps at word boundaries and hyphens.
-    /// Removes invalid characters and color sequences.
-    /// Supports optional line prefixes for second and consequent lines.
-    /// This class is implemented as IEnumerable of Packets, so it's usable with foreach() and Linq. </summary>
+    /// <summary>
+    ///     Intelligent line-wrapper for Minecraft protocol.
+    ///     Splits long messages into 64-character chunks of ASCII.
+    ///     Maintains colors between lines. Wraps at word boundaries and hyphens.
+    ///     Removes invalid characters and color sequences.
+    ///     Supports optional line prefixes for second and consequent lines.
+    ///     This class is implemented as IEnumerable of Packets, so it's usable with foreach() and Linq.
+    /// </summary>
     public sealed class LineWrapper : IEnumerable<Packet>, IEnumerator<Packet>
     {
-        const string DefaultPrefixString = "> ";
-        static readonly byte[] DefaultPrefix;
+        private const string DefaultPrefixString = "> ";
 
+
+        private const int MaxPrefixSize = 48;
+        private const int PacketSize = 66; // opcode + id + 64
+        private const byte DefaultColor = (byte) 'f';
+        private static readonly byte[] DefaultPrefix;
+        private readonly byte[] input;
+        private readonly byte[] prefix;
+        private bool canWrap; // used to see if a word needs to be forcefully wrapped (i.e. doesnt fit in one line)
+
+        private byte color; // used to detect duplicate color codes
+
+        private bool endsWithSymbol; // used to guarantee suffixes for symbols ("emotes")
+        private bool expectingColor; // whether next input character is expected to be a color code
+
+        private bool hadColor; // used to see if a word needs to be forcefully wrapped (i.e. doesnt fit in one line)
+
+        private int inputIndex;
+        private byte lastColor; // used to detect duplicate color codes
+
+        private byte[] output;
+
+        private int outputIndex;
+
+        private int outputStart;
+
+        private int spaceCount,
+            // used to track spacing between words
+            wordLength; // used to see whether to wrap at hyphens
+
+        private byte wrapColor; // value of "color" field at the wrapping point
+        private bool wrapEndsWithSymbol; // value of "endsWithSymbol" field at the wrapping point
+
+        private int wrapInputIndex,
+            // index of the nearest line-wrapping opportunity in the input buffer 
+            wrapOutputIndex; // corresponding index in the output buffer
 
         static LineWrapper()
         {
@@ -26,40 +63,7 @@ namespace fCraft
         }
 
 
-        const int MaxPrefixSize = 48;
-        const int PacketSize = 66; // opcode + id + 64
-        const byte DefaultColor = (byte)'f';
-
-        public Packet Current { get; private set; }
-
-        bool expectingColor;// whether next input character is expected to be a color code
-        byte color,         // color that the next inserted character should be
-             lastColor;     // used to detect duplicate color codes
-
-        bool endsWithSymbol; // used to guarantee suffixes for symbols ("emotes")
-
-        bool hadColor,      // used to see if white (&f) colorcodes should be inserted
-             canWrap;       // used to see if a word needs to be forcefully wrapped (i.e. doesnt fit in one line)
-
-        int spaceCount,     // used to track spacing between words
-            wordLength;     // used to see whether to wrap at hyphens
-
-        readonly byte[] prefix;
-
-        readonly byte[] input;
-        int inputIndex;
-
-        byte[] output;
-        int outputStart,
-            outputIndex;
-
-        int wrapInputIndex,     // index of the nearest line-wrapping opportunity in the input buffer 
-            wrapOutputIndex;    // corresponding index in the output buffer
-        byte wrapColor;         // value of "color" field at the wrapping point
-        bool wrapEndsWithSymbol; // value of "endsWithSymbol" field at the wrapping point
-
-
-        LineWrapper([NotNull] string message)
+        private LineWrapper([NotNull] string message)
         {
             if (message == null) throw new ArgumentNullException("message");
             input = Encoding.ASCII.GetBytes(message);
@@ -68,7 +72,7 @@ namespace fCraft
         }
 
 
-        LineWrapper([NotNull] string prefixString, [NotNull] string message)
+        private LineWrapper([NotNull] string prefixString, [NotNull] string message)
         {
             if (prefixString == null) throw new ArgumentNullException("prefixString");
             prefix = Encoding.ASCII.GetBytes(prefixString);
@@ -77,6 +81,8 @@ namespace fCraft
             input = Encoding.ASCII.GetBytes(message);
             Reset();
         }
+
+        public Packet Current { get; private set; }
 
 
         public void Reset()
@@ -97,7 +103,7 @@ namespace fCraft
             }
 
             output = new byte[PacketSize];
-            output[0] = (byte)OpCode.Message;
+            output[0] = (byte) OpCode.Message;
             Current = new Packet(output);
 
             hadColor = false;
@@ -161,12 +167,36 @@ namespace fCraft
             return true;
         }
 
+        object IEnumerator.Current
+        {
+            get { return Current; }
+        }
 
-        bool ProcessChar(byte ch)
+
+        void IDisposable.Dispose()
+        {
+        }
+
+        #region IEnumerable<Packet> Members
+
+        public IEnumerator<Packet> GetEnumerator()
+        {
+            return this;
+        }
+
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this;
+        }
+
+        #endregion
+
+        private bool ProcessChar(byte ch)
         {
             switch (ch)
             {
-                case (byte)' ':
+                case (byte) ' ':
                     canWrap = true;
                     expectingColor = false;
                     if (spaceCount == 0)
@@ -180,12 +210,12 @@ namespace fCraft
                     spaceCount++;
                     break;
 
-                case (byte)'&':
+                case (byte) '&':
                     // skip double ampersands
                     expectingColor = !expectingColor;
                     break;
 
-                case (byte)'-':
+                case (byte) '-':
                     if (spaceCount > 0)
                     {
                         // set wrapping point, if at beginning of a word
@@ -219,7 +249,7 @@ namespace fCraft
                     }
                     break;
 
-                case (byte)'\n':
+                case (byte) '\n':
                     // break the line early
                     inputIndex++;
                     return true;
@@ -253,7 +283,7 @@ namespace fCraft
                         if (ch == 0 || ch > 127)
                         {
                             // replace unprintable chars with '?'
-                            ch = (byte)'?';
+                            ch = (byte) '?';
                         }
                         if (!Append(ch))
                         {
@@ -273,16 +303,16 @@ namespace fCraft
         }
 
 
-        void PrepareOutput()
+        private void PrepareOutput()
         {
             // pad the packet with spaces
             for (int i = outputIndex; i < PacketSize; i++)
             {
-                output[i] = (byte)' ';
+                output[i] = (byte) ' ';
             }
             if (endsWithSymbol)
             {
-                output[65] = (byte)'.';
+                output[65] = (byte) '.';
             }
 #if DEBUG_LINE_WRAPPER
             Console.WriteLine( "\"" + Encoding.ASCII.GetString( output, outputStart, outputIndex - outputStart ) + "\"" );
@@ -291,7 +321,7 @@ namespace fCraft
         }
 
 
-        bool Append(byte ch)
+        private bool Append(byte ch)
         {
             bool prependColor =
                 // color changed since last inserted character
@@ -342,7 +372,7 @@ namespace fCraft
             // append color, if changed since last inserted character
             if (prependColor)
             {
-                output[outputIndex++] = (byte)'&';
+                output[outputIndex++] = (byte) '&';
                 output[outputIndex++] = color;
                 lastColor = color;
             }
@@ -356,7 +386,7 @@ namespace fCraft
                 // append spaces that accumulated since last word
                 while (spaceCount > 0)
                 {
-                    output[outputIndex++] = (byte)' ';
+                    output[outputIndex++] = (byte) ' ';
                     spaceCount--;
                 }
                 wordLength = 0;
@@ -375,39 +405,39 @@ namespace fCraft
             switch (ch)
             {
                 case 9:
-                    output[outputIndex++] = (byte)' ';
-                    output[outputIndex++] = (byte)'.';
+                    output[outputIndex++] = (byte) ' ';
+                    output[outputIndex++] = (byte) '.';
                     endsWithSymbol = false;
                     break;
                 case 12:
-                    output[outputIndex++] = (byte)' ';
-                    output[outputIndex++] = (byte)'`';
+                    output[outputIndex++] = (byte) ' ';
+                    output[outputIndex++] = (byte) '`';
                     endsWithSymbol = false;
                     break;
                 case 18:
-                    output[outputIndex++] = (byte)' ';
-                    output[outputIndex++] = (byte)'.';
+                    output[outputIndex++] = (byte) ' ';
+                    output[outputIndex++] = (byte) '.';
                     endsWithSymbol = false;
                     break;
                 case 19:
-                    output[outputIndex++] = (byte)' ';
-                    output[outputIndex++] = (byte)'!';
+                    output[outputIndex++] = (byte) ' ';
+                    output[outputIndex++] = (byte) '!';
                     endsWithSymbol = false;
                     break;
                 case 22:
-                    output[outputIndex++] = (byte)'.';
-                    output[outputIndex++] = (byte)' ';
+                    output[outputIndex++] = (byte) '.';
+                    output[outputIndex++] = (byte) ' ';
                     endsWithSymbol = false;
                     break;
                 case 24:
-                    output[outputIndex++] = (byte)'^';
-                    output[outputIndex++] = (byte)' ';
+                    output[outputIndex++] = (byte) '^';
+                    output[outputIndex++] = (byte) ' ';
                     endsWithSymbol = false;
                     break;
                 case 7:
                 case 25:
-                    output[outputIndex++] = (byte)' ';
-                    output[outputIndex++] = (byte)' ';
+                    output[outputIndex++] = (byte) ' ';
+                    output[outputIndex++] = (byte) ' ';
                     endsWithSymbol = true;
                     break;
                 default:
@@ -418,78 +448,53 @@ namespace fCraft
         }
 
 
-        static bool ProcessColor(ref byte ch)
+        private static bool ProcessColor(ref byte ch)
         {
-            if (ch >= (byte)'A' && ch <= (byte)'Z')
+            if (ch >= (byte) 'A' && ch <= (byte) 'Z')
             {
                 ch += 32;
             }
-            if (ch >= (byte)'a' && ch <= (byte)'f' ||
-                ch >= (byte)'0' && ch <= (byte)'9')
+            if (ch >= (byte) 'a' && ch <= (byte) 'f' ||
+                ch >= (byte) '0' && ch <= (byte) '9')
             {
                 return true;
             }
             switch (ch)
             {
-                case (byte)'s':
-                    ch = (byte)Color.Sys[1];
+                case (byte) 's':
+                    ch = (byte) Color.Sys[1];
                     return true;
 
-                case (byte)'y':
-                    ch = (byte)Color.Say[1];
+                case (byte) 'y':
+                    ch = (byte) Color.Say[1];
                     return true;
 
-                case (byte)'p':
-                    ch = (byte)Color.PM[1];
+                case (byte) 'p':
+                    ch = (byte) Color.PM[1];
                     return true;
 
-                case (byte)'r':
-                    ch = (byte)Color.Announcement[1];
+                case (byte) 'r':
+                    ch = (byte) Color.Announcement[1];
                     return true;
 
-                case (byte)'h':
-                    ch = (byte)Color.Help[1];
+                case (byte) 'h':
+                    ch = (byte) Color.Help[1];
                     return true;
 
-                case (byte)'w':
-                    ch = (byte)Color.Warning[1];
+                case (byte) 'w':
+                    ch = (byte) Color.Warning[1];
                     return true;
 
-                case (byte)'m':
-                    ch = (byte)Color.Me[1];
+                case (byte) 'm':
+                    ch = (byte) Color.Me[1];
                     return true;
 
-                case (byte)'i':
-                    ch = (byte)Color.IRC[1];
+                case (byte) 'i':
+                    ch = (byte) Color.IRC[1];
                     return true;
             }
             return false;
         }
-
-
-        object IEnumerator.Current
-        {
-            get { return Current; }
-        }
-
-
-        void IDisposable.Dispose() { }
-
-
-        #region IEnumerable<Packet> Members
-
-        public IEnumerator<Packet> GetEnumerator()
-        {
-            return this;
-        }
-
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this;
-        }
-
-        #endregion
 
 
         /// <summary> Creates a new line wrapper for a given raw string. </summary>

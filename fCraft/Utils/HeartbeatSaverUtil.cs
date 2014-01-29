@@ -23,12 +23,13 @@ using System.IO;
 
 namespace fCraft
 {
-    class HeartbeatSaverUtil
+    internal class HeartbeatSaverUtil
     {
         public static void Init()
         {
             EventHandler<CrashedEventArgs> Crash = new EventHandler<CrashedEventArgs>(HbCrashEvent);
         }
+
         public static void HbCrashEvent(object sender, CrashedEventArgs e)
         {
             if (e.ShutdownImminent.Equals(true))

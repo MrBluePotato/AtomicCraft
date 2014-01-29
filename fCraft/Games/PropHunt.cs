@@ -32,7 +32,7 @@ using System.Threading;
 
 namespace fCraft
 {
-    class PropHunt
+    internal class PropHunt
     {
         //Randoms
         private static Random randBlock = new Random();
@@ -40,7 +40,6 @@ namespace fCraft
 
         //Time stuff
         private static SchedulerTask task_;
-        private DateTime startTime;
         public static DateTime lastChecked;
         public static DateTime roundEnd;
         public static int timeLeft = 0;
@@ -66,7 +65,7 @@ namespace fCraft
         public static World world3;
 
         //Lists
-        private static string[] blockId = { "1", "2", "4", "5", "7", "12", "13", "17", "19", "64", "65" };
+        private static string[] blockId = {"1", "2", "4", "5", "7", "12", "13", "17", "19", "64", "65"};
 
         public static List<Player> PropHuntPlayers = new List<Player>();
         public static List<World> PropHuntWorlds = new List<World>();
@@ -76,6 +75,17 @@ namespace fCraft
         public static int Voted1;
         public static int Voted2;
         public static int Voted3;
+
+        private static Block[] clickableBlocks =
+        {
+            Block.Stone, Block.Grass, Block.Dirt, Block.Cobblestone,
+            Block.Plank, Block.Bedrock, Block.Sand, Block.Gravel,
+            Block.Log, Block.Sponge, Block.Crate, Block.StoneBrick
+        };
+
+        private static SchedulerTask checkIdlesTask;
+        private static TimeSpan checkIdlesInterval = TimeSpan.FromSeconds(1);
+        private DateTime startTime;
 
         //For on-demand instances of PropHunt
         public PropHunt(World world)
@@ -100,10 +110,22 @@ namespace fCraft
             }
             if (PropHuntWorlds.Count() <= 3)
             {
-                Logger.Log(LogType.Error, "You must have at least 3 PropHunt maps. Please add some with /PropHunt add [mapname].");
+                Logger.Log(LogType.Error,
+                    "You must have at least 3 PropHunt maps. Please add some with /PropHunt add [mapname].");
                 return;
             }
             _world = PropHuntWorlds[randWorld.Next(0, PropHuntWorlds.Count)];
+        }
+
+        public static TimeSpan CheckIdlesInterval
+        {
+            get { return checkIdlesInterval; }
+            set
+            {
+                if (value.Ticks < 0) throw new ArgumentException("CheckIdlesInterval may not be negative.");
+                checkIdlesInterval = value;
+                if (checkIdlesTask != null) checkIdlesTask.Interval = checkIdlesInterval;
+            }
         }
 
         public void Start()
@@ -118,7 +140,8 @@ namespace fCraft
             _world.gameMode = GameMode.PropHunt;
             startTime = DateTime.Now;
             task_ = new SchedulerTask(Interval, true).RunForever(TimeSpan.FromMilliseconds(250));
-            Logger.Log(LogType.SystemActivity, "&WPropHunt &S is starting in {0} seconds in world {0}", timeDelay, _world.ClassyName);
+            Logger.Log(LogType.SystemActivity, "&WPropHunt &S is starting in {0} seconds in world {0}", timeDelay,
+                _world.ClassyName);
             _world.Players.Message("&WPropHunt &S is starting in {0} seconds in world {0}", timeDelay, _world.ClassyName);
 #if DEBUG
             Server.Message("PropHunt is starting");
@@ -174,7 +197,7 @@ namespace fCraft
                 checkIdlesTask = Scheduler.NewTask(CheckIdles).RunForever(CheckIdlesInterval);
 
                 isOn = true;
-                lastChecked = DateTime.Now;     //used for intervals
+                lastChecked = DateTime.Now; //used for intervals
 
 #if DEBUG
                 Server.Message("It is on and stuff...");
@@ -209,12 +232,13 @@ namespace fCraft
                     roundStarted = false;
                     takeVote();
                     return;
-
                 }
             }
             if (lastChecked != null && (DateTime.Now - lastChecked).TotalSeconds > 30 && timeLeft <= timeLimit)
             {
-                _world.Players.Message("There are currently {0} block(s) and {1} seeker(s) left on {2}", _world.Players.Count() - _world.Players.Count(player => !player.isPropHuntSeeker), _world.Players.Count(player => player.isPropHuntSeeker), _world.ClassyName);
+                _world.Players.Message("There are currently {0} block(s) and {1} seeker(s) left on {2}",
+                    _world.Players.Count() - _world.Players.Count(player => !player.isPropHuntSeeker),
+                    _world.Players.Count(player => player.isPropHuntSeeker), _world.ClassyName);
                 _world.Players.Message("There are {0} seconds left!", timeLeft);
                 lastChecked = DateTime.Now;
             }
@@ -296,8 +320,8 @@ namespace fCraft
             if (!votingRestarting)
             {
                 World[] voteWorlds = PropHuntWorlds.OrderBy(x => randWorld.Next())
-                                                   .Take(3)
-                                                   .ToArray();
+                    .Take(3)
+                    .ToArray();
                 world1 = voteWorlds[0];
                 world2 = voteWorlds[1];
                 world3 = voteWorlds[2];
@@ -305,13 +329,12 @@ namespace fCraft
             Server.Players.Message("&S--------------------------------------------------------------");
             Server.Players.Message("Vote for the next map!");
             Server.Players.Message("&S/Vote &c1&S for {0}&S, &c2&S for {1}&S, and &c3&S for {2}",
-                                   world1.ClassyName, world2.ClassyName, world3.ClassyName);
+                world1.ClassyName, world2.ClassyName, world3.ClassyName);
             Server.Players.Message("&S--------------------------------------------------------------");
             VoteIsOn = true;
 
             Scheduler.NewTask((task) => VoteCheck())
-                     .RunOnce(TimeSpan.FromSeconds(60));
-
+                .RunOnce(TimeSpan.FromSeconds(60));
         }
 
         public void VoteCheck()
@@ -339,8 +362,9 @@ namespace fCraft
                     _winningWorld = world3;
                 }
                 Server.Players.Message("&S--------------------------------------------------------------");
-                Server.Players.Message("&SVoting results are in! &A{0}&S:&C {1}, &A{2}&S:&C {3}, &A{4}&S:&C {5}", world1.ClassyName,
-                                       Voted1, world2.ClassyName, Voted2, world3.ClassyName, Voted3);
+                Server.Players.Message("&SVoting results are in! &A{0}&S:&C {1}, &A{2}&S:&C {3}, &A{4}&S:&C {5}",
+                    world1.ClassyName,
+                    Voted1, world2.ClassyName, Voted2, world3.ClassyName, Voted3);
                 Server.Players.Message("&SThe next map is: {0}", _winningWorld.ClassyName);
                 Server.Players.Message("&S--------------------------------------------------------------");
                 VoteIsOn = false;
@@ -365,10 +389,6 @@ namespace fCraft
         }
 
         // Avoid re-defining the list every time your handler is called. Make it static!
-        static Block[] clickableBlocks = {
-            Block.Stone, Block.Grass, Block.Dirt, Block.Cobblestone,
-            Block.Plank, Block.Bedrock, Block.Sand, Block.Gravel,
-            Block.Log, Block.Sponge, Block.Crate, Block.StoneBrick };
 
         public static void PlayerClickingHandler(object sender, fCraft.Events.PlayerClickingEventArgs e)
         {
@@ -407,15 +427,17 @@ namespace fCraft
         {
             if (e.Player.isPropHuntSeeker)
             {
-                Vector3I oldPos = new Vector3I(e.OldPosition.X / 32, e.OldPosition.Y / 32, e.OldPosition.Z / 32); // Get the position of the player
-                Vector3I newPos = new Vector3I(e.NewPosition.X / 32, e.NewPosition.Y / 32, e.NewPosition.Z / 32);
+                Vector3I oldPos = new Vector3I(e.OldPosition.X/32, e.OldPosition.Y/32, e.OldPosition.Z/32);
+                    // Get the position of the player
+                Vector3I newPos = new Vector3I(e.NewPosition.X/32, e.NewPosition.Y/32, e.NewPosition.Z/32);
 
-                if (oldPos.X != newPos.X || oldPos.Y != newPos.Y || oldPos.Z != newPos.Z) // Check if the positions are not the same (player moved)
+                if (oldPos.X != newPos.X || oldPos.Y != newPos.Y || oldPos.Z != newPos.Z)
+                    // Check if the positions are not the same (player moved)
                 {
                     foreach (Player p in _world.Players)
                     {
                         Vector3I pos = p.Position.ToBlockCoords(); // Converts to block coords
-                        if (e.NewPosition.DistanceSquaredTo(pos.ToPlayerCoords()) <= 48 * 48)
+                        if (e.NewPosition.DistanceSquaredTo(pos.ToPlayerCoords()) <= 48*48)
                         {
                             if (!p.isPropHuntSeeker && !p.isSolidBlock)
                             {
@@ -450,7 +472,8 @@ namespace fCraft
                         }
                         else
                         {
-                            Server.Message("&cThere are not enough players online to being PropHunt. Please try again later.");
+                            Server.Message(
+                                "&cThere are not enough players online to being PropHunt. Please try again later.");
                             return;
                         }
                     }
@@ -464,18 +487,6 @@ namespace fCraft
         }
 
         // checks for idle players
-        static SchedulerTask checkIdlesTask;
-        static TimeSpan checkIdlesInterval = TimeSpan.FromSeconds(1);
-        public static TimeSpan CheckIdlesInterval
-        {
-            get { return checkIdlesInterval; }
-            set
-            {
-                if (value.Ticks < 0) throw new ArgumentException("CheckIdlesInterval may not be negative.");
-                checkIdlesInterval = value;
-                if (checkIdlesTask != null) checkIdlesTask.Interval = checkIdlesInterval;
-            }
-        }
 
         public static void CheckIdles(SchedulerTask task)
         {
@@ -497,10 +508,11 @@ namespace fCraft
                         player.isSolidBlock = true;
 
                         //Gets the coords of the player
-                        short x = (short)(player.Position.X / 32 * 32 + 16);
-                        short y = (short)(player.Position.Y / 32 * 32 + 16);
-                        short z = (short)(player.Position.Z / 32 * 32);
-                        Vector3I Pos = new Vector3I(player.Position.X / 32, player.Position.Y / 32, (player.Position.Z - 32) / 32);
+                        short x = (short) (player.Position.X/32*32 + 16);
+                        short y = (short) (player.Position.Y/32*32 + 16);
+                        short z = (short) (player.Position.Z/32*32);
+                        Vector3I Pos = new Vector3I(player.Position.X/32, player.Position.Y/32,
+                            (player.Position.Z - 32)/32);
 
                         //Saves the player pos when they were solid for later removing the block
                         player.prophuntSolidPos = Pos;

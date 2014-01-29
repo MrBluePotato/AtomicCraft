@@ -30,7 +30,84 @@ namespace RandomMaze
         public const int DefaultYSize = 5;
         public const int DefaultZSize = 3;
         public const int DefaultCellSize = 3;
-		public const double HintProbability = 0.3;
+        public const double HintProbability = 0.3;
+        private const Block HintBlock = Block.Log;
+
+        private int _cellSize;
+        private int _count = 0;
+        private bool _drawElevators = true;
+        private bool _drawHints = false;
+        private bool _drawingElevator = false;
+        private bool _drawingWall = false;
+        private Maze _maze;
+        private bool _needHint = false;
+        private int _patternIdx;
+
+        private Block[][][] _patterns =
+        {
+            new Block[][]
+            {
+                new Block[] {Block.Glass, Block.Glass, Block.Glass},
+                new Block[] {Block.Glass, Block.Glass, Block.Glass},
+                new Block[] {Block.Glass, Block.Glass, Block.Glass}
+            },
+            new Block[][]
+            {
+                new Block[] {Block.Undefined, Block.Glass, Block.Undefined},
+                new Block[] {Block.Glass, Block.Glass, Block.Glass},
+                new Block[] {Block.Undefined, Block.Glass, Block.Undefined}
+            },
+            new Block[][]
+            {
+                new Block[] {Block.Undefined, Block.Glass, Block.Undefined},
+                new Block[] {Block.Glass, Block.Undefined, Block.Glass},
+                new Block[] {Block.Undefined, Block.Glass, Block.Undefined}
+            },
+            new Block[][]
+            {
+                new Block[] {Block.Glass, Block.Undefined, Block.Glass},
+                new Block[] {Block.Undefined, Block.Glass, Block.Undefined},
+                new Block[] {Block.Glass, Block.Undefined, Block.Glass}
+            },
+            new Block[][]
+            {
+                new Block[] {Block.Leaves, Block.Leaves, Block.Leaves},
+                new Block[] {Block.Leaves, Block.Glass, Block.Leaves},
+                new Block[] {Block.Leaves, Block.Leaves, Block.Leaves}
+            },
+            new Block[][]
+            {
+                new Block[] {Block.Glass, Block.Leaves, Block.Glass},
+                new Block[] {Block.Leaves, Block.Glass, Block.Leaves},
+                new Block[] {Block.Glass, Block.Leaves, Block.Glass}
+            },
+        };
+
+        private IBrushInstance _playersBrush;
+        private Random _r = new Random();
+
+        private Block[] _randomBlocks =
+        {
+            Block.WhiteWool, Block.BlueWool, Block.Gold, Block.CyanWool, Block.GreenWool,
+            Block.IndigoWool, Block.MagentaWool, Block.Obsidian, Block.OrangeWool,
+            Block.PinkWool, Block.RedWool, Block.Sponge, Block.PurpleWool, Block.YellowWool
+        };
+
+        private int _wallPatternCoordX;
+        private int _wallPatternCoordY;
+
+        public RandomMazeDrawOperation(Player player, Command cmd)
+            : base(player)
+        {
+            int xSize = CommandOrDefault(cmd, DefaultXSize);
+            int ySize = CommandOrDefault(cmd, DefaultYSize);
+            int zSize = CommandOrDefault(cmd, DefaultZSize);
+            ReadFlags(cmd);
+            _cellSize = DefaultCellSize;
+            _playersBrush = player.Brush.MakeInstance(player, cmd, this);
+
+            _maze = new Maze(xSize, ySize, zSize);
+        }
 
         public override string Name
         {
@@ -42,33 +119,9 @@ namespace RandomMaze
             get { return Name; }
         }
 
-        public override int ExpectedMarks { get { return 1; } }
-
-        private Maze _maze;
-        private int _cellSize;
-        private int _count = 0;
-        private bool _drawingWall = false;
-        private bool _drawingElevator = false;
-        private int _wallPatternCoordX;
-        private int _wallPatternCoordY;
-        private int _patternIdx;
-        private Random _r = new Random();
-        private IBrushInstance _playersBrush;
-		private bool _drawElevators = true;
-		private bool _drawHints = false;
-		private bool _needHint = false;
-
-        public RandomMazeDrawOperation(Player player, Command cmd)
-            : base(player)
+        public override int ExpectedMarks
         {
-            int xSize = CommandOrDefault(cmd, DefaultXSize);
-            int ySize = CommandOrDefault(cmd, DefaultYSize);
-            int zSize = CommandOrDefault(cmd, DefaultZSize);
-			ReadFlags(cmd);
-            _cellSize = DefaultCellSize; 
-            _playersBrush = player.Brush.MakeInstance(player, cmd, this);
-
-            _maze = new Maze(xSize, ySize, zSize);
+            get { return 1; }
         }
 
         private static int CommandOrDefault(Command cmd, int defVal)
@@ -83,22 +136,22 @@ namespace RandomMaze
             return defVal;
         }
 
-		private void ReadFlags(Command cmd)
-		{
-			for (;;)
-			{
-				string s = cmd.Next();
-				if (null==s)
-					break;
-				s.ToLower();
-				if (s=="noelevators" || s=="nolifts")
-					_drawElevators = false;
-				else if (s=="hint" || s=="hints")
-					_drawHints = true;
-				else
-					Player.Message("Unknown option: "+s+", ignored");
-			}
-		}
+        private void ReadFlags(Command cmd)
+        {
+            for (;;)
+            {
+                string s = cmd.Next();
+                if (null == s)
+                    break;
+                s.ToLower();
+                if (s == "noelevators" || s == "nolifts")
+                    _drawElevators = false;
+                else if (s == "hint" || s == "hints")
+                    _drawHints = true;
+                else
+                    Player.Message("Unknown option: " + s + ", ignored");
+            }
+        }
 
         public override bool Prepare(Vector3I[] marks)
         {
@@ -107,9 +160,9 @@ namespace RandomMaze
             if (marks.Length < 1)
                 throw new ArgumentException("At least one mark needed.", "marks");
 
-            Vector3I mark2 = new Vector3I((_cellSize + 1) * _maze.XSize + 1 + marks[0].X,
-                (_cellSize + 1) * _maze.YSize + 1 + marks[0].Y,
-                (_cellSize + 1) * _maze.ZSize + 1 + marks[0].Z);
+            Vector3I mark2 = new Vector3I((_cellSize + 1)*_maze.XSize + 1 + marks[0].X,
+                (_cellSize + 1)*_maze.YSize + 1 + marks[0].Y,
+                (_cellSize + 1)*_maze.ZSize + 1 + marks[0].Z);
 
             Marks = marks;
 
@@ -194,32 +247,32 @@ namespace RandomMaze
         {
             DrawWall(xCell, yCell, zCell, Direction.All[2]);
             DrawWall(xCell, yCell, zCell, Direction.All[3]);
-			//here we always request a hint, and in DrawWall we will correct it to the necessary probability
-			//only if we rally draw a wall there
-			if (_drawHints && _maze.GetCell(xCell, yCell, zCell).IsOnSolutionPath())
-				_needHint = true;
-			DrawWall(xCell, yCell, zCell, Direction.All[4]);
-			_needHint = false;
-			DrawColumn(xCell, yCell, zCell, Direction.All[0]);
-			DrawColumn(xCell, yCell, zCell, Direction.All[1]);
-			DrawColumn(xCell, yCell, zCell, Direction.All[4]);
-			//special case: elevator
-			if (_drawElevators && !_maze.GetCell(xCell, yCell, zCell).Wall(Direction.All[5]))
-				DrawElevator(xCell, yCell, zCell);
+            //here we always request a hint, and in DrawWall we will correct it to the necessary probability
+            //only if we rally draw a wall there
+            if (_drawHints && _maze.GetCell(xCell, yCell, zCell).IsOnSolutionPath())
+                _needHint = true;
+            DrawWall(xCell, yCell, zCell, Direction.All[4]);
+            _needHint = false;
+            DrawColumn(xCell, yCell, zCell, Direction.All[0]);
+            DrawColumn(xCell, yCell, zCell, Direction.All[1]);
+            DrawColumn(xCell, yCell, zCell, Direction.All[4]);
+            //special case: elevator
+            if (_drawElevators && !_maze.GetCell(xCell, yCell, zCell).Wall(Direction.All[5]))
+                DrawElevator(xCell, yCell, zCell);
         }
 
         private void DrawWall(int xCell, int yCell, int zCell, Direction d)
         {
             if (_maze.GetCell(xCell, yCell, zCell).Wall(d))
             {
-				//reduce the hint probability from 1.0 to required
-				if (_needHint && _r.NextDouble() >= HintProbability)
-					_needHint = false;
+                //reduce the hint probability from 1.0 to required
+                if (_needHint && _r.NextDouble() >= HintProbability)
+                    _needHint = false;
 
                 d.ArrangeCoords(ref Coords.X, ref Coords.Y, ref Coords.Z,
-                    xCell * (_cellSize + 1) + 1 + Marks[0].X,
-                    yCell * (_cellSize + 1) + 1 + Marks[0].Y,
-                    zCell * (_cellSize + 1) + 1 + Marks[0].Z,
+                    xCell*(_cellSize + 1) + 1 + Marks[0].X,
+                    yCell*(_cellSize + 1) + 1 + Marks[0].Y,
+                    zCell*(_cellSize + 1) + 1 + Marks[0].Z,
                     _cellSize, WallCallback);
             }
         }
@@ -227,10 +280,10 @@ namespace RandomMaze
         private void DrawColumn(int xCell, int yCell, int zCell, Direction d)
         {
             d.ArrangeCoords(ref Coords.X, ref Coords.Y, ref Coords.Z,
-                    xCell * (_cellSize + 1) + 1 + Marks[0].X,
-                    yCell * (_cellSize + 1) + 1 + Marks[0].Y,
-                    zCell * (_cellSize + 1) + 1 + Marks[0].Z,
-                    _cellSize, StickCallback);
+                xCell*(_cellSize + 1) + 1 + Marks[0].X,
+                yCell*(_cellSize + 1) + 1 + Marks[0].Y,
+                zCell*(_cellSize + 1) + 1 + Marks[0].Z,
+                _cellSize, StickCallback);
         }
 
         private void StickCallback(ref int coord, int coordFrom)
@@ -259,9 +312,9 @@ namespace RandomMaze
 
         private void DrawElevator(int xCell, int yCell, int zCell)
         {
-            Coords.X = xCell * (_cellSize + 1) + 1 + _cellSize / 2 + Marks[0].X;
-            Coords.Y = yCell * (_cellSize + 1) + 1 + _cellSize / 2 + Marks[0].Y;
-            int zFrom = zCell * (_cellSize + 1) + 1 + Marks[0].Z;
+            Coords.X = xCell*(_cellSize + 1) + 1 + _cellSize/2 + Marks[0].X;
+            Coords.Y = yCell*(_cellSize + 1) + 1 + _cellSize/2 + Marks[0].Y;
+            int zFrom = zCell*(_cellSize + 1) + 1 + Marks[0].Z;
             //water column
             _drawingElevator = true;
             for (Coords.Z = zFrom; Coords.Z < zFrom + _cellSize + 1; ++Coords.Z)
@@ -274,15 +327,15 @@ namespace RandomMaze
             //partial floor above
             _drawingWall = true;
             ChoosePattern();
-            Coords.Z = (zCell + 1) * (_cellSize + 1) + Marks[0].Z;
+            Coords.Z = (zCell + 1)*(_cellSize + 1) + Marks[0].Z;
 
-            Coords.Y = yCell * (_cellSize + 1) + 1 + _cellSize / 2 + Marks[0].Y;
-            _wallPatternCoordY = _cellSize / 2;
-            DrawPartOfPartialWall(ref Coords.X, xCell * (_cellSize + 1) + 1 + Marks[0].X, ref _wallPatternCoordX);
+            Coords.Y = yCell*(_cellSize + 1) + 1 + _cellSize/2 + Marks[0].Y;
+            _wallPatternCoordY = _cellSize/2;
+            DrawPartOfPartialWall(ref Coords.X, xCell*(_cellSize + 1) + 1 + Marks[0].X, ref _wallPatternCoordX);
 
-            Coords.X = xCell * (_cellSize + 1) + 1 + _cellSize / 2 + Marks[0].X;
-            _wallPatternCoordX = _cellSize / 2;
-            DrawPartOfPartialWall(ref Coords.Y, yCell * (_cellSize + 1) + 1 + Marks[0].Y, ref _wallPatternCoordY);
+            Coords.X = xCell*(_cellSize + 1) + 1 + _cellSize/2 + Marks[0].X;
+            _wallPatternCoordX = _cellSize/2;
+            DrawPartOfPartialWall(ref Coords.Y, yCell*(_cellSize + 1) + 1 + Marks[0].Y, ref _wallPatternCoordY);
 
             _drawingWall = false;
         }
@@ -292,7 +345,7 @@ namespace RandomMaze
             for (coord = coordFrom; coord < coordFrom + _cellSize; ++coord)
             {
                 patternCoord = coord - coordFrom;
-                if (patternCoord == _cellSize / 2)
+                if (patternCoord == _cellSize/2)
                     continue;
                 if (DrawOneBlock())
                     ++_count;
@@ -311,60 +364,29 @@ namespace RandomMaze
         }
 
 
-        private Block[][][] _patterns = { new Block[][]
-										{ new Block[]{ Block.Glass, Block.Glass, Block.Glass }, 
-										  new Block[]{ Block.Glass, Block.Glass, Block.Glass }, 
-										  new Block[]{ Block.Glass, Block.Glass, Block.Glass } },
-										  new Block[][]
-										{ new Block[]{ Block.Undefined, Block.Glass, Block.Undefined }, 
-										  new Block[]{ Block.Glass, Block.Glass, Block.Glass }, 
-										  new Block[]{ Block.Undefined, Block.Glass, Block.Undefined } },
-										  new Block[][]
-										{ new Block[]{ Block.Undefined, Block.Glass, Block.Undefined }, 
-										  new Block[]{ Block.Glass, Block.Undefined, Block.Glass }, 
-										  new Block[]{ Block.Undefined, Block.Glass, Block.Undefined } },
-										  new Block[][]
-										{ new Block[]{ Block.Glass, Block.Undefined, Block.Glass }, 
-										  new Block[]{ Block.Undefined, Block.Glass, Block.Undefined }, 
-										  new Block[]{ Block.Glass, Block.Undefined, Block.Glass } },
-										  new Block[][]
-										{ new Block[]{ Block.Leaves, Block.Leaves, Block.Leaves }, 
-										  new Block[]{ Block.Leaves, Block.Glass, Block.Leaves }, 
-										  new Block[]{ Block.Leaves, Block.Leaves, Block.Leaves } },
-										  new Block[][]
-										{ new Block[]{ Block.Glass, Block.Leaves, Block.Glass }, 
-										  new Block[]{ Block.Leaves, Block.Glass, Block.Leaves }, 
-										  new Block[]{ Block.Glass, Block.Leaves, Block.Glass } },
-										};
-        private Block[] _randomBlocks = {Block.WhiteWool, Block.BlueWool, Block.Gold, Block.CyanWool, Block.GreenWool, 
-											Block.IndigoWool, Block.MagentaWool, Block.Obsidian, Block.OrangeWool, 
-											Block.PinkWool,Block.RedWool, Block.Sponge, Block.PurpleWool, Block.YellowWool};
-
-		private const Block HintBlock = Block.Log;
-
         protected override Block NextBlock()
         {
             if (_drawingElevator)
                 return Block.Water;
             if (!_drawingWall)
-                return Block.Plank;//_playersBrush.NextBlock(this);
+                return Block.Plank; //_playersBrush.NextBlock(this);
 
             if (_patternIdx < 0)
-			{
-				if (_needHint)
-				{
-					_needHint = false;
-					return HintBlock;
-				}
-				return _r.NextDouble() < 0.2
-				       	? Block.Plank /*_playersBrush.NextBlock(this)*/
-				       	: _randomBlocks[_r.Next(_randomBlocks.Length)];
-			}
+            {
+                if (_needHint)
+                {
+                    _needHint = false;
+                    return HintBlock;
+                }
+                return _r.NextDouble() < 0.2
+                    ? Block.Plank /*_playersBrush.NextBlock(this)*/
+                    : _randomBlocks[_r.Next(_randomBlocks.Length)];
+            }
 
             Block b = _patterns[_patternIdx][_wallPatternCoordX][_wallPatternCoordY];
             if (b == Block.Undefined)
                 b = Block.Plank; //_playersBrush.NextBlock(this);
-			
+
             return b;
         }
     }

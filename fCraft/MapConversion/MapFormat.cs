@@ -1,8 +1,10 @@
 // Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
 
-namespace fCraft.MapConversion {
+namespace fCraft.MapConversion
+{
     /// <summary> An enumeration of map formats supported by fCraft. </summary>
-    public enum MapFormat {
+    public enum MapFormat
+    {
         /// <summary> Unidentified map. </summary>
         Unknown,
 
@@ -42,7 +44,8 @@ namespace fCraft.MapConversion {
 
 
     /// <summary> Type of map storage (file or folder-based). </summary>
-    public enum MapStorageType {
+    public enum MapStorageType
+    {
         SingleFile,
         Directory
     }

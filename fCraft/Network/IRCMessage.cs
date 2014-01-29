@@ -25,9 +25,31 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-namespace fCraft {
+namespace fCraft
+{
     // ReSharper disable FieldCanBeMadeReadOnly.Global
-    public sealed class IRCMessage {
+    public sealed class IRCMessage
+    {
+        public IRCMessage(string from, string nick, string ident, string host, string channel, string message,
+            string rawMessage, IRCMessageType type, IRCReplyCode replycode)
+        {
+            RawMessage = rawMessage;
+            RawMessageArray = rawMessage.Split(new[] {' '});
+            Type = type;
+            ReplyCode = replycode;
+            From = from;
+            Nick = nick;
+            Ident = ident;
+            Host = host;
+            Channel = channel;
+            if (message != null)
+            {
+                // message is optional
+                Message = message;
+                MessageArray = message.Split(new[] {' '});
+            }
+        }
+
         public string From { get; private set; }
         public string Nick { get; private set; }
         public string Ident { get; private set; }
@@ -39,22 +61,5 @@ namespace fCraft {
         public string[] RawMessageArray { get; private set; }
         public IRCMessageType Type { get; private set; }
         public IRCReplyCode ReplyCode { get; private set; }
-
-        public IRCMessage( string from, string nick, string ident, string host, string channel, string message, string rawMessage, IRCMessageType type, IRCReplyCode replycode ) {
-            RawMessage = rawMessage;
-            RawMessageArray = rawMessage.Split( new[] { ' ' } );
-            Type = type;
-            ReplyCode = replycode;
-            From = from;
-            Nick = nick;
-            Ident = ident;
-            Host = host;
-            Channel = channel;
-            if( message != null ) {
-                // message is optional
-                Message = message;
-                MessageArray = message.Split( new[] { ' ' } );
-            }
-        }
     }
 }

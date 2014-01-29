@@ -14,6 +14,7 @@
 //along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 //Copyright (C) <2011 - 2014> Glenn Mariën (http://project-vanilla.com)
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,26 @@ namespace fCraft.Portals
 {
     public class Portal
     {
+        public bool HasDesiredOutput = false;
+
+        public Portal()
+        {
+            //empty
+        }
+
+        public Portal(String world, Vector3I[] affectedBlocks, String Name, String Creator, String Place,
+            bool CustomOutput)
+        {
+            this.World = world;
+            this.AffectedBlocks = affectedBlocks;
+            this.Range = Portal.CalculateRange(this);
+            this.Name = Name;
+            this.Creator = Creator;
+            this.Created = DateTime.UtcNow;
+            this.Place = Place;
+            this.HasDesiredOutput = CustomOutput;
+        }
+
         public String Name { get; set; }
         public String Creator { get; set; }
         public DateTime Created { get; set; }
@@ -38,24 +59,6 @@ namespace fCraft.Portals
         public int DesiredOutputZ { get; set; }
         public byte DesiredOutputR { get; set; }
         public byte DesiredOutputL { get; set; }
-        public bool HasDesiredOutput = false;
-
-        public Portal()
-        {
-            //empty
-        }
-
-        public Portal(String world, Vector3I[] affectedBlocks, String Name, String Creator, String Place, bool CustomOutput)
-        {
-            this.World = world;
-            this.AffectedBlocks = affectedBlocks;
-            this.Range = Portal.CalculateRange(this);
-            this.Name = Name;
-            this.Creator = Creator;
-            this.Created = DateTime.UtcNow;
-            this.Place = Place;
-            this.HasDesiredOutput = CustomOutput;
-        }
 
         public static PortalRange CalculateRange(Portal portal)
         {
@@ -141,11 +144,11 @@ namespace fCraft.Portals
 
         public bool IsInRange(Player player)
         {
-            if ((player.Position.X / 32) <= Range.Xmax && (player.Position.X / 32) >= Range.Xmin)
+            if ((player.Position.X/32) <= Range.Xmax && (player.Position.X/32) >= Range.Xmin)
             {
-                if ((player.Position.Y / 32) <= Range.Ymax && (player.Position.Y / 32) >= Range.Ymin)
+                if ((player.Position.Y/32) <= Range.Ymax && (player.Position.Y/32) >= Range.Ymin)
                 {
-                    if (((player.Position.Z / 32) - 1) <= Range.Zmax && ((player.Position.Z / 32) - 1) >= Range.Zmin)
+                    if (((player.Position.Z/32) - 1) <= Range.Zmax && ((player.Position.Z/32) - 1) >= Range.Zmin)
                     {
                         return true;
                     }
@@ -276,7 +279,7 @@ namespace fCraft.Portals
         public string Serialize()
         {
             SerializedData data = new SerializedData(this);
-            DataContractSerializer serializer = new DataContractSerializer(typeof(SerializedData));
+            DataContractSerializer serializer = new DataContractSerializer(typeof (SerializedData));
             System.IO.MemoryStream s = new System.IO.MemoryStream();
             serializer.WriteObject(s, data);
             return Convert.ToBase64String(s.ToArray());
@@ -286,50 +289,34 @@ namespace fCraft.Portals
         {
             byte[] bdata = Convert.FromBase64String(sdata);
             Portal portal = new Portal();
-            DataContractSerializer serializer = new DataContractSerializer(typeof(SerializedData));
+            DataContractSerializer serializer = new DataContractSerializer(typeof (SerializedData));
             System.IO.MemoryStream s = new System.IO.MemoryStream(bdata);
-            SerializedData data = (SerializedData)serializer.ReadObject(s);
+            SerializedData data = (SerializedData) serializer.ReadObject(s);
 
             data.UpdatePortal(portal);
             return portal;
         }
+
         [DataContract]
         private class SerializedData
         {
-            [DataMember]
-            public String Name;
-            [DataMember]
-            public String Creator;
-            [DataMember]
-            public DateTime Created;
-            [DataMember]
-            public String World;
-            [DataMember]
-            public int XMin;
-            [DataMember]
-            public int XMax;
-            [DataMember]
-            public int YMin;
-            [DataMember]
-            public int YMax;
-            [DataMember]
-            public int ZMin;
-            [DataMember]
-            public int ZMax;
-            [DataMember]
-            public String Place;
-            [DataMember]
-            public int DesiredOutputX;
-            [DataMember]
-            public int DesiredOutputY;
-            [DataMember]
-            public int DesiredOutputZ;
-            [DataMember]
-            public byte DesiredOutputR;
-            [DataMember]
-            public byte DesiredOutputL;
-            [DataMember]
-            public bool HasDesiredOutput;
+            [DataMember] public DateTime Created;
+            [DataMember] public String Creator;
+            [DataMember] public byte DesiredOutputL;
+            [DataMember] public byte DesiredOutputR;
+            [DataMember] public int DesiredOutputX;
+            [DataMember] public int DesiredOutputY;
+            [DataMember] public int DesiredOutputZ;
+            [DataMember] public bool HasDesiredOutput;
+            [DataMember] public String Name;
+            [DataMember] public String Place;
+            [DataMember] public String World;
+            [DataMember] public int XMax;
+            [DataMember] public int XMin;
+            [DataMember] public int YMax;
+            [DataMember] public int YMin;
+            [DataMember] public int ZMax;
+            [DataMember] public int ZMin;
 
             public SerializedData(Portal portal)
             {

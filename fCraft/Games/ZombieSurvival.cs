@@ -35,6 +35,7 @@
 // ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,9 +44,10 @@ using System.IO;
 
 namespace fCraft
 {
-    class ZombieSurvival
+    internal class ZombieSurvival
     {
         //Timing
+        private const string _zomb = "&8_Infected_";
         private static SchedulerTask task_;
         public static DateTime startTime;
         public static DateTime lastChecked;
@@ -54,17 +56,17 @@ namespace fCraft
         public static int timeDelay = 10;
 
         //Values
-        private const string _zomb = "&8_Infected_";
         public static bool isOn = false;
         public static ZombieSurvival instance;
         private static World _world;
         public static Random rand = new Random();
         public static List<Player> ZombiePlayers = new List<Player>();
-        public ZombieSurvival (World world)
+
+        public ZombieSurvival(World world)
         {
             startTime = DateTime.UtcNow;
-        _world = world;
-        task_ = new SchedulerTask(Interval, true).RunForever(TimeSpan.FromSeconds(1));
+            _world = world;
+            task_ = new SchedulerTask(Interval, true).RunForever(TimeSpan.FromSeconds(1));
         }
 
         public void Start()
@@ -95,23 +97,26 @@ namespace fCraft
             if (p != null && _world != null)
             {
                 _world.Players.Message("{0}&S stopped the Zombie Survival on world {1}",
-                p.ClassyName, _world.ClassyName);
+                    p.ClassyName, _world.ClassyName);
             }
             RevertGame();
             return;
         }
+
         public static void HumansWin()
         {
             _world.Players.Message("&cThe humans have won the game!");
             RevertGame();
             return;
         }
+
         public static void ZombiesWin() //
         {
             _world.Players.Message("&cThe zombies have won the game!");
             RevertGame();
             return;
         }
+
         public static void PlayerMoved(Player p, fCraft.Events.PlayerMovingEventArgs e)
         {
             if (p.isInfected)
@@ -126,13 +131,12 @@ namespace fCraft
                     }
                 }
             }
-
         }
 
         public void Interval(SchedulerTask task)
         {
             //check to stop Interval
-            if (_world.gameMode != GameMode.ZombieSurvival|| _world == null)
+            if (_world.gameMode != GameMode.ZombieSurvival || _world == null)
             {
                 _world = null;
                 task.Stop();
@@ -167,16 +171,18 @@ namespace fCraft
                                 break;
                             }
                         }
-                        p.TeleportTo(new Position(x, y, z1 + 2).ToVector3I().ToPlayerCoords()); //teleport players to a random position
+                        p.TeleportTo(new Position(x, y, z1 + 2).ToVector3I().ToPlayerCoords());
+                            //teleport players to a random position
                         beginGame(p);
                         chooseInfected();
                     }
                     isOn = true;
-                    lastChecked = DateTime.UtcNow;     //used for intervals
+                    lastChecked = DateTime.UtcNow; //used for intervals
                     return;
                 }
             }
-            if (isOn && (DateTime.UtcNow - lastChecked).TotalSeconds > 10) //check if players left the world, forfeits if no players of that team left
+            if (isOn && (DateTime.UtcNow - lastChecked).TotalSeconds > 10)
+                //check if players left the world, forfeits if no players of that team left
             {
                 if (_world.Players.Count(player => player.isInfected) == _world.Players.Count())
                 {
@@ -188,19 +194,19 @@ namespace fCraft
                     HumansWin();
                     return;
                 }
-
             }
             timeLeft = Convert.ToInt16(((timeDelay + timeLimit) - (DateTime.Now - startTime).TotalSeconds));
 
             if (lastChecked != null && (DateTime.UtcNow - lastChecked).TotalSeconds > 29.9 && timeLeft <= timeLimit)
             {
-                _world.Players.Message("There are currently {0} human(s) and {1} zombie(s) left on {2}", _world.Players.Count() - _world.Players.Count(player => player.isInfected), _world.Players.Count(player => player.isInfected), _world.ClassyName);
+                _world.Players.Message("There are currently {0} human(s) and {1} zombie(s) left on {2}",
+                    _world.Players.Count() - _world.Players.Count(player => player.isInfected),
+                    _world.Players.Count(player => player.isInfected), _world.ClassyName);
             }
         }
 
         public static void beginGame(Player player)
         {
-
             player.isPlayingZombieSurvival = true;
             ZombiePlayers.Add(player);
         }
@@ -230,6 +236,7 @@ namespace fCraft
                 ToZombie(null, p);
             }*/
         }
+
         public void ToZombie(Player infector, Player target)
         {
             if (infector == null)
@@ -260,6 +267,7 @@ namespace fCraft
                 infector.Message("&WYou are now a Zombie!");
             }
         }
+
         public static void RevertGame() //Reset game bools/stats and stop timers
         {
             _world.gameMode = GameMode.NULL;
@@ -277,7 +285,6 @@ namespace fCraft
                 p.isPlayingZombieSurvival = false;
                 p.Message("You are no longer playing zombie survival.");
             }
-
         }
     }
 }

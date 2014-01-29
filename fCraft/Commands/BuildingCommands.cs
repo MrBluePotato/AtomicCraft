@@ -14,6 +14,7 @@
 
 //You should have received a copy of the GNU General Public License
 //along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 using System;
 using System.Linq;
 using fCraft.Drawing;
@@ -23,16 +24,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Drawing;
 using fCraft.Doors;
+
 namespace fCraft
 {
-    /// <summary> Commands for placing specific blocks (solid, water, grass),
-    /// and switching block placement modes (paint, bind). </summary>
-    static class BuildingCommands
+    /// <summary>
+    ///     Commands for placing specific blocks (solid, water, grass),
+    ///     and switching block placement modes (paint, bind).
+    /// </summary>
+    internal static class BuildingCommands
     {
-        public static int MaxUndoCount = 2000000;
+        private const string GeneralDrawingHelp = " Use &H/Cancel&S to cancel selection mode. " +
+                                                  "Use &H/Undo&S to stop and undo the last command.";
 
-        const string GeneralDrawingHelp = " Use &H/Cancel&S to cancel selection mode. " +
-                                          "Use &H/Undo&S to stop and undo the last command.";
+        public static int MaxUndoCount = 2000000;
 
         internal static void Init()
         {
@@ -123,29 +127,36 @@ namespace fCraft
             CommandManager.RegisterCommand(CdDrawImage);
         }
 
-
         #region Door
-        static readonly CommandDescriptor CdDoor = new CommandDescriptor
+
+        private static readonly CommandDescriptor CdDoor = new CommandDescriptor
         {
             Name = "Door",
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Build },
+            Permissions = new[] {Permission.Build},
             IsConsoleSafe = false,
             Usage = "/Door [remove | info | list]",
             Help = "Controls doors, options are: remove, list, info\n&S" +
                    "See &H/Help Door <option>&S for details about each option.",
-            HelpSections = new Dictionary<string, string>() {
-                { "remove",     "&H/Door remove Door1\n&S" +
-                                "Removes Door with name 'Door1'."},
-                { "list",       "&H/Door list\n&S" +
-                                "Gives you a list of doors in the current world."},
-                { "info",       "&H/Door info Door1\n&S" +
-                                "Gives you information of door with name 'Door1'."},
+            HelpSections = new Dictionary<string, string>()
+            {
+                {
+                    "remove", "&H/Door remove Door1\n&S" +
+                              "Removes Door with name 'Door1'."
+                },
+                {
+                    "list", "&H/Door list\n&S" +
+                            "Gives you a list of doors in the current world."
+                },
+                {
+                    "info", "&H/Door info Door1\n&S" +
+                            "Gives you information of door with name 'Door1'."
+                },
             },
             Handler = Door
         };
 
-        static void Door(Player player, Command cmd)
+        private static void Door(Player player, Command cmd)
         {
             string option = cmd.Next();
             if (option == null)
@@ -247,11 +258,13 @@ namespace fCraft
                 else
                 {
                     String[] doorNames = new String[player.World.Map.Doors.Count];
-                    System.Text.StringBuilder output = new System.Text.StringBuilder("There are " + player.World.Map.Doors.Count + " doors in " + player.World.ClassyName + "&S: ");
+                    System.Text.StringBuilder output =
+                        new System.Text.StringBuilder("There are " + player.World.Map.Doors.Count + " doors in " +
+                                                      player.World.ClassyName + "&S: ");
 
                     for (int i = 0; i < player.World.Map.Doors.Count; i++)
                     {
-                        doorNames[i] = ((Door)player.World.Map.Doors[i]).Name;
+                        doorNames[i] = ((Door) player.World.Map.Doors[i]).Name;
                     }
                     output.Append(doorNames.JoinToString(", "));
                     player.Message(output.ToString());
@@ -268,7 +281,7 @@ namespace fCraft
             }
         }
 
-        static void DoorCheckCallback(Player player, Vector3I[] marks, object tag)
+        private static void DoorCheckCallback(Player player, Vector3I[] marks, object tag)
         {
             Vector3I Pos = marks[0];
             if (player.World != null && player.World.Map != null)
@@ -282,13 +295,14 @@ namespace fCraft
                     }
                     else
                     {
-                        player.Message("&aDoorCheck: This position contains '" + door.Name + "' &acreated on " + door.Created + " &aby " + door.Creator + "&a.");
+                        player.Message("&aDoorCheck: This position contains '" + door.Name + "' &acreated on " +
+                                       door.Created + " &aby " + door.Creator + "&a.");
                     }
                 }
             }
         }
 
-        static void DoorAdd(Player player, Vector3I[] marks, object tag)
+        private static void DoorAdd(Player player, Vector3I[] marks, object tag)
         {
             int sx = Math.Min(marks[0].X, marks[1].X);
             int ex = Math.Max(marks[0].X, marks[1].X);
@@ -297,7 +311,7 @@ namespace fCraft
             int sh = Math.Min(marks[0].Z, marks[1].Z);
             int eh = Math.Max(marks[0].Z, marks[1].Z);
 
-            int volume = (ex - sx + 1) * (ey - sy + 1) * (eh - sh + 1);
+            int volume = (ex - sx + 1)*(ey - sy + 1)*(eh - sh + 1);
             if (volume > 30)
             {
                 player.Message("Doors are only allowed to be {0} blocks", 30);
@@ -310,13 +324,13 @@ namespace fCraft
                 {
                     case SecurityCheckResult.BlackListed:
                         player.Message("Cannot add a door to world {0}&S: You are barred from building here.",
-                                        player.World.ClassyName);
+                            player.World.ClassyName);
                         return;
                     case SecurityCheckResult.RankTooLow:
                         player.Message("Cannot add a door to world {0}&S: You are not allowed to build here.",
-                                        player.World.ClassyName);
+                            player.World.ClassyName);
                         return;
-                    //case SecurityCheckResult.RankTooHigh:
+                        //case SecurityCheckResult.RankTooHigh:
                 }
             }
             List<Vector3I> blocks = new List<Vector3I>();
@@ -326,10 +340,13 @@ namespace fCraft
                 {
                     for (int z = sh; z < eh; z++)
                     {
-                        if (player.CanPlace(player.World.Map, new Vector3I(x, y, z), Block.Plank, BlockChangeContext.Manual) != CanPlaceResult.Allowed)
+                        if (
+                            player.CanPlace(player.World.Map, new Vector3I(x, y, z), Block.Plank,
+                                BlockChangeContext.Manual) != CanPlaceResult.Allowed)
                         {
-                            player.Message("Cannot add a door to world {0}&S: Build permissions in this area replied with 'denied'.",
-                                        player.World.ClassyName);
+                            player.Message(
+                                "Cannot add a door to world {0}&S: Build permissions in this area replied with 'denied'.",
+                                player.World.ClassyName);
                             return;
                         }
                         blocks.Add(new Vector3I(x, y, z));
@@ -344,26 +361,29 @@ namespace fCraft
             door.Range = new DoorRange(sx, ex, sy, ey, sh, eh);
 
             DoorHandler.CreateDoor(door, player.World);
-            Logger.Log(LogType.UserActivity, "{0} created door {1} (on world {2})", player.Name, door.Name, player.World.Name);
+            Logger.Log(LogType.UserActivity, "{0} created door {1} (on world {2})", player.Name, door.Name,
+                player.World.Name);
             player.Message("Door created on world {0}&S with name {1}", player.World.ClassyName, door.Name);
         }
+
         #endregion
 
-
         #region DrawImage
-        static readonly CommandDescriptor CdDrawImage = new CommandDescriptor
+
+        private static readonly CommandDescriptor CdDrawImage = new CommandDescriptor
         {
             Name = "DrawImage",
-            Aliases = new[] { "Drawimg", "Imgdraw", "ImgPrint" },
+            Aliases = new[] {"Drawimg", "Imgdraw", "ImgPrint"},
             Category = CommandCategory.Building,
-            Permissions = new Permission[] { Permission.DrawAdvanced },
+            Permissions = new Permission[] {Permission.DrawAdvanced},
             IsConsoleSafe = false,
             Usage = "/DrawImage WebsiteUrl.com/picture.jpg",
             Help = "Draws an image file from a website in minecraft blocks. " +
-            "If your url is from imgur.com, you can type '++' followed by the image code. Example: ++kbFRo.png",
+                   "If your url is from imgur.com, you can type '++' followed by the image code. Example: ++kbFRo.png",
             Handler = DrawImageHandler
         };
-        static void DrawImageHandler(Player player, Command cmd)
+
+        private static void DrawImageHandler(Player player, Command cmd)
         {
             string Url = cmd.Next();
             if (string.IsNullOrEmpty(Url))
@@ -378,9 +398,9 @@ namespace fCraft
             }
         }
 
-        static void DrawImgCallback(Player player, Vector3I[] marks, object tag)
+        private static void DrawImgCallback(Player player, Vector3I[] marks, object tag)
         {
-            string Url = (string)tag;
+            string Url = (string) tag;
             if (Url.StartsWith("++")) Url = Url.Replace("++", "i.imgur.com/");
             if (!Url.ToLower().StartsWith("http://")) Url = "http://" + Url;
 
@@ -395,7 +415,7 @@ namespace fCraft
             DrawImageOperation Op = null;
             try
             {
-                Op = new DrawImageOperation();//create new instance
+                Op = new DrawImageOperation(); //create new instance
                 Op.DrawImage(1, direction, marks[0], player, Url);
                 player.Message("DrawImg: Drawing {0}",
                     Url, Op.blocks);
@@ -406,23 +426,24 @@ namespace fCraft
             }
             Op = null; //get lost
         }
+
         #endregion
 
-
         #region SetFont
-        static CommandDescriptor CdSetFont = new CommandDescriptor()
+
+        private static CommandDescriptor CdSetFont = new CommandDescriptor()
         {
             Name = "SetFont",
-            Aliases = new[] { "FontSet", "Font", "Sf" },
+            Aliases = new[] {"FontSet", "Font", "Sf"},
             Category = CommandCategory.Building,
-            Permissions = new Permission[] { Permission.DrawAdvanced },
+            Permissions = new Permission[] {Permission.DrawAdvanced},
             IsConsoleSafe = false,
             Help = "Sets the properties for /Write, such as: font and size",
             Handler = SetFontHandler,
             Usage = "/SetFont < Font | Size | Reset > <Variable>"
         };
 
-        static void SetFontHandler(Player player, Command cmd)
+        private static void SetFontHandler(Player player, Command cmd)
         {
             string Param = cmd.Next();
             if (Param == null)
@@ -443,7 +464,8 @@ namespace fCraft
                 if (!Directory.Exists(Paths.FontsPath))
                 {
                     Directory.CreateDirectory(Paths.FontsPath);
-                    player.Message("There are no fonts available for this server. Font is set to default: {0}", player.font.FontFamily.Name);
+                    player.Message("There are no fonts available for this server. Font is set to default: {0}",
+                        player.font.FontFamily.Name);
                     return;
                 }
                 string fontFileName = null;
@@ -451,7 +473,8 @@ namespace fCraft
                 if (sectionName.Length < 1)
                 {
                     var sectionList = GetFontSectionList();
-                    player.Message("{0} fonts Available: {1}", sectionList.Length, sectionList.JoinToString()); //print the folder contents
+                    player.Message("{0} fonts Available: {1}", sectionList.Length, sectionList.JoinToString());
+                        //print the folder contents
                     return;
                 }
                 for (int i = 0; i < sectionFiles.Length; i++)
@@ -472,9 +495,10 @@ namespace fCraft
                         else
                         {
                             var matches = sectionFiles.Select(f => Path.GetFileNameWithoutExtension(f))
-                                                      .Where(sn => sn != null && sn.StartsWith(sectionName, StringComparison.OrdinalIgnoreCase));
+                                .Where(
+                                    sn => sn != null && sn.StartsWith(sectionName, StringComparison.OrdinalIgnoreCase));
                             player.Message("Multiple font files matched \"{0}\": {1}",
-                                            sectionName, matches.JoinToString());
+                                sectionName, matches.JoinToString());
                             return;
                         }
                     }
@@ -497,7 +521,7 @@ namespace fCraft
                     else
                     {
                         player.Message("No fonts found for \"{0}\". Available fonts: {1}",
-                                        sectionName, sectionList.JoinToString());
+                            sectionName, sectionList.JoinToString());
                     }
                 }
             }
@@ -511,7 +535,8 @@ namespace fCraft
                         player.Message("&WIncorrect font size ({0}): Size needs to be between 10 and 48", Size);
                         return;
                     }
-                    player.Message("SetFont: Size changed from {0} to {1} ({2})", player.font.Size, Size, player.font.FontFamily.Name);
+                    player.Message("SetFont: Size changed from {0} to {1} ({2})", player.font.Size, Size,
+                        player.font.FontFamily.Name);
                     player.font = new System.Drawing.Font(player.font.FontFamily, Size);
                 }
                 else
@@ -527,27 +552,28 @@ namespace fCraft
                 return;
             }
         }
+
         #endregion
 
-
         #region Draw2D
-        static readonly CommandDescriptor CdDraw2D = new CommandDescriptor
+
+        private static readonly CommandDescriptor CdDraw2D = new CommandDescriptor
         {
             Name = "Draw2D",
-            Aliases = new[] { "D2d" },
+            Aliases = new[] {"D2d"},
             Category = CommandCategory.Building,
-            Permissions = new Permission[] { Permission.DrawAdvanced },
+            Permissions = new Permission[] {Permission.DrawAdvanced},
             RepeatableSelection = true,
             IsConsoleSafe = true,
             Help = "/Draw2D, then select a shape (Polygon, spiral, star). You can then choose a size in blocks " +
-            " for the shape before selecting two points." +
-            "Example: /Draw2d Polygon 50. Polygon and triangle can be used with any number of points " +
-            "exceeding 3, which should follow the 'Size' argument",
+                   " for the shape before selecting two points." +
+                   "Example: /Draw2d Polygon 50. Polygon and triangle can be used with any number of points " +
+                   "exceeding 3, which should follow the 'Size' argument",
             Usage = "/Draw2D <Shape> <Size> <Points> <Fill: true/false>",
             Handler = Draw2DHandler,
         };
 
-        static void Draw2DHandler(Player player, Command cmd)
+        private static void Draw2DHandler(Player player, Command cmd)
         {
             string Shape = cmd.Next();
             if (Shape == null)
@@ -583,23 +609,15 @@ namespace fCraft
                     fill = true;
                 }
             }
-            Draw2DData tag = new Draw2DData() { Shape = Shape, Points = Points, Radius = radius, Fill = fill };
+            Draw2DData tag = new Draw2DData() {Shape = Shape, Points = Points, Radius = radius, Fill = fill};
             player.Message("Draw2D({0}): Click 2 blocks or use &H/Mark&S to set direction.", Shape);
             player.SelectionStart(2, Draw2DCallback, tag, Permission.DrawAdvanced);
         }
 
-        struct Draw2DData
-        {
-            public int Radius;
-            public int Points;
-            public string Shape;
-            public bool Fill;
-        }
-
-        static void Draw2DCallback(Player player, Vector3I[] marks, object tag)
+        private static void Draw2DCallback(Player player, Vector3I[] marks, object tag)
         {
             Block block = new Block();
-            Draw2DData data = (Draw2DData)tag;
+            Draw2DData data = (Draw2DData) tag;
             int radius = data.Radius;
             int Points = data.Points;
             bool fill = data.Fill;
@@ -653,16 +671,25 @@ namespace fCraft
                 player.Message(e.Message);
             }
         }
+
+        private struct Draw2DData
+        {
+            public bool Fill;
+            public int Points;
+            public int Radius;
+            public string Shape;
+        }
+
         #endregion
 
-
         #region Write
-        static readonly CommandDescriptor CdWrite = new CommandDescriptor
+
+        private static readonly CommandDescriptor CdWrite = new CommandDescriptor
         {
             Name = "Write",
-            Aliases = new[] { "Text", "Wt" },
+            Aliases = new[] {"Text", "Wt"},
             Category = CommandCategory.Building,
-            Permissions = new Permission[] { Permission.DrawAdvanced },
+            Permissions = new Permission[] {Permission.DrawAdvanced},
             RepeatableSelection = true,
             IsConsoleSafe = false,
             Help = "/Write Sentence, then click 2 blocks. The first is the starting point, the second is the direction",
@@ -670,7 +697,7 @@ namespace fCraft
             Handler = WriteHandler,
         };
 
-        static void WriteHandler(Player player, Command cmd)
+        private static void WriteHandler(Player player, Command cmd)
         {
             string sentence = cmd.NextAll();
             if (sentence.Length < 1)
@@ -685,10 +712,10 @@ namespace fCraft
             }
         }
 
-        static void WriteCallback(Player player, Vector3I[] marks, object tag)
+        private static void WriteCallback(Player player, Vector3I[] marks, object tag)
         {
             Block block = new Block();
-            string sentence = (string)tag;
+            string sentence = (string) tag;
             //block bugfix kinda
             if (player.LastUsedBlockType == Block.Undefined)
             {
@@ -724,14 +751,14 @@ namespace fCraft
             }
         }
 
-        static string[] GetFontSectionList()
+        private static string[] GetFontSectionList()
         {
             if (Directory.Exists(Paths.FontsPath))
             {
                 string[] sections = Directory.GetFiles(Paths.FontsPath, "*.ttf", SearchOption.TopDirectoryOnly)
-                                             .Select(name => Path.GetFileNameWithoutExtension(name))
-                                             .Where(name => !String.IsNullOrEmpty(name))
-                                             .ToArray();
+                    .Select(name => Path.GetFileNameWithoutExtension(name))
+                    .Where(name => !String.IsNullOrEmpty(name))
+                    .ToArray();
                 if (sections.Length != 0)
                 {
                     return sections;
@@ -739,21 +766,23 @@ namespace fCraft
             }
             return null;
         }
+
         #endregion
 
-
         #region Tree
-        static readonly CommandDescriptor CdTree = new CommandDescriptor
+
+        private static readonly CommandDescriptor CdTree = new CommandDescriptor
         {
             Name = "Tree",
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.DrawAdvanced },
+            Permissions = new[] {Permission.DrawAdvanced},
             Usage = "/Tree Shape Height",
-            Help = "&HPlants a tree of given shape and height. Available shapes: Normal, Bamboo, Palm, Cone, Round, Rainforest, Mangrove",
+            Help =
+                "&HPlants a tree of given shape and height. Available shapes: Normal, Bamboo, Palm, Cone, Round, Rainforest, Mangrove",
             Handler = TreeHandler
         };
 
-        static void TreeHandler(Player player, Command cmd)
+        private static void TreeHandler(Player player, Command cmd)
         {
             string shapeName = cmd.Next();
             int height;
@@ -776,11 +805,13 @@ namespace fCraft
                 player.Message("Tree height must be 6 blocks or above");
                 return;
             }
-            int volume = (int)Math.Pow(height, 3);
+            int volume = (int) Math.Pow(height, 3);
             if (!player.CanDraw(volume))
             {
-                player.Message(String.Format("You are only allowed to run commands that affect up to {0} blocks. This one would affect {1} blocks.",
-                                               player.Info.Rank.DrawLimit, volume));
+                player.Message(
+                    String.Format(
+                        "You are only allowed to run commands that affect up to {0} blocks. This one would affect {1} blocks.",
+                        player.Info.Rank.DrawLimit, volume));
                 return;
             }
 
@@ -801,28 +832,30 @@ namespace fCraft
             player.MessageNow("Tree: Place a block or type /Mark to use your location.");
         }
 
-        static void TreeCallback(Player player, Vector3I[] marks, object tag)
+        private static void TreeCallback(Player player, Vector3I[] marks, object tag)
         {
-            ForesterArgs args = (ForesterArgs)tag;
+            ForesterArgs args = (ForesterArgs) tag;
             int blocksPlaced = 0, blocksDenied = 0;
             UndoState undoState = player.DrawBegin(null);
             args.BlockPlacing +=
                 (sender, e) =>
-               DrawOneBlock(player, player.World.Map, e.Block, new Vector3I(e.Coordinate.X, e.Coordinate.Y, e.Coordinate.Z),
-                              BlockChangeContext.Drawn,
-                              ref blocksPlaced, ref blocksDenied, undoState);
+                    DrawOneBlock(player, player.World.Map, e.Block,
+                        new Vector3I(e.Coordinate.X, e.Coordinate.Y, e.Coordinate.Z),
+                        BlockChangeContext.Drawn,
+                        ref blocksPlaced, ref blocksDenied, undoState);
             Forester.SexyPlant(args, marks[0]);
             DrawingFinished(player, "/Tree: Planted", blocksPlaced, blocksDenied);
         }
+
         #endregion
 
-
         #region Cylinder
-        static readonly CommandDescriptor CdCylinder = new CommandDescriptor
+
+        private static readonly CommandDescriptor CdCylinder = new CommandDescriptor
         {
             Name = "Cylinder",
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Build },
+            Permissions = new[] {Permission.Build},
             IsConsoleSafe = false,
             NotRepeatable = false,
             RepeatableSelection = true,
@@ -832,19 +865,20 @@ namespace fCraft
             Handler = CylinderHandler
         };
 
-        static void CylinderHandler(Player player, Command cmd)
+        private static void CylinderHandler(Player player, Command cmd)
         {
             DrawOperationBegin(player, cmd, new CylinderDrawOperation(player));
         }
+
         #endregion
 
-
         #region Place
-        static readonly CommandDescriptor CdPlace = new CommandDescriptor
+
+        private static readonly CommandDescriptor CdPlace = new CommandDescriptor
         {
             Name = "Place",
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Build },
+            Permissions = new[] {Permission.Build},
             IsConsoleSafe = false,
             NotRepeatable = false,
             Usage = "/Place",
@@ -853,35 +887,38 @@ namespace fCraft
             Handler = Place
         };
 
-        static void Place(Player player, Command cmd)
+        private static void Place(Player player, Command cmd)
         {
             if (player.LastUsedBlockType != Block.Undefined)
             {
-                Vector3I Pos = new Vector3I(player.Position.X / 32, player.Position.Y / 32, (player.Position.Z / 32) - 2);
+                Vector3I Pos = new Vector3I(player.Position.X/32, player.Position.Y/32, (player.Position.Z/32) - 2);
 
-                if (player.CanPlace(player.World.Map, Pos, player.LastUsedBlockType, BlockChangeContext.Manual) != CanPlaceResult.Allowed)
+                if (player.CanPlace(player.World.Map, Pos, player.LastUsedBlockType, BlockChangeContext.Manual) !=
+                    CanPlaceResult.Allowed)
                 {
                     player.Message("&WYou are not allowed to build here");
                     return;
                 }
 
-                Player.RaisePlayerPlacedBlockEvent(player, player.WorldMap, Pos, player.WorldMap.GetBlock(Pos), player.LastUsedBlockType, BlockChangeContext.Manual);
+                Player.RaisePlayerPlacedBlockEvent(player, player.WorldMap, Pos, player.WorldMap.GetBlock(Pos),
+                    player.LastUsedBlockType, BlockChangeContext.Manual);
                 BlockUpdate blockUpdate = new BlockUpdate(null, Pos, player.LastUsedBlockType);
                 player.World.Map.QueueUpdate(blockUpdate);
                 player.Message("Block placed below your feet");
             }
             else player.Message("&WError: No last used blocktype was found");
         }
+
         #endregion
 
-
         #region Center
-        static readonly CommandDescriptor CdCenter = new CommandDescriptor
+
+        private static readonly CommandDescriptor CdCenter = new CommandDescriptor
         {
             Name = "Center",
-            Aliases = new[] { "Centre" },
+            Aliases = new[] {"Centre"},
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Build },
+            Permissions = new[] {Permission.Build},
             IsConsoleSafe = false,
             NotRepeatable = false,
             Usage = "/Center",
@@ -890,34 +927,37 @@ namespace fCraft
             Handler = CenterHandler
         };
 
-        static void CenterHandler(Player player, Command cmd)
+        private static void CenterHandler(Player player, Command cmd)
         {
             player.SelectionStart(2, CenterCallback, null, CdCenter.Permissions);
             player.MessageNow("Center: Place a block or type /Mark to use your location.");
         }
 
-        static void CenterCallback(Player player, Vector3I[] marks, object tag)
+        private static void CenterCallback(Player player, Vector3I[] marks, object tag)
         {
             if (player.LastUsedBlockType != Block.Undefined)
             {
-                int sx = Math.Min(marks[0].X, marks[1].X), ex = Math.Max(marks[0].X, marks[1].X),
-                sy = Math.Min(marks[0].Y, marks[1].Y), ey = Math.Max(marks[0].Y, marks[1].Y),
-                sz = Math.Min(marks[0].Z, marks[1].Z), ez = Math.Max(marks[0].Z, marks[1].Z);
+                int sx = Math.Min(marks[0].X, marks[1].X),
+                    ex = Math.Max(marks[0].X, marks[1].X),
+                    sy = Math.Min(marks[0].Y, marks[1].Y),
+                    ey = Math.Max(marks[0].Y, marks[1].Y),
+                    sz = Math.Min(marks[0].Z, marks[1].Z),
+                    ez = Math.Max(marks[0].Z, marks[1].Z);
 
                 BoundingBox bounds = new BoundingBox(sx, sy, sz, ex, ey, ez);
-                Vector3I cPos = new Vector3I((bounds.XMin + bounds.XMax) / 2,
-                    (bounds.YMin + bounds.YMax) / 2,
-                    (bounds.ZMin + bounds.ZMax) / 2);
+                Vector3I cPos = new Vector3I((bounds.XMin + bounds.XMax)/2,
+                    (bounds.YMin + bounds.YMax)/2,
+                    (bounds.ZMin + bounds.ZMax)/2);
                 int blocksDrawn = 0,
-                blocksSkipped = 0;
+                    blocksSkipped = 0;
                 UndoState undoState = player.DrawBegin(null);
 
                 World playerWorld = player.World;
                 if (playerWorld == null) PlayerOpException.ThrowNoWorld(player);
                 Map map = player.WorldMap;
                 DrawOneBlock(player, player.World.Map, player.LastUsedBlockType, cPos,
-                          BlockChangeContext.Drawn,
-                          ref blocksDrawn, ref blocksSkipped, undoState);
+                    BlockChangeContext.Drawn,
+                    ref blocksDrawn, ref blocksSkipped, undoState);
                 DrawingFinished(player, "Placed", blocksDrawn, blocksSkipped);
             }
             else
@@ -925,23 +965,24 @@ namespace fCraft
                 player.Message("&WCannot deduce desired block. Click a block or type out the block name.");
             }
         }
+
         #endregion
 
-
         #region BanX
-        static readonly CommandDescriptor CdBanx = new CommandDescriptor
+
+        private static readonly CommandDescriptor CdBanx = new CommandDescriptor
         {
             Name = "Banx",
             Category = CommandCategory.Moderation,
             IsConsoleSafe = false,
             IsHidden = false,
-            Permissions = new[] { Permission.Ban },
+            Permissions = new[] {Permission.Ban},
             Usage = "/Banx playerName reason",
             Help = "Bans and undoes a players actions up to 50000 blocks",
             Handler = BanXHandler
         };
 
-        static void BanXHandler(Player player, Command cmd)
+        private static void BanXHandler(Player player, Command cmd)
         {
             string ban = cmd.Next();
 
@@ -998,7 +1039,7 @@ namespace fCraft
                 }
                 if (player.World.BlockDB.IsEnabled)
                 {
-                    UndoPlayerHandler2(player, new PlayerInfo[] { target });
+                    UndoPlayerHandler2(player, new PlayerInfo[] {target});
                 }
                 if (player.Can(Permission.Demote, target.Rank))
                 {
@@ -1007,23 +1048,32 @@ namespace fCraft
                         player.LastUsedPlayerName = target.Name;
                         target.ChangeRank(player, RankManager.LowestRank, reason, false, true, false);
                     }
-                    Server.Players.Message("{0}&S was BanX'd by {1}&S (with auto-demote):&W {2}", target.ClassyName, player.ClassyName, reason);
+                    Server.Players.Message("{0}&S was BanX'd by {1}&S (with auto-demote):&W {2}", target.ClassyName,
+                        player.ClassyName, reason);
                     IRC.PlayerSomethingMessage(player, "BanX'd (with auto-demote)", target, reason);
                     return;
                 }
                 else
                 {
                     player.Message("&WAuto demote failed: You didn't have the permissions to demote the target player");
-                    Server.Players.Message("{0}&S was BanX'd by {1}: &W{2}", target.ClassyName, player.ClassyName, reason);
+                    Server.Players.Message("{0}&S was BanX'd by {1}: &W{2}", target.ClassyName, player.ClassyName,
+                        reason);
                     IRC.PlayerSomethingMessage(player, "BanX'd", target, reason);
                 }
                 player.Message("&SConfirm the undo with &A/ok");
             }
         }
 
-        static void UndoPlayerHandler2(Player player, PlayerInfo[] target)
+        private static void UndoPlayerHandler2(Player player, PlayerInfo[] target)
         {
-            BlockDBUndoArgs args = new BlockDBUndoArgs() { Player = player, World = player.World, CountLimit = 50000, Not = false, Targets = target };
+            BlockDBUndoArgs args = new BlockDBUndoArgs()
+            {
+                Player = player,
+                World = player.World,
+                CountLimit = 50000,
+                Not = false,
+                Targets = target
+            };
             bool allPlayers = (args.Targets.Length == 0);
             string cmdName = (args.Not ? "UndoPlayerNot" : "UndoPlayer");
 
@@ -1057,13 +1107,12 @@ namespace fCraft
                 if (changes.Length > 0)
                 {
                     Logger.Log(LogType.UserActivity,
-                                "{0}: Asked {1} to confirm undo on world {2}",
-                                cmdName, args.Player.Name, args.World.Name);
+                        "{0}: Asked {1} to confirm undo on world {2}",
+                        cmdName, args.Player.Name, args.World.Name);
                     args.Player.Confirm(BlockDBUndoConfirmCallback, args,
-                                         "Undo last {0} changes made by {1}&S?",
-                                         changes.Length, targetList);
+                        "Undo last {0} changes made by {1}&S?",
+                        changes.Length, targetList);
                 }
-
             }
             else
             {
@@ -1079,11 +1128,11 @@ namespace fCraft
                 if (changes.Length > 0)
                 {
                     Logger.Log(LogType.UserActivity,
-                                "{0}: Asked {1} to confirm undo on world {2}",
-                                cmdName, args.Player.Name, args.World.Name);
+                        "{0}: Asked {1} to confirm undo on world {2}",
+                        cmdName, args.Player.Name, args.World.Name);
                     args.Player.Confirm(BlockDBUndoConfirmCallback, args,
-                                         "Undo changes ({0}) made by {1}&S in the last {2}?",
-                                         changes.Length, targetList, args.AgeLimit.ToMiniString());
+                        "Undo changes ({0}) made by {1}&S in the last {2}?",
+                        changes.Length, targetList, args.AgeLimit.ToMiniString());
                 }
             }
 
@@ -1097,128 +1146,99 @@ namespace fCraft
                 args.Entries = changes;
             }
         }
+
         #endregion
 
-
         #region Walls
-        static readonly CommandDescriptor CdWalls = new CommandDescriptor
+
+        private static readonly CommandDescriptor CdWalls = new CommandDescriptor
         {
             Name = "Walls",
             IsConsoleSafe = false,
             RepeatableSelection = true,
             Category = CommandCategory.Building,
             IsHidden = false,
-            Permissions = new[] { Permission.Draw },
+            Permissions = new[] {Permission.Draw},
             Help = "&HFills a rectangular area of walls",
             Handler = WallsHandler
         };
 
-        static void WallsHandler(Player player, Command cmd)
+        private static void WallsHandler(Player player, Command cmd)
         {
             DrawOperationBegin(player, cmd, new WallsDrawOperation(player));
         }
-        #endregion
 
+        #endregion
 
         #region DrawOperations & Brushes
 
-        static readonly CommandDescriptor CdCuboid = new CommandDescriptor
+        private static readonly CommandDescriptor CdCuboid = new CommandDescriptor
         {
             Name = "Cuboid",
-            Aliases = new[] { "blb", "c", "z" },
+            Aliases = new[] {"blb", "c", "z"},
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Draw },
+            Permissions = new[] {Permission.Draw},
             RepeatableSelection = true,
             Help = "Fills a rectangular area (cuboid) with blocks.",
             Handler = CuboidHandler
         };
 
-        static void CuboidHandler(Player player, Command cmd)
-        {
-            DrawOperationBegin(player, cmd, new CuboidDrawOperation(player));
-        }
 
-
-
-        static readonly CommandDescriptor CdCuboidWireframe = new CommandDescriptor
+        private static readonly CommandDescriptor CdCuboidWireframe = new CommandDescriptor
         {
             Name = "CuboidW",
-            Aliases = new[] { "cubw", "cw", "bfb" },
+            Aliases = new[] {"cubw", "cw", "bfb"},
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Draw },
+            Permissions = new[] {Permission.Draw},
             RepeatableSelection = true,
             Help = "Draws a wireframe box (a frame) around the selected rectangular area.",
             Handler = CuboidWireframeHandler
         };
 
-        static void CuboidWireframeHandler(Player player, Command cmd)
-        {
-            DrawOperationBegin(player, cmd, new CuboidWireframeDrawOperation(player));
-        }
 
-
-
-        static readonly CommandDescriptor CdCuboidHollow = new CommandDescriptor
+        private static readonly CommandDescriptor CdCuboidHollow = new CommandDescriptor
         {
             Name = "CuboidH",
-            Aliases = new[] { "cubh", "ch", "h", "bhb" },
+            Aliases = new[] {"cubh", "ch", "h", "bhb"},
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Draw },
+            Permissions = new[] {Permission.Draw},
             RepeatableSelection = true,
             Help = "Surrounds the selected rectangular area with a box of blocks. " +
                    "Unless two blocks are specified, leaves the inside untouched.",
             Handler = CuboidHollowHandler
         };
 
-        static void CuboidHollowHandler(Player player, Command cmd)
-        {
-            DrawOperationBegin(player, cmd, new CuboidHollowDrawOperation(player));
-        }
 
-
-
-        static readonly CommandDescriptor CdEllipsoid = new CommandDescriptor
+        private static readonly CommandDescriptor CdEllipsoid = new CommandDescriptor
         {
             Name = "Ellipsoid",
-            Aliases = new[] { "e" },
+            Aliases = new[] {"e"},
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Draw },
+            Permissions = new[] {Permission.Draw},
             RepeatableSelection = true,
             Help = "Fills an ellipsoid-shaped area (elongated sphere) with blocks.",
             Handler = EllipsoidHandler
         };
 
-        static void EllipsoidHandler(Player player, Command cmd)
-        {
-            DrawOperationBegin(player, cmd, new EllipsoidDrawOperation(player));
-        }
 
-
-
-        static readonly CommandDescriptor CdEllipsoidHollow = new CommandDescriptor
+        private static readonly CommandDescriptor CdEllipsoidHollow = new CommandDescriptor
         {
             Name = "EllipsoidH",
-            Aliases = new[] { "eh" },
+            Aliases = new[] {"eh"},
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Draw },
+            Permissions = new[] {Permission.Draw},
             RepeatableSelection = true,
             Help = "Surrounds the selected an ellipsoid-shaped area (elongated sphere) with a shell of blocks.",
             Handler = EllipsoidHollowHandler
         };
 
-        static void EllipsoidHollowHandler(Player player, Command cmd)
-        {
-            DrawOperationBegin(player, cmd, new EllipsoidHollowDrawOperation(player));
-        }
 
-
-
-        static readonly CommandDescriptor CdSphere = new CommandDescriptor
+        private static readonly CommandDescriptor CdSphere = new CommandDescriptor
         {
             Name = "Sphere",
-            Aliases = new[] { "sp", "spheroid" },
+            Aliases = new[] {"sp", "spheroid"},
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Draw, Permission.DrawAdvanced },
+            Permissions = new[] {Permission.Draw, Permission.DrawAdvanced},
             RepeatableSelection = true,
             Help = "Fills a spherical area with blocks. " +
                    "The first mark denotes the CENTER of the sphere, and " +
@@ -1226,19 +1246,13 @@ namespace fCraft
             Handler = SphereHandler
         };
 
-        static void SphereHandler(Player player, Command cmd)
-        {
-            DrawOperationBegin(player, cmd, new SphereDrawOperation(player));
-        }
 
-
-
-        static readonly CommandDescriptor CdSphereHollow = new CommandDescriptor
+        private static readonly CommandDescriptor CdSphereHollow = new CommandDescriptor
         {
             Name = "SphereH",
-            Aliases = new[] { "sph", "hsphere" },
+            Aliases = new[] {"sph", "hsphere"},
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Draw, Permission.DrawAdvanced },
+            Permissions = new[] {Permission.Draw, Permission.DrawAdvanced},
             RepeatableSelection = true,
             Help = "Surrounds a spherical area with a shell of blocks. " +
                    "The first mark denotes the CENTER of the sphere, and " +
@@ -1246,74 +1260,50 @@ namespace fCraft
             Handler = SphereHollowHandler
         };
 
-        static void SphereHollowHandler(Player player, Command cmd)
-        {
-            DrawOperationBegin(player, cmd, new SphereHollowDrawOperation(player));
-        }
 
-
-
-        static readonly CommandDescriptor CdLine = new CommandDescriptor
+        private static readonly CommandDescriptor CdLine = new CommandDescriptor
         {
             Name = "Line",
-            Aliases = new[] { "ln" },
+            Aliases = new[] {"ln"},
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Draw },
+            Permissions = new[] {Permission.Draw},
             RepeatableSelection = true,
             Help = "Draws a continuous line between two points with blocks. " +
                    "Marks do not have to be aligned.",
             Handler = LineHandler
         };
 
-        static void LineHandler(Player player, Command cmd)
-        {
-            DrawOperationBegin(player, cmd, new LineDrawOperation(player));
-        }
 
-
-
-        static readonly CommandDescriptor CdTriangleWireframe = new CommandDescriptor
+        private static readonly CommandDescriptor CdTriangleWireframe = new CommandDescriptor
         {
             Name = "TriangleW",
-            Aliases = new[] { "tw" },
+            Aliases = new[] {"tw"},
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Draw },
+            Permissions = new[] {Permission.Draw},
             RepeatableSelection = true,
             Help = "Draws lines between three points, to form a triangle.",
             Handler = TriangleWireframeHandler
         };
 
-        static void TriangleWireframeHandler(Player player, Command cmd)
-        {
-            DrawOperationBegin(player, cmd, new TriangleWireframeDrawOperation(player));
-        }
 
-
-
-        static readonly CommandDescriptor CdTriangle = new CommandDescriptor
+        private static readonly CommandDescriptor CdTriangle = new CommandDescriptor
         {
             Name = "Triangle",
-            Aliases = new[] { "t" },
+            Aliases = new[] {"t"},
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Draw },
+            Permissions = new[] {Permission.Draw},
             RepeatableSelection = true,
             Help = "Draws a triangle between three points.",
             Handler = TriangleHandler
         };
 
-        static void TriangleHandler(Player player, Command cmd)
-        {
-            DrawOperationBegin(player, cmd, new TriangleDrawOperation(player));
-        }
 
-
-
-        static readonly CommandDescriptor CdTorus = new CommandDescriptor
+        private static readonly CommandDescriptor CdTorus = new CommandDescriptor
         {
             Name = "Torus",
-            Aliases = new[] { "donut", "bagel" },
+            Aliases = new[] {"donut", "bagel"},
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Draw, Permission.DrawAdvanced },
+            Permissions = new[] {Permission.Draw, Permission.DrawAdvanced},
             RepeatableSelection = true,
             Help = "Draws a horizontally-oriented torus. The first mark denotes the CENTER of the torus, horizontal " +
                    "distance to the second mark denotes the ring radius, and the vertical distance to the second mark denotes the " +
@@ -1321,11 +1311,60 @@ namespace fCraft
             Handler = TorusHandler
         };
 
-        static void TorusHandler(Player player, Command cmd)
+        private static void CuboidHandler(Player player, Command cmd)
+        {
+            DrawOperationBegin(player, cmd, new CuboidDrawOperation(player));
+        }
+
+        private static void CuboidWireframeHandler(Player player, Command cmd)
+        {
+            DrawOperationBegin(player, cmd, new CuboidWireframeDrawOperation(player));
+        }
+
+        private static void CuboidHollowHandler(Player player, Command cmd)
+        {
+            DrawOperationBegin(player, cmd, new CuboidHollowDrawOperation(player));
+        }
+
+        private static void EllipsoidHandler(Player player, Command cmd)
+        {
+            DrawOperationBegin(player, cmd, new EllipsoidDrawOperation(player));
+        }
+
+        private static void EllipsoidHollowHandler(Player player, Command cmd)
+        {
+            DrawOperationBegin(player, cmd, new EllipsoidHollowDrawOperation(player));
+        }
+
+        private static void SphereHandler(Player player, Command cmd)
+        {
+            DrawOperationBegin(player, cmd, new SphereDrawOperation(player));
+        }
+
+        private static void SphereHollowHandler(Player player, Command cmd)
+        {
+            DrawOperationBegin(player, cmd, new SphereHollowDrawOperation(player));
+        }
+
+        private static void LineHandler(Player player, Command cmd)
+        {
+            DrawOperationBegin(player, cmd, new LineDrawOperation(player));
+        }
+
+        private static void TriangleWireframeHandler(Player player, Command cmd)
+        {
+            DrawOperationBegin(player, cmd, new TriangleWireframeDrawOperation(player));
+        }
+
+        private static void TriangleHandler(Player player, Command cmd)
+        {
+            DrawOperationBegin(player, cmd, new TriangleDrawOperation(player));
+        }
+
+        private static void TorusHandler(Player player, Command cmd)
         {
             DrawOperationBegin(player, cmd, new TorusDrawOperation(player));
         }
-
 
 
         public static void DrawOperationBegin(Player player, Command cmd, DrawOperation op)
@@ -1339,38 +1378,38 @@ namespace fCraft
             op.Brush = brush;
             player.SelectionStart(op.ExpectedMarks, DrawOperationCallback, op, Permission.Draw);
             player.Message("{0}: Click {1} blocks or use &H/Mark&S to make a selection.",
-                            op.Description, op.ExpectedMarks);
+                op.Description, op.ExpectedMarks);
         }
 
 
-        static void DrawOperationCallback(Player player, Vector3I[] marks, object tag)
+        private static void DrawOperationCallback(Player player, Vector3I[] marks, object tag)
         {
-            DrawOperation op = (DrawOperation)tag;
+            DrawOperation op = (DrawOperation) tag;
             if (!op.Prepare(marks)) return;
             if (!player.CanDraw(op.BlocksTotalEstimate))
             {
-                player.MessageNow("You are only allowed to run draw commands that affect up to {0} blocks. This one would affect {1} blocks.",
-                                   player.Info.Rank.DrawLimit,
-                                   op.Bounds.Volume);
+                player.MessageNow(
+                    "You are only allowed to run draw commands that affect up to {0} blocks. This one would affect {1} blocks.",
+                    player.Info.Rank.DrawLimit,
+                    op.Bounds.Volume);
                 op.Cancel();
                 return;
             }
             player.Message("{0}: Processing ~{1} blocks.",
-                            op.Description, op.BlocksTotalEstimate);
+                op.Description, op.BlocksTotalEstimate);
             op.Begin();
         }
 
         #endregion
 
-
         #region Fill
 
-        static readonly CommandDescriptor CdFill2D = new CommandDescriptor
+        private static readonly CommandDescriptor CdFill2D = new CommandDescriptor
         {
             Name = "Fill2D",
-            Aliases = new[] { "f2d" },
+            Aliases = new[] {"f2d"},
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Draw, Permission.DrawAdvanced },
+            Permissions = new[] {Permission.Draw, Permission.DrawAdvanced},
             RepeatableSelection = true,
             Help = "Fills a continuous area with blocks, in 2D. " +
                    "Takes just 1 mark, and replaces blocks of the same type as the block you clicked. " +
@@ -1379,7 +1418,7 @@ namespace fCraft
             Handler = Fill2DHandler
         };
 
-        static void Fill2DHandler(Player player, Command cmd)
+        private static void Fill2DHandler(Player player, Command cmd)
         {
             Fill2DDrawOperation op = new Fill2DDrawOperation(player);
             op.ReadParams(cmd);
@@ -1388,9 +1427,9 @@ namespace fCraft
         }
 
 
-        static void Fill2DCallback(Player player, Vector3I[] marks, object tag)
+        private static void Fill2DCallback(Player player, Vector3I[] marks, object tag)
         {
-            DrawOperation op = (DrawOperation)tag;
+            DrawOperation op = (DrawOperation) tag;
             if (!op.Prepare(marks)) return;
             if (player.WorldMap.GetBlock(marks[0]) == Block.Air)
             {
@@ -1403,30 +1442,41 @@ namespace fCraft
         }
 
 
-        static void Fill2DConfirmCallback(Player player, object tag, bool fromConsole)
+        private static void Fill2DConfirmCallback(Player player, object tag, bool fromConsole)
         {
-            Fill2DDrawOperation op = (Fill2DDrawOperation)tag;
+            Fill2DDrawOperation op = (Fill2DDrawOperation) tag;
             player.Message("{0}: Filling in a {1}x{1} area...",
-                            op.Description, player.Info.Rank.FillLimit);
+                op.Description, player.Info.Rank.FillLimit);
             op.Begin();
         }
 
         #endregion
 
-
         #region Solid
 
-        static readonly CommandDescriptor CdSolid = new CommandDescriptor
+        private static readonly CommandDescriptor CdSolid = new CommandDescriptor
         {
             Name = "Solid",
-            Aliases = new[] { "s" },
+            Aliases = new[] {"s"},
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.PlaceAdmincrete },
-            Help = "Toggles the admincrete placement mode. When enabled, any stone block you place is replaced with admincrete.",
+            Permissions = new[] {Permission.PlaceAdmincrete},
+            Help =
+                "Toggles the admincrete placement mode. When enabled, any stone block you place is replaced with admincrete.",
             Handler = SolidHandler
         };
 
-        static void SolidHandler(Player player, Command cmd)
+
+        private static readonly CommandDescriptor CdPaint = new CommandDescriptor
+        {
+            Name = "Paint",
+            Aliases = new[] {"p"},
+            Category = CommandCategory.Building,
+            Help = "When paint mode is on, any block you delete will be replaced with the block you are holding. " +
+                   "Paint command toggles this behavior on and off.",
+            Handler = PaintHandler
+        };
+
+        private static void SolidHandler(Player player, Command cmd)
         {
             if (player.GetBind(Block.Stone) == Block.Bedrock)
             {
@@ -1440,19 +1490,7 @@ namespace fCraft
             }
         }
 
-
-
-        static readonly CommandDescriptor CdPaint = new CommandDescriptor
-        {
-            Name = "Paint",
-            Aliases = new[] { "p" },
-            Category = CommandCategory.Building,
-            Help = "When paint mode is on, any block you delete will be replaced with the block you are holding. " +
-                   "Paint command toggles this behavior on and off.",
-            Handler = PaintHandler
-        };
-
-        static void PaintHandler(Player player, Command cmd)
+        private static void PaintHandler(Player player, Command cmd)
         {
             player.IsPainting = !player.IsPainting;
             if (player.IsPainting)
@@ -1464,15 +1502,16 @@ namespace fCraft
                 player.Message("Paint mode: OFF");
             }
         }
+
         #endregion
 
-
         #region Bind
-        static readonly CommandDescriptor CdBind = new CommandDescriptor
+
+        private static readonly CommandDescriptor CdBind = new CommandDescriptor
         {
             Name = "Bind",
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Build },
+            Permissions = new[] {Permission.Build},
             Help = "&HAssigns one blocktype to another. " +
                    "Allows to build blocktypes that are not normally buildable directly: admincrete, lava, water, grass, double step. " +
                    "Calling &H/Bind BlockType&S without second parameter resets the binding. If used with no params, ALL bindings are reset.",
@@ -1480,7 +1519,7 @@ namespace fCraft
             Handler = BindHandler
         };
 
-        static void BindHandler(Player player, Command cmd)
+        private static void BindHandler(Player player, Command cmd)
         {
             string originalBlockName = cmd.Next();
             if (originalBlockName == null)
@@ -1502,14 +1541,14 @@ namespace fCraft
                 if (player.GetBind(originalBlock) != originalBlock)
                 {
                     player.Message("{0} is no longer bound to {1}",
-                                    originalBlock,
-                                    player.GetBind(originalBlock));
+                        originalBlock,
+                        player.GetBind(originalBlock));
                     player.ResetBind(originalBlock);
                 }
                 else
                 {
                     player.Message("{0} is not bound to anything.",
-                                    originalBlock);
+                        originalBlock);
                 }
                 return;
             }
@@ -1548,11 +1587,10 @@ namespace fCraft
 
         #endregion
 
-
         #region Drawing Helpers
 
-        static void DrawOneBlock([NotNull] Player player, [NotNull] Map map, Block drawBlock, Vector3I coord,
-                                 BlockChangeContext context, ref int blocks, ref int blocksDenied, UndoState undoState)
+        private static void DrawOneBlock([NotNull] Player player, [NotNull] Map map, Block drawBlock, Vector3I coord,
+            BlockChangeContext context, ref int blocks, ref int blocksDenied, UndoState undoState)
         {
             if (player == null) throw new ArgumentNullException("player");
 
@@ -1581,7 +1619,7 @@ namespace fCraft
         }
 
 
-        static void DrawingFinished([NotNull] Player player, string verb, int blocks, int blocksDenied)
+        private static void DrawingFinished([NotNull] Player player, string verb, int blocks, int blocksDenied)
         {
             if (player == null) throw new ArgumentNullException("player");
             if (blocks == 0)
@@ -1600,7 +1638,7 @@ namespace fCraft
                 if (blocksDenied > 0)
                 {
                     player.MessageNow("{0} {1} blocks ({2} blocks skipped due to permission issues)... " +
-                                       "The map is now being updated.", verb, blocks, blocksDenied);
+                                      "The map is now being updated.", verb, blocks, blocksDenied);
                 }
                 else
                 {
@@ -1616,10 +1654,48 @@ namespace fCraft
 
         #endregion
 
-
         #region Replace
 
-        static void ReplaceHandlerInternal(IBrush factory, Player player, Command cmd)
+        private static readonly CommandDescriptor CdReplace = new CommandDescriptor
+        {
+            Name = "Replace",
+            Aliases = new[] {"r"},
+            Category = CommandCategory.Building,
+            Permissions = new[] {Permission.Draw},
+            RepeatableSelection = true,
+            Usage = "/Replace BlockToReplace [AnotherOne, ...] ReplacementBlock",
+            Help = "Replaces all blocks of specified type(s) in an area.",
+            Handler = ReplaceHandler
+        };
+
+
+        private static readonly CommandDescriptor CdReplaceNot = new CommandDescriptor
+        {
+            Name = "ReplaceNot",
+            Aliases = new[] {"rn"},
+            Category = CommandCategory.Building,
+            Permissions = new[] {Permission.Draw},
+            RepeatableSelection = true,
+            Usage = "/ReplaceNot (ExcludedBlock [AnotherOne]) ReplacementBlock",
+            Help = "Replaces all blocks EXCEPT specified type(s) in an area.",
+            Handler = ReplaceNotHandler
+        };
+
+
+        private static readonly CommandDescriptor CdReplaceBrush = new CommandDescriptor
+        {
+            Name = "ReplaceBrush",
+            Aliases = new[] {"rb"},
+            Category = CommandCategory.Building,
+            Permissions = new[] {Permission.Draw, Permission.DrawAdvanced},
+            RepeatableSelection = true,
+            Usage = "/ReplaceBrush Block BrushName [Params]",
+            Help = "Replaces all blocks of specified type(s) in an area with output of a given brush. " +
+                   "See &H/Help brush&S for a list of available brushes.",
+            Handler = ReplaceBrushHandler
+        };
+
+        private static void ReplaceHandlerInternal(IBrush factory, Player player, Command cmd)
         {
             CuboidDrawOperation op = new CuboidDrawOperation(player);
             IBrushInstance brush = factory.MakeInstance(player, cmd, op);
@@ -1628,87 +1704,56 @@ namespace fCraft
 
             player.SelectionStart(2, DrawOperationCallback, op, Permission.Draw);
             player.MessageNow("{0}: Click 2 blocks or use &H/Mark&S to make a selection.",
-                               op.Brush.InstanceDescription);
+                op.Brush.InstanceDescription);
         }
 
-
-        static readonly CommandDescriptor CdReplace = new CommandDescriptor
-        {
-            Name = "Replace",
-            Aliases = new[] { "r" },
-            Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Draw },
-            RepeatableSelection = true,
-            Usage = "/Replace BlockToReplace [AnotherOne, ...] ReplacementBlock",
-            Help = "Replaces all blocks of specified type(s) in an area.",
-            Handler = ReplaceHandler
-        };
-
-        static void ReplaceHandler(Player player, Command cmd)
+        private static void ReplaceHandler(Player player, Command cmd)
         {
             var replaceBrush = ReplaceBrushFactory.Instance.MakeBrush(player, cmd);
             if (replaceBrush == null) return;
             ReplaceHandlerInternal(replaceBrush, player, cmd);
         }
 
-
-
-        static readonly CommandDescriptor CdReplaceNot = new CommandDescriptor
-        {
-            Name = "ReplaceNot",
-            Aliases = new[] { "rn" },
-            Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Draw },
-            RepeatableSelection = true,
-            Usage = "/ReplaceNot (ExcludedBlock [AnotherOne]) ReplacementBlock",
-            Help = "Replaces all blocks EXCEPT specified type(s) in an area.",
-            Handler = ReplaceNotHandler
-        };
-
-        static void ReplaceNotHandler(Player player, Command cmd)
+        private static void ReplaceNotHandler(Player player, Command cmd)
         {
             var replaceBrush = ReplaceNotBrushFactory.Instance.MakeBrush(player, cmd);
             if (replaceBrush == null) return;
             ReplaceHandlerInternal(replaceBrush, player, cmd);
         }
 
-
-
-        static readonly CommandDescriptor CdReplaceBrush = new CommandDescriptor
-        {
-            Name = "ReplaceBrush",
-            Aliases = new[] { "rb" },
-            Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Draw, Permission.DrawAdvanced },
-            RepeatableSelection = true,
-            Usage = "/ReplaceBrush Block BrushName [Params]",
-            Help = "Replaces all blocks of specified type(s) in an area with output of a given brush. " +
-                   "See &H/Help brush&S for a list of available brushes.",
-            Handler = ReplaceBrushHandler
-        };
-
-        static void ReplaceBrushHandler(Player player, Command cmd)
+        private static void ReplaceBrushHandler(Player player, Command cmd)
         {
             var replaceBrush = ReplaceBrushBrushFactory.Instance.MakeBrush(player, cmd);
             if (replaceBrush == null) return;
             ReplaceHandlerInternal(replaceBrush, player, cmd);
         }
-        #endregion
 
+        #endregion
 
         #region Undo / Redo
 
-        static readonly CommandDescriptor CdUndo = new CommandDescriptor
+        private static readonly CommandDescriptor CdUndo = new CommandDescriptor
         {
             Name = "Undo",
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Draw },
+            Permissions = new[] {Permission.Draw},
             Help = "&HSelectively removes changes from your last drawing command. " +
                    "Note that commands involving over 2 million blocks cannot be undone due to memory restrictions.",
             Handler = UndoHandler
         };
 
-        static void UndoHandler(Player player, Command cmd)
+
+        private static readonly CommandDescriptor CdRedo = new CommandDescriptor
+        {
+            Name = "Redo",
+            Category = CommandCategory.Building,
+            Permissions = new[] {Permission.Draw},
+            Help = "&HSelectively removes changes from your last drawing command. " +
+                   "Note that commands involving over 2 million blocks cannot be undone due to memory restrictions.",
+            Handler = RedoHandler
+        };
+
+        private static void UndoHandler(Player player, Command cmd)
         {
             World playerWorld = player.World;
             if (playerWorld == null) PlayerOpException.ThrowNoWorld(player);
@@ -1731,8 +1776,8 @@ namespace fCraft
             {
                 undoState.Op.Cancel();
                 msg += String.Format("Cancelled {0} (was {1}% done). ",
-                                     undoState.Op.Description,
-                                     undoState.Op.PercentDone);
+                    undoState.Op.Description,
+                    undoState.Op.PercentDone);
             }
 
             // Check if command was too massive.
@@ -1751,13 +1796,13 @@ namespace fCraft
 
             // no need to set player.drawingInProgress here because this is done on the user thread
             Logger.Log(LogType.UserActivity,
-                        "Player {0} initiated /Undo affecting {1} blocks (on world {2})",
-                        player.Name,
-                        undoState.Buffer.Count,
-                        playerWorld.Name);
+                "Player {0} initiated /Undo affecting {1} blocks (on world {2})",
+                player.Name,
+                undoState.Buffer.Count,
+                playerWorld.Name);
 
             msg += String.Format("Restoring {0} blocks. Type &H/Redo&S to reverse.",
-                                  undoState.Buffer.Count);
+                undoState.Buffer.Count);
             player.MessageNow(msg);
 
             var op = new UndoDrawOperation(player, undoState, false);
@@ -1765,18 +1810,7 @@ namespace fCraft
             op.Begin();
         }
 
-
-        static readonly CommandDescriptor CdRedo = new CommandDescriptor
-        {
-            Name = "Redo",
-            Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Draw },
-            Help = "&HSelectively removes changes from your last drawing command. " +
-                   "Note that commands involving over 2 million blocks cannot be undone due to memory restrictions.",
-            Handler = RedoHandler
-        };
-
-        static void RedoHandler(Player player, Command cmd)
+        private static void RedoHandler(Player player, Command cmd)
         {
             if (cmd.HasNext)
             {
@@ -1799,19 +1833,19 @@ namespace fCraft
             {
                 redoState.Op.Cancel();
                 msg += String.Format("Cancelled {0} (was {1}% done). ",
-                                     redoState.Op.Description,
-                                     redoState.Op.PercentDone);
+                    redoState.Op.Description,
+                    redoState.Op.PercentDone);
             }
 
             // no need to set player.drawingInProgress here because this is done on the user thread
             Logger.Log(LogType.UserActivity,
-                        "Player {0} initiated /Redo affecting {1} blocks (on world {2})",
-                        player.Name,
-                        redoState.Buffer.Count,
-                        playerWorld.Name);
+                "Player {0} initiated /Redo affecting {1} blocks (on world {2})",
+                player.Name,
+                redoState.Buffer.Count,
+                playerWorld.Name);
 
             msg += String.Format("Restoring {0} blocks. Type &H/Undo&S to reverse.",
-                                  redoState.Buffer.Count);
+                redoState.Buffer.Count);
             player.MessageNow(msg);
 
             var op = new UndoDrawOperation(player, redoState, true);
@@ -1821,20 +1855,124 @@ namespace fCraft
 
         #endregion
 
-
         #region Copy and Paste
 
-        static readonly CommandDescriptor CdCopySlot = new CommandDescriptor
+        private static readonly CommandDescriptor CdCopySlot = new CommandDescriptor
         {
             Name = "CopySlot",
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.CopyAndPaste },
+            Permissions = new[] {Permission.CopyAndPaste},
             Usage = "/CopySlot [#]",
             Help = "&HSelects a slot to copy to/paste from. The maximum number of slots is limited per-rank.",
             Handler = CopySlotHandler
         };
 
-        static void CopySlotHandler(Player player, Command cmd)
+
+        private static readonly CommandDescriptor CdCopy = new CommandDescriptor
+        {
+            Name = "Copy",
+            Category = CommandCategory.Building,
+            Permissions = new[] {Permission.CopyAndPaste},
+            Help = "&HCopy blocks for pasting. " +
+                   "Used together with &H/Paste&S and &H/PasteNot&S commands. " +
+                   "Note that pasting starts at the same corner that you started &H/Copy&S from.",
+            Handler = CopyHandler
+        };
+
+        private static readonly CommandDescriptor CdCut = new CommandDescriptor
+        {
+            Name = "Cut",
+            Category = CommandCategory.Building,
+            Permissions = new[] {Permission.CopyAndPaste},
+            RepeatableSelection = true,
+            Help =
+                "&HCopies and removes blocks for pasting. Unless a different block type is specified, the area is filled with air. " +
+                "Used together with &H/Paste&S and &H/PasteNot&S commands. " +
+                "Note that pasting starts at the same corner that you started &H/Cut&S from.",
+            Usage = "/Cut [FillBlock]",
+            Handler = CutHandler
+        };
+
+        private static readonly CommandDescriptor CdMirror = new CommandDescriptor
+        {
+            Name = "Mirror",
+            Aliases = new[] {"flip"},
+            Category = CommandCategory.Building,
+            Permissions = new[] {Permission.CopyAndPaste},
+            Help = "Flips copied blocks along specified axis/axes. " +
+                   "The axes are: X = horizontal (east-west), Y = horizontal (north-south), Z = vertical. " +
+                   "You can mirror more than one axis at a time, e.g. &H/Mirror X Y",
+            Usage = "/Mirror [X] [Y] [Z]",
+            Handler = MirrorHandler
+        };
+
+        private static readonly CommandDescriptor CdRotate = new CommandDescriptor
+        {
+            Name = "Rotate",
+            Aliases = new[] {"spin"},
+            Category = CommandCategory.Building,
+            Permissions = new[] {Permission.CopyAndPaste},
+            Help = "Rotates copied blocks around specifies axis/axes. If no axis is given, rotates around Z (vertical).",
+            Usage = "/Rotate (-90|90|180|270) (X|Y|Z)",
+            Handler = RotateHandler
+        };
+
+        private static readonly CommandDescriptor CdPasteX = new CommandDescriptor
+        {
+            Name = "PasteX",
+            Aliases = new[] {"px"},
+            Category = CommandCategory.Building,
+            Permissions = new[] {Permission.CopyAndPaste},
+            RepeatableSelection = true,
+            Help = "Pastes previously copied blocks, aligned. Used together with &H/Copy&S command. " +
+                   "If one or more optional IncludedBlock parameters are specified, ONLY pastes blocks of specified type(s). " +
+                   "Takes 2 marks: first sets the origin of pasting, and second sets the direction where to paste.",
+            Usage = "/PasteX [IncludedBlock [AnotherOne etc]]",
+            Handler = PasteXHandler
+        };
+
+        private static readonly CommandDescriptor CdPasteNotX = new CommandDescriptor
+        {
+            Name = "PasteNotX",
+            Aliases = new[] {"pnx", "pxn"},
+            Category = CommandCategory.Building,
+            Permissions = new[] {Permission.CopyAndPaste},
+            RepeatableSelection = true,
+            Help = "Pastes previously copied blocks, aligned, except the given block type(s). " +
+                   "Used together with &H/Copy&S command. " +
+                   "Takes 2 marks: first sets the origin of pasting, and second sets the direction where to paste.",
+            Usage = "/PasteNotX ExcludedBlock [AnotherOne etc]",
+            Handler = PasteNotXHandler
+        };
+
+        private static readonly CommandDescriptor CdPaste = new CommandDescriptor
+        {
+            Name = "Paste",
+            Category = CommandCategory.Building,
+            Permissions = new[] {Permission.CopyAndPaste},
+            RepeatableSelection = true,
+            Help = "&HPastes previously copied blocks. Used together with &H/Copy&S command. " +
+                   "If one or more optional IncludedBlock parameters are specified, ONLY pastes blocks of specified type(s). " +
+                   "Alignment semantics are... complicated.",
+            Usage = "/Paste [IncludedBlock [AnotherOne etc]]",
+            Handler = PasteHandler
+        };
+
+        private static readonly CommandDescriptor CdPasteNot = new CommandDescriptor
+        {
+            Name = "PasteNot",
+            Aliases = new[] {"pn"},
+            Category = CommandCategory.Building,
+            Permissions = new[] {Permission.CopyAndPaste},
+            RepeatableSelection = true,
+            Help = "Pastes previously copied blocks, except the given block type(s). " +
+                   "Used together with &H/Copy&S command. " +
+                   "Alignment semantics are... complicated.",
+            Usage = "/PasteNot ExcludedBlock [AnotherOne etc]",
+            Handler = PasteNotHandler
+        };
+
+        private static void CopySlotHandler(Player player, Command cmd)
         {
             int slotNumber;
             if (cmd.NextInt(out slotNumber))
@@ -1859,8 +1997,8 @@ namespace fCraft
                     else
                     {
                         player.Message("Selected copy slot {0}: {1} blocks from {2}, {3} old.",
-                                        slotNumber, info.Buffer.Length,
-                                        info.OriginWorld, DateTime.UtcNow.Subtract(info.CopyTime).ToMiniString());
+                            slotNumber, info.Buffer.Length,
+                            info.OriginWorld, DateTime.UtcNow.Subtract(info.CopyTime).ToMiniString());
                     }
                 }
             }
@@ -1868,33 +2006,20 @@ namespace fCraft
             {
                 CopyState[] slots = player.CopyInformation;
                 player.Message("Using {0} of {1} slots. Selected slot: {2}",
-                                slots.Count(info => info != null), player.Info.Rank.CopySlots, player.CopySlot + 1);
+                    slots.Count(info => info != null), player.Info.Rank.CopySlots, player.CopySlot + 1);
                 for (int i = 0; i < slots.Length; i++)
                 {
                     if (slots[i] != null)
                     {
                         player.Message("  {0}: {1} blocks from {2}, {3} old",
-                                        i + 1, slots[i].Buffer.Length,
-                                        slots[i].OriginWorld, DateTime.UtcNow.Subtract(slots[i].CopyTime).ToMiniString());
+                            i + 1, slots[i].Buffer.Length,
+                            slots[i].OriginWorld, DateTime.UtcNow.Subtract(slots[i].CopyTime).ToMiniString());
                     }
                 }
             }
         }
 
-
-
-        static readonly CommandDescriptor CdCopy = new CommandDescriptor
-        {
-            Name = "Copy",
-            Category = CommandCategory.Building,
-            Permissions = new[] { Permission.CopyAndPaste },
-            Help = "&HCopy blocks for pasting. " +
-                   "Used together with &H/Paste&S and &H/PasteNot&S commands. " +
-                   "Note that pasting starts at the same corner that you started &H/Copy&S from.",
-            Handler = CopyHandler
-        };
-
-        static void CopyHandler(Player player, Command cmd)
+        private static void CopyHandler(Player player, Command cmd)
         {
             if (cmd.HasNext)
             {
@@ -1906,7 +2031,7 @@ namespace fCraft
         }
 
 
-        static void CopyCallback(Player player, Vector3I[] marks, object tag)
+        private static void CopyCallback(Player player, Vector3I[] marks, object tag)
         {
             int sx = Math.Min(marks[0].X, marks[1].X);
             int ex = Math.Max(marks[0].X, marks[1].X);
@@ -1919,8 +2044,10 @@ namespace fCraft
             int volume = bounds.Volume;
             if (!player.CanDraw(volume))
             {
-                player.MessageNow(String.Format("You are only allowed to run commands that affect up to {0} blocks. This one would affect {1} blocks.",
-                                               player.Info.Rank.DrawLimit, volume));
+                player.MessageNow(
+                    String.Format(
+                        "You are only allowed to run commands that affect up to {0} blocks. This one would affect {1} blocks.",
+                        player.Info.Rank.DrawLimit, volume));
                 return;
             }
 
@@ -1947,34 +2074,20 @@ namespace fCraft
             player.SetCopyInformation(copyInfo);
 
             player.MessageNow("{0} blocks copied into slot #{1}. You can now &H/Paste",
-                               volume, player.CopySlot + 1);
+                volume, player.CopySlot + 1);
             player.MessageNow("Origin at {0} {1}{2} corner.",
-                               (copyInfo.Orientation.X == 1 ? "bottom" : "top"),
-                               (copyInfo.Orientation.Y == 1 ? "south" : "north"),
-                               (copyInfo.Orientation.Z == 1 ? "east" : "west"));
+                (copyInfo.Orientation.X == 1 ? "bottom" : "top"),
+                (copyInfo.Orientation.Y == 1 ? "south" : "north"),
+                (copyInfo.Orientation.Z == 1 ? "east" : "west"));
 
             Logger.Log(LogType.UserActivity,
-                        "{0} copied {1} blocks from {2} (between {3} and {4}).",
-                        player.Name, volume, playerWorld.Name,
-                        bounds.MinVertex, bounds.MaxVertex);
+                "{0} copied {1} blocks from {2} (between {3} and {4}).",
+                player.Name, volume, playerWorld.Name,
+                bounds.MinVertex, bounds.MaxVertex);
         }
 
 
-
-        static readonly CommandDescriptor CdCut = new CommandDescriptor
-        {
-            Name = "Cut",
-            Category = CommandCategory.Building,
-            Permissions = new[] { Permission.CopyAndPaste },
-            RepeatableSelection = true,
-            Help = "&HCopies and removes blocks for pasting. Unless a different block type is specified, the area is filled with air. " +
-                   "Used together with &H/Paste&S and &H/PasteNot&S commands. " +
-                   "Note that pasting starts at the same corner that you started &H/Cut&S from.",
-            Usage = "/Cut [FillBlock]",
-            Handler = CutHandler
-        };
-
-        static void CutHandler(Player player, Command cmd)
+        private static void CutHandler(Player player, Command cmd)
         {
             Block fillBlock = Block.Air;
             if (cmd.HasNext)
@@ -1997,7 +2110,7 @@ namespace fCraft
             if (fillBlock != Block.Air)
             {
                 player.Message("Cut/{0}: Click 2 blocks or use &H/Mark&S to make a selection.",
-                                fillBlock);
+                    fillBlock);
             }
             else
             {
@@ -2006,20 +2119,7 @@ namespace fCraft
         }
 
 
-        static readonly CommandDescriptor CdMirror = new CommandDescriptor
-        {
-            Name = "Mirror",
-            Aliases = new[] { "flip" },
-            Category = CommandCategory.Building,
-            Permissions = new[] { Permission.CopyAndPaste },
-            Help = "Flips copied blocks along specified axis/axes. " +
-                   "The axes are: X = horizontal (east-west), Y = horizontal (north-south), Z = vertical. " +
-                   "You can mirror more than one axis at a time, e.g. &H/Mirror X Y",
-            Usage = "/Mirror [X] [Y] [Z]",
-            Handler = MirrorHandler
-        };
-
-        static void MirrorHandler(Player player, Command cmd)
+        private static void MirrorHandler(Player player, Command cmd)
         {
             CopyState originalInfo = player.GetCopyInformation();
             if (originalInfo == null)
@@ -2159,19 +2259,7 @@ namespace fCraft
         }
 
 
-
-        static readonly CommandDescriptor CdRotate = new CommandDescriptor
-        {
-            Name = "Rotate",
-            Aliases = new[] { "spin" },
-            Category = CommandCategory.Building,
-            Permissions = new[] { Permission.CopyAndPaste },
-            Help = "Rotates copied blocks around specifies axis/axes. If no axis is given, rotates around Z (vertical).",
-            Usage = "/Rotate (-90|90|180|270) (X|Y|Z)",
-            Handler = RotateHandler
-        };
-
-        static void RotateHandler(Player player, Command cmd)
+        private static void RotateHandler(Player player, Command cmd)
         {
             CopyState originalInfo = player.GetCopyInformation();
             if (originalInfo == null)
@@ -2210,26 +2298,24 @@ namespace fCraft
             }
 
             // allocate the new buffer
-            Block[, ,] oldBuffer = originalInfo.Buffer;
-            Block[, ,] newBuffer;
+            Block[,,] oldBuffer = originalInfo.Buffer;
+            Block[,,] newBuffer;
 
             if (degrees == 180)
             {
                 newBuffer = new Block[oldBuffer.GetLength(0), oldBuffer.GetLength(1), oldBuffer.GetLength(2)];
-
             }
             else if (axis == Axis.X)
             {
                 newBuffer = new Block[oldBuffer.GetLength(0), oldBuffer.GetLength(2), oldBuffer.GetLength(1)];
-
             }
             else if (axis == Axis.Y)
             {
                 newBuffer = new Block[oldBuffer.GetLength(2), oldBuffer.GetLength(1), oldBuffer.GetLength(0)];
-
             }
             else
-            { // axis == Axis.Z
+            {
+                // axis == Axis.Z
                 newBuffer = new Block[oldBuffer.GetLength(1), oldBuffer.GetLength(0), oldBuffer.GetLength(2)];
             }
 
@@ -2237,10 +2323,11 @@ namespace fCraft
             CopyState info = new CopyState(originalInfo, newBuffer);
 
             // construct the rotation matrix
-            int[,] matrix = new[,]{
-                {1,0,0},
-                {0,1,0},
-                {0,0,1}
+            int[,] matrix = new[,]
+            {
+                {1, 0, 0},
+                {0, 1, 0},
+                {0, 0, 1}
             };
 
             int a, b;
@@ -2303,122 +2390,63 @@ namespace fCraft
             }
 
             player.Message("Rotated copy (slot {0}) by {1} degrees around {2} axis.",
-                            info.Slot + 1, degrees, axis);
+                info.Slot + 1, degrees, axis);
             player.SetCopyInformation(info);
         }
 
 
-
-        static readonly CommandDescriptor CdPasteX = new CommandDescriptor
-        {
-            Name = "PasteX",
-            Aliases = new[] { "px" },
-            Category = CommandCategory.Building,
-            Permissions = new[] { Permission.CopyAndPaste },
-            RepeatableSelection = true,
-            Help = "Pastes previously copied blocks, aligned. Used together with &H/Copy&S command. " +
-                   "If one or more optional IncludedBlock parameters are specified, ONLY pastes blocks of specified type(s). " +
-                   "Takes 2 marks: first sets the origin of pasting, and second sets the direction where to paste.",
-            Usage = "/PasteX [IncludedBlock [AnotherOne etc]]",
-            Handler = PasteXHandler
-        };
-
-        static void PasteXHandler(Player player, Command cmd)
+        private static void PasteXHandler(Player player, Command cmd)
         {
             PasteDrawOperation op = new PasteDrawOperation(player, false);
             if (!op.ReadParams(cmd)) return;
             player.SelectionStart(2, DrawOperationCallback, op, Permission.Draw, Permission.CopyAndPaste);
             player.MessageNow("{0}: Click 2 blocks or use &H/Mark&S to make a selection.",
-                               op.Description);
+                op.Description);
         }
 
 
-
-        static readonly CommandDescriptor CdPasteNotX = new CommandDescriptor
-        {
-            Name = "PasteNotX",
-            Aliases = new[] { "pnx", "pxn" },
-            Category = CommandCategory.Building,
-            Permissions = new[] { Permission.CopyAndPaste },
-            RepeatableSelection = true,
-            Help = "Pastes previously copied blocks, aligned, except the given block type(s). " +
-                    "Used together with &H/Copy&S command. " +
-                   "Takes 2 marks: first sets the origin of pasting, and second sets the direction where to paste.",
-            Usage = "/PasteNotX ExcludedBlock [AnotherOne etc]",
-            Handler = PasteNotXHandler
-        };
-
-        static void PasteNotXHandler(Player player, Command cmd)
+        private static void PasteNotXHandler(Player player, Command cmd)
         {
             PasteDrawOperation op = new PasteDrawOperation(player, true);
             if (!op.ReadParams(cmd)) return;
             player.SelectionStart(2, DrawOperationCallback, op, Permission.Draw, Permission.CopyAndPaste);
             player.MessageNow("{0}: Click 2 blocks or use &H/Mark&S to make a selection.",
-                               op.Description);
+                op.Description);
         }
 
 
-
-        static readonly CommandDescriptor CdPaste = new CommandDescriptor
-        {
-            Name = "Paste",
-            Category = CommandCategory.Building,
-            Permissions = new[] { Permission.CopyAndPaste },
-            RepeatableSelection = true,
-            Help = "&HPastes previously copied blocks. Used together with &H/Copy&S command. " +
-                   "If one or more optional IncludedBlock parameters are specified, ONLY pastes blocks of specified type(s). " +
-                   "Alignment semantics are... complicated.",
-            Usage = "/Paste [IncludedBlock [AnotherOne etc]]",
-            Handler = PasteHandler
-        };
-
-        static void PasteHandler(Player player, Command cmd)
+        private static void PasteHandler(Player player, Command cmd)
         {
             QuickPasteDrawOperation op = new QuickPasteDrawOperation(player, false);
             if (!op.ReadParams(cmd)) return;
             player.SelectionStart(1, DrawOperationCallback, op, Permission.Draw, Permission.CopyAndPaste);
             player.MessageNow("{0}: Click a block or use &H/Mark&S to begin pasting.",
-                               op.Description);
+                op.Description);
         }
 
 
-
-        static readonly CommandDescriptor CdPasteNot = new CommandDescriptor
-        {
-            Name = "PasteNot",
-            Aliases = new[] { "pn" },
-            Category = CommandCategory.Building,
-            Permissions = new[] { Permission.CopyAndPaste },
-            RepeatableSelection = true,
-            Help = "Pastes previously copied blocks, except the given block type(s). " +
-                   "Used together with &H/Copy&S command. " +
-                   "Alignment semantics are... complicated.",
-            Usage = "/PasteNot ExcludedBlock [AnotherOne etc]",
-            Handler = PasteNotHandler
-        };
-
-        static void PasteNotHandler(Player player, Command cmd)
+        private static void PasteNotHandler(Player player, Command cmd)
         {
             QuickPasteDrawOperation op = new QuickPasteDrawOperation(player, true);
             if (!op.ReadParams(cmd)) return;
             player.SelectionStart(1, DrawOperationCallback, op, Permission.Draw, Permission.CopyAndPaste);
             player.MessageNow("{0}: Click a block or use &H/Mark&S to begin pasting.",
-                               op.Description);
+                op.Description);
         }
 
         #endregion
 
-
         #region Restore
 
-        const BlockChangeContext RestoreContext = BlockChangeContext.Drawn | BlockChangeContext.Restored;
+        private const BlockChangeContext RestoreContext = BlockChangeContext.Drawn | BlockChangeContext.Restored;
 
 
-        static readonly CommandDescriptor CdRestore = new CommandDescriptor
+        private static readonly CommandDescriptor CdRestore = new CommandDescriptor
         {
             Name = "Restore",
             Category = CommandCategory.World,
-            Permissions = new[] {
+            Permissions = new[]
+            {
                 Permission.Draw,
                 Permission.DrawAdvanced,
                 Permission.CopyAndPaste,
@@ -2431,7 +2459,7 @@ namespace fCraft
             Handler = RestoreHandler
         };
 
-        static void RestoreHandler(Player player, Command cmd)
+        private static void RestoreHandler(Player player, Command cmd)
         {
             string fileName = cmd.Next();
             if (fileName == null)
@@ -2459,22 +2487,23 @@ namespace fCraft
             if (playerMap.Width != map.Width || playerMap.Length != map.Length || playerMap.Height != map.Height)
             {
                 player.Message("Mapfile dimensions must match your current world's dimensions ({0}x{1}x{2})",
-                                playerMap.Width,
-                                playerMap.Length,
-                                playerMap.Height);
+                    playerMap.Width,
+                    playerMap.Length,
+                    playerMap.Height);
                 return;
             }
 
             map.Metadata["fCraft.Temp", "FileName"] = fullFileName;
             player.SelectionStart(2, RestoreCallback, map, CdRestore.Permissions);
-            player.MessageNow("Restore: Select the area to restore. To mark a corner, place/click a block or type &H/Mark");
+            player.MessageNow(
+                "Restore: Select the area to restore. To mark a corner, place/click a block or type &H/Mark");
         }
 
 
-        static void RestoreCallback(Player player, Vector3I[] marks, object tag)
+        private static void RestoreCallback(Player player, Vector3I[] marks, object tag)
         {
             BoundingBox selection = new BoundingBox(marks[0], marks[1]);
-            Map map = (Map)tag;
+            Map map = (Map) tag;
 
             if (!player.CanDraw(selection.Volume))
             {
@@ -2499,40 +2528,52 @@ namespace fCraft
                     for (int z = selection.ZMin; z <= selection.ZMax; z++)
                     {
                         DrawOneBlock(player, playerMap, map.GetBlock(x, y, z), new Vector3I(x, y, z),
-                                      RestoreContext,
-                                      ref blocksDrawn, ref blocksSkipped, undoState);
+                            RestoreContext,
+                            ref blocksDrawn, ref blocksSkipped, undoState);
                     }
                 }
             }
 
             Logger.Log(LogType.UserActivity,
-                        "{0} restored {1} blocks on world {2} (@{3},{4},{5} - {6},{7},{8}) from file {9}.",
-                        player.Name, blocksDrawn,
-                        playerWorld.Name,
-                        selection.XMin, selection.YMin, selection.ZMin,
-                        selection.XMax, selection.YMax, selection.ZMax,
-                        map.Metadata["fCraft.Temp", "FileName"]);
+                "{0} restored {1} blocks on world {2} (@{3},{4},{5} - {6},{7},{8}) from file {9}.",
+                player.Name, blocksDrawn,
+                playerWorld.Name,
+                selection.XMin, selection.YMin, selection.ZMin,
+                selection.XMax, selection.YMax, selection.ZMax,
+                map.Metadata["fCraft.Temp", "FileName"]);
 
             DrawingFinished(player, "Restored", blocksDrawn, blocksSkipped);
         }
 
         #endregion
 
-
         #region Mark, Cancel
 
-        static readonly CommandDescriptor CdMark = new CommandDescriptor
+        private static readonly CommandDescriptor CdMark = new CommandDescriptor
         {
             Name = "Mark",
-            Aliases = new[] { "m" },
+            Aliases = new[] {"m"},
             Category = CommandCategory.Building,
             Usage = "/Mark&S or &H/Mark X Y H",
-            Help = "When making a selection (for drawing or zoning) use this to make a marker at your position in the world. " +
-                   "If three numbers are given, those coordinates are used instead.",
+            Help =
+                "When making a selection (for drawing or zoning) use this to make a marker at your position in the world. " +
+                "If three numbers are given, those coordinates are used instead.",
             Handler = MarkHandler
         };
 
-        static void MarkHandler(Player player, Command cmd)
+
+        private static readonly CommandDescriptor CdCancel = new CommandDescriptor
+        {
+            Name = "Cancel",
+            Category = CommandCategory.Building,
+            NotRepeatable = true,
+            Help =
+                "&HCancels current selection (for drawing or zoning) operation, for instance if you misclicked on the first block. " +
+                "If you wish to stop a drawing in-progress, use &H/Undo&S instead.",
+            Handler = CancelHandler
+        };
+
+        private static void MarkHandler(Player player, Command cmd)
         {
             Map map = player.WorldMap;
             int x, y, z;
@@ -2564,19 +2605,7 @@ namespace fCraft
             }
         }
 
-
-
-        static readonly CommandDescriptor CdCancel = new CommandDescriptor
-        {
-            Name = "Cancel",
-            Category = CommandCategory.Building,
-            NotRepeatable = true,
-            Help = "&HCancels current selection (for drawing or zoning) operation, for instance if you misclicked on the first block. " +
-                   "If you wish to stop a drawing in-progress, use &H/Undo&S instead.",
-            Handler = CancelHandler
-        };
-
-        static void CancelHandler(Player player, Command cmd)
+        private static void CancelHandler(Player player, Command cmd)
         {
             if (cmd.HasNext)
             {
@@ -2596,25 +2625,11 @@ namespace fCraft
 
         #endregion
 
-
         #region UndoPlayer and UndoArea
-
-        sealed class BlockDBUndoArgs
-        {
-            public Player Player;
-            public PlayerInfo[] Targets;
-            public World World;
-            public int CountLimit;
-            public TimeSpan AgeLimit;
-            public BlockDBEntry[] Entries;
-            public BoundingBox Area;
-            public bool Not;
-        }
-
 
         // parses and checks command parameters (for both UndoPlayer and UndoArea)
         [CanBeNull]
-        static BlockDBUndoArgs ParseBlockDBUndoParams(Player player, Command cmd, string cmdName, bool not)
+        private static BlockDBUndoArgs ParseBlockDBUndoParams(Player player, Command cmd, string cmdName, bool not)
         {
             // check if command's being called by a worldless player (e.g. console)
             World playerWorld = player.World;
@@ -2654,7 +2669,6 @@ namespace fCraft
                     return null;
                 }
                 allPlayers = true;
-
             }
             else
             {
@@ -2667,7 +2681,7 @@ namespace fCraft
                 if (targets.Contains(target))
                 {
                     player.Message("{0}: Player {1}&S was listed twice.",
-                                    target.ClassyName, cmdName);
+                        target.ClassyName, cmdName);
                     return null;
                 }
                 // make sure player has the permission
@@ -2676,10 +2690,10 @@ namespace fCraft
                     !player.Can(Permission.UndoOthersActions, target.Rank))
                 {
                     player.Message("&W{0}: You may only undo actions of players ranked {1}&S or lower.",
-                                    cmdName,
-                                    player.Info.Rank.GetLimit(Permission.UndoOthersActions).ClassyName);
+                        cmdName,
+                        player.Info.Rank.GetLimit(Permission.UndoOthersActions).ClassyName);
                     player.Message("Player {0}&S is ranked {1}",
-                                    target.ClassyName, target.Rank.ClassyName);
+                        target.ClassyName, target.Rank.ClassyName);
                     return null;
                 }
                 targets.Add(target);
@@ -2739,9 +2753,9 @@ namespace fCraft
 
 
         // called after player types "/ok" to the confirmation prompt.
-        static void BlockDBUndoConfirmCallback(Player player, object tag, bool fromConsole)
+        private static void BlockDBUndoConfirmCallback(Player player, object tag, bool fromConsole)
         {
-            BlockDBUndoArgs args = (BlockDBUndoArgs)tag;
+            BlockDBUndoArgs args = (BlockDBUndoArgs) tag;
             string cmdName = (args.Area == null ? "UndoArea" : "UndoPlayer");
             if (args.Not) cmdName += "Not";
 
@@ -2749,7 +2763,7 @@ namespace fCraft
             Vector3I[] coords;
             if (args.Area != null)
             {
-                coords = new[] { args.Area.MinVertex, args.Area.MaxVertex };
+                coords = new[] {args.Area.MinVertex, args.Area.MaxVertex};
             }
             else
             {
@@ -2767,14 +2781,14 @@ namespace fCraft
                 else if (args.Not)
                 {
                     description = String.Format("{0} by everyone except {1}",
-                                                 args.CountLimit,
-                                                 args.Targets.JoinToString(p => p.Name));
+                        args.CountLimit,
+                        args.Targets.JoinToString(p => p.Name));
                 }
                 else
                 {
                     description = String.Format("{0} by {1}",
-                                                 args.CountLimit,
-                                                 args.Targets.JoinToString(p => p.Name));
+                        args.CountLimit,
+                        args.Targets.JoinToString(p => p.Name));
                 }
             }
             else
@@ -2786,14 +2800,14 @@ namespace fCraft
                 else if (args.Not)
                 {
                     description = String.Format("{0} by everyone except {1}",
-                                                 args.AgeLimit.ToMiniString(),
-                                                 args.Targets.JoinToString(p => p.Name));
+                        args.AgeLimit.ToMiniString(),
+                        args.Targets.JoinToString(p => p.Name));
                 }
                 else
                 {
                     description = String.Format("{0} by {1}",
-                                                 args.AgeLimit.ToMiniString(),
-                                                 args.Targets.JoinToString(p => p.Name));
+                        args.AgeLimit.ToMiniString(),
+                        args.Targets.JoinToString(p => p.Name));
                 }
             }
 
@@ -2816,26 +2830,25 @@ namespace fCraft
                 targetList = args.Targets.JoinToClassyString();
             }
             Logger.Log(LogType.UserActivity,
-                        "{0}: Player {1} will undo {2} changes (limit of {3}) by {4} on world {5}",
-                        cmdName,
-                        player.Name,
-                        args.Entries.Length,
-                        args.CountLimit == 0 ? args.AgeLimit.ToMiniString() : args.CountLimit.ToStringInvariant(),
-                        targetList,
-                        args.World.Name);
+                "{0}: Player {1} will undo {2} changes (limit of {3}) by {4} on world {5}",
+                cmdName,
+                player.Name,
+                args.Entries.Length,
+                args.CountLimit == 0 ? args.AgeLimit.ToMiniString() : args.CountLimit.ToStringInvariant(),
+                targetList,
+                args.World.Name);
 
             op.Begin();
         }
 
-
         #region UndoArea
 
-        static readonly CommandDescriptor CdUndoArea = new CommandDescriptor
+        private static readonly CommandDescriptor CdUndoArea = new CommandDescriptor
         {
             Name = "UndoArea",
-            Aliases = new[] { "ua" },
+            Aliases = new[] {"ua"},
             Category = CommandCategory.Moderation,
-            Permissions = new[] { Permission.UndoOthersActions },
+            Permissions = new[] {Permission.UndoOthersActions},
             RepeatableSelection = true,
             Usage = "/UndoArea PlayerName (TimeSpan|BlockCount)",
             Help = "Reverses changes made by the given player(s). " +
@@ -2844,9 +2857,27 @@ namespace fCraft
             Handler = UndoAreaHandler
         };
 
-        static void UndoAreaHandler(Player player, Command cmd)
+
+        private static readonly CommandDescriptor CdUndoAreaNot = new CommandDescriptor
         {
-            if (!cmd.HasNext) { CdUndoArea.PrintUsage(player); return; }
+            Name = "UndoAreaNot",
+            Aliases = new[] {"uan", "una"},
+            Category = CommandCategory.Moderation,
+            Permissions = new[] {Permission.UndoOthersActions, Permission.UndoAll},
+            RepeatableSelection = true,
+            Usage = "/UndoArea PlayerName (TimeSpan|BlockCount)",
+            Help = "Reverses changes made by everyone EXCEPT the given player(s). " +
+                   "Applies to a selected area in the current world. ",
+            Handler = UndoAreaNotHandler
+        };
+
+        private static void UndoAreaHandler(Player player, Command cmd)
+        {
+            if (!cmd.HasNext)
+            {
+                CdUndoArea.PrintUsage(player);
+                return;
+            }
             BlockDBUndoArgs args = ParseBlockDBUndoParams(player, cmd, "UndoArea", false);
             if (args == null) return;
 
@@ -2863,23 +2894,13 @@ namespace fCraft
             player.MessageNow("UndoArea: Click or &H/Mark&S 2 blocks.");
         }
 
-
-        static readonly CommandDescriptor CdUndoAreaNot = new CommandDescriptor
+        private static void UndoAreaNotHandler(Player player, Command cmd)
         {
-            Name = "UndoAreaNot",
-            Aliases = new[] { "uan", "una" },
-            Category = CommandCategory.Moderation,
-            Permissions = new[] { Permission.UndoOthersActions, Permission.UndoAll },
-            RepeatableSelection = true,
-            Usage = "/UndoArea PlayerName (TimeSpan|BlockCount)",
-            Help = "Reverses changes made by everyone EXCEPT the given player(s). " +
-                   "Applies to a selected area in the current world. ",
-            Handler = UndoAreaNotHandler
-        };
-
-        static void UndoAreaNotHandler(Player player, Command cmd)
-        {
-            if (!cmd.HasNext) { CdUndoAreaNot.PrintUsage(player); return; }
+            if (!cmd.HasNext)
+            {
+                CdUndoAreaNot.PrintUsage(player);
+                return;
+            }
             BlockDBUndoArgs args = ParseBlockDBUndoParams(player, cmd, "UndoAreaNot", true);
             if (args == null) return;
 
@@ -2889,19 +2910,19 @@ namespace fCraft
 
 
         // Queues UndoAreaLookup to run in the background
-        static void UndoAreaSelectionCallback(Player player, Vector3I[] marks, object tag)
+        private static void UndoAreaSelectionCallback(Player player, Vector3I[] marks, object tag)
         {
-            BlockDBUndoArgs args = (BlockDBUndoArgs)tag;
+            BlockDBUndoArgs args = (BlockDBUndoArgs) tag;
             args.Area = new BoundingBox(marks[0], marks[1]);
             Scheduler.NewBackgroundTask(UndoAreaLookup)
-                     .RunOnce(args, TimeSpan.Zero);
+                .RunOnce(args, TimeSpan.Zero);
         }
 
 
         // Looks up the changes in BlockDB and prints a confirmation prompt. Runs on a background thread.
-        static void UndoAreaLookup(SchedulerTask task)
+        private static void UndoAreaLookup(SchedulerTask task)
         {
-            BlockDBUndoArgs args = (BlockDBUndoArgs)task.UserState;
+            BlockDBUndoArgs args = (BlockDBUndoArgs) task.UserState;
             bool allPlayers = (args.Targets.Length == 0);
             string cmdName = (args.Not ? "UndoAreaNot" : "UndoArea");
 
@@ -2935,13 +2956,12 @@ namespace fCraft
                 if (changes.Length > 0)
                 {
                     Logger.Log(LogType.UserActivity,
-                                "{0}: Asked {1} to confirm undo on world {2}",
-                                cmdName, args.Player.Name, args.World.Name);
+                        "{0}: Asked {1} to confirm undo on world {2}",
+                        cmdName, args.Player.Name, args.World.Name);
                     args.Player.Confirm(BlockDBUndoConfirmCallback, args,
-                                         "Undo last {0} changes made here by {1}&S?",
-                                         changes.Length, targetList);
+                        "Undo last {0} changes made here by {1}&S?",
+                        changes.Length, targetList);
                 }
-
             }
             else
             {
@@ -2957,11 +2977,11 @@ namespace fCraft
                 if (changes.Length > 0)
                 {
                     Logger.Log(LogType.UserActivity,
-                                "{0}: Asked {1} to confirm undo on world {2}",
-                                cmdName, args.Player.Name, args.World.Name);
+                        "{0}: Asked {1} to confirm undo on world {2}",
+                        cmdName, args.Player.Name, args.World.Name);
                     args.Player.Confirm(BlockDBUndoConfirmCallback, args,
-                                         "Undo changes ({0}) made here by {1}&S in the last {2}?",
-                                         changes.Length, targetList, args.AgeLimit.ToMiniString());
+                        "Undo changes ({0}) made here by {1}&S in the last {2}?",
+                        changes.Length, targetList, args.AgeLimit.ToMiniString());
                 }
             }
 
@@ -2978,57 +2998,64 @@ namespace fCraft
 
         #endregion
 
-
         #region UndoPlayer
 
-        static readonly CommandDescriptor CdUndoPlayer = new CommandDescriptor
+        private static readonly CommandDescriptor CdUndoPlayer = new CommandDescriptor
         {
             Name = "UndoPlayer",
-            Aliases = new[] { "up", "undox" },
+            Aliases = new[] {"up", "undox"},
             Category = CommandCategory.Moderation,
-            Permissions = new[] { Permission.UndoOthersActions },
+            Permissions = new[] {Permission.UndoOthersActions},
             Usage = "/UndoPlayer PlayerName (TimeSpan|BlockCount) ",
             Help = "Reverses changes made by a given player in the current world. " +
                    "Players with UndoAll permission can use '*' in place of player name to undo everyone's changes at once.",
             Handler = UndoPlayerHandler
         };
 
-        static void UndoPlayerHandler(Player player, Command cmd)
-        {
-            if (!cmd.HasNext) { CdUndoPlayer.PrintUsage(player); return; }
-            BlockDBUndoArgs args = ParseBlockDBUndoParams(player, cmd, "UndoPlayer", false);
-            if (args == null) return;
-            Scheduler.NewBackgroundTask(UndoPlayerLookup)
-                     .RunOnce(args, TimeSpan.Zero);
-        }
 
-
-        static readonly CommandDescriptor CdUndoPlayerNot = new CommandDescriptor
+        private static readonly CommandDescriptor CdUndoPlayerNot = new CommandDescriptor
         {
             Name = "UndoPlayerNot",
-            Aliases = new[] { "upn", "unp" },
+            Aliases = new[] {"upn", "unp"},
             Category = CommandCategory.Moderation,
-            Permissions = new[] { Permission.UndoOthersActions, Permission.UndoAll },
+            Permissions = new[] {Permission.UndoOthersActions, Permission.UndoAll},
             Usage = "/UndoPlayerNot PlayerName (TimeSpan|BlockCount)",
             Help = "Reverses changes made by everyone EXCEPT the given player(s). " +
                    "Applies to the whole world. ",
             Handler = UndoPlayerNotHandler
         };
 
-        static void UndoPlayerNotHandler(Player player, Command cmd)
+        private static void UndoPlayerHandler(Player player, Command cmd)
         {
-            if (!cmd.HasNext) { CdUndoPlayerNot.PrintUsage(player); return; }
+            if (!cmd.HasNext)
+            {
+                CdUndoPlayer.PrintUsage(player);
+                return;
+            }
+            BlockDBUndoArgs args = ParseBlockDBUndoParams(player, cmd, "UndoPlayer", false);
+            if (args == null) return;
+            Scheduler.NewBackgroundTask(UndoPlayerLookup)
+                .RunOnce(args, TimeSpan.Zero);
+        }
+
+        private static void UndoPlayerNotHandler(Player player, Command cmd)
+        {
+            if (!cmd.HasNext)
+            {
+                CdUndoPlayerNot.PrintUsage(player);
+                return;
+            }
             BlockDBUndoArgs args = ParseBlockDBUndoParams(player, cmd, "UndoPlayerNot", true);
             if (args == null) return;
             Scheduler.NewBackgroundTask(UndoPlayerLookup)
-                     .RunOnce(args, TimeSpan.Zero);
+                .RunOnce(args, TimeSpan.Zero);
         }
 
 
         // Looks up the changes in BlockDB and prints a confirmation prompt. Runs on a background thread.
-        static void UndoPlayerLookup(SchedulerTask task)
+        private static void UndoPlayerLookup(SchedulerTask task)
         {
-            BlockDBUndoArgs args = (BlockDBUndoArgs)task.UserState;
+            BlockDBUndoArgs args = (BlockDBUndoArgs) task.UserState;
             bool allPlayers = (args.Targets.Length == 0);
             string cmdName = (args.Not ? "UndoPlayerNot" : "UndoPlayer");
 
@@ -3062,13 +3089,12 @@ namespace fCraft
                 if (changes.Length > 0)
                 {
                     Logger.Log(LogType.UserActivity,
-                                "{0}: Asked {1} to confirm undo on world {2}",
-                                cmdName, args.Player.Name, args.World.Name);
+                        "{0}: Asked {1} to confirm undo on world {2}",
+                        cmdName, args.Player.Name, args.World.Name);
                     args.Player.Confirm(BlockDBUndoConfirmCallback, args,
-                                         "Undo last {0} changes made by {1}&S?",
-                                         changes.Length, targetList);
+                        "Undo last {0} changes made by {1}&S?",
+                        changes.Length, targetList);
                 }
-
             }
             else
             {
@@ -3084,11 +3110,11 @@ namespace fCraft
                 if (changes.Length > 0)
                 {
                     Logger.Log(LogType.UserActivity,
-                                "{0}: Asked {1} to confirm undo on world {2}",
-                                cmdName, args.Player.Name, args.World.Name);
+                        "{0}: Asked {1} to confirm undo on world {2}",
+                        cmdName, args.Player.Name, args.World.Name);
                     args.Player.Confirm(BlockDBUndoConfirmCallback, args,
-                                         "Undo changes ({0}) made by {1}&S in the last {2}?",
-                                         changes.Length, targetList, args.AgeLimit.ToMiniString());
+                        "Undo changes ({0}) made by {1}&S in the last {2}?",
+                        changes.Length, targetList, args.AgeLimit.ToMiniString());
                 }
             }
 
@@ -3105,12 +3131,23 @@ namespace fCraft
 
         #endregion
 
-        #endregion
+        private sealed class BlockDBUndoArgs
+        {
+            public TimeSpan AgeLimit;
+            public BoundingBox Area;
+            public int CountLimit;
+            public BlockDBEntry[] Entries;
+            public bool Not;
+            public Player Player;
+            public PlayerInfo[] Targets;
+            public World World;
+        }
 
+        #endregion
 
         #region Static
 
-        static readonly CommandDescriptor CdStatic = new CommandDescriptor
+        private static readonly CommandDescriptor CdStatic = new CommandDescriptor
         {
             Name = "Static",
             Category = CommandCategory.Building,
@@ -3118,7 +3155,7 @@ namespace fCraft
             Handler = StaticHandler
         };
 
-        static void StaticHandler(Player player, Command cmd)
+        private static void StaticHandler(Player player, Command cmd)
         {
             if (cmd.HasNext)
             {
@@ -3140,22 +3177,22 @@ namespace fCraft
 
         #endregion
 
-
         #region Tower
-        static readonly CommandDescriptor CdTower = new CommandDescriptor
-       {
-           Name = "Tower",
-           Category = CommandCategory.Building,
-           Permissions = new[] { Permission.Tower },
-           IsConsoleSafe = false,
-           NotRepeatable = false,
-           Usage = "/Tower [/Tower Remove]",
-           Help = "&HToggles tower mode on for yourself. All Iron blocks will be replaced with towers.",
-           UsableByFrozenPlayers = false,
-           Handler = towerHandler
-       };
 
-        static void towerHandler(Player player, Command cmd)
+        private static readonly CommandDescriptor CdTower = new CommandDescriptor
+        {
+            Name = "Tower",
+            Category = CommandCategory.Building,
+            Permissions = new[] {Permission.Tower},
+            IsConsoleSafe = false,
+            NotRepeatable = false,
+            Usage = "/Tower [/Tower Remove]",
+            Help = "&HToggles tower mode on for yourself. All Iron blocks will be replaced with towers.",
+            UsableByFrozenPlayers = false,
+            Handler = towerHandler
+        };
+
+        private static void towerHandler(Player player, Command cmd)
         {
             string Param = cmd.Next();
             if (Param == null)
@@ -3170,7 +3207,7 @@ namespace fCraft
                 {
                     player.towerMode = true;
                     player.Message("TowerMode has been turned on. " +
-                        "All Iron blocks are now being replaced with Towers.");
+                                   "All Iron blocks are now being replaced with Towers.");
                 }
             }
             else if (Param.ToLower() == "remove")
@@ -3200,6 +3237,7 @@ namespace fCraft
 
             else CdTower.PrintUsage(player);
         }
+
         #endregion
     }
 }

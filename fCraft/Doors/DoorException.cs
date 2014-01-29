@@ -14,6 +14,7 @@
 //along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 //Copyright (C) <2011 - 2014> Glenn Mariën (http://project-vanilla.com)
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ using System.Text;
 
 namespace fCraft.Doors
 {
-    class DoorException : Exception
+    internal class DoorException : Exception
     {
         public DoorException(String message)
             : base(message)

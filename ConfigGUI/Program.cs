@@ -20,17 +20,21 @@
  *  THE SOFTWARE.
  *
  */
+
 using System;
 using System.Windows.Forms;
 
-namespace fCraft.ConfigGUI {
-    static class Program {
+namespace fCraft.ConfigGUI
+{
+    internal static class Program
+    {
         [STAThread]
-        static void Main() {
+        private static void Main()
+        {
             Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault( false );
+            Application.SetCompatibleTextRenderingDefault(false);
 #if DEBUG
-            Application.Run( new MainForm() );
+            Application.Run(new MainForm());
 #else
             try {
                 Application.Run( new MainForm() );

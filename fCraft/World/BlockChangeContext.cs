@@ -1,10 +1,14 @@
 ﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+
 using System;
 
-namespace fCraft {
+namespace fCraft
+{
     /// <summary> Context of the block change. Multiple flags can be combined. </summary>
     [Flags]
-    public enum BlockChangeContext { // Backed by Int32.
+    public enum BlockChangeContext
+    {
+        // Backed by Int32.
         /// <summary> Default/unknown context. </summary>
         Unknown = 0,
 

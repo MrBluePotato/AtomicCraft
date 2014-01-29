@@ -12,14 +12,18 @@
 
 //You should have received a copy of the GNU General Public License
 //along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 ///<Summary> Spell enum, to be used with Spell Physics </Summary>
-namespace fCraft {
-    public enum Spell : byte {
+
+namespace fCraft
+{
+    public enum Spell : byte
+    {
         Polymorph = 1,
 
         Impersonation = 2,

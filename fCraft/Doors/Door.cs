@@ -14,6 +14,7 @@
 //along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 //Copyright (C) <2011 - 2014> Glenn Mariën (http://project-vanilla.com)
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,8 +23,25 @@ using fCraft.Drawing;
 using System.Threading;
 using System.Runtime.Serialization;
 
-namespace fCraft.Doors {
-    public class Door {
+namespace fCraft.Doors
+{
+    public class Door
+    {
+        public Door()
+        {
+            //empty
+        }
+
+        public Door(String world, Vector3I[] affectedBlocks, String Name, String Creator)
+        {
+            this.World = world;
+            this.AffectedBlocks = affectedBlocks;
+            this.Range = Door.CalculateRange(this);
+            this.Name = Name;
+            this.Creator = Creator;
+            this.Created = DateTime.UtcNow;
+        }
+
         public String Name { get; set; }
         public String Creator { get; set; }
         public DateTime Created { get; set; }
@@ -31,67 +49,80 @@ namespace fCraft.Doors {
         public Vector3I[] AffectedBlocks { get; set; }
         public DoorRange Range { get; set; }
 
-        public Door () {
-            //empty
-        }
+        public static DoorRange CalculateRange(Door Door)
+        {
+            DoorRange range = new DoorRange(0, 0, 0, 0, 0, 0);
 
-        public Door ( String world, Vector3I[] affectedBlocks, String Name, String Creator ) {
-            this.World = world;
-            this.AffectedBlocks = affectedBlocks;
-            this.Range = Door.CalculateRange( this );
-            this.Name = Name;
-            this.Creator = Creator;
-            this.Created = DateTime.UtcNow;
-        }
-
-        public static DoorRange CalculateRange ( Door Door ) {
-            DoorRange range = new DoorRange( 0, 0, 0, 0, 0, 0 );
-
-            foreach ( Vector3I block in Door.AffectedBlocks ) {
-                if ( range.Xmin == 0 ) {
+            foreach (Vector3I block in Door.AffectedBlocks)
+            {
+                if (range.Xmin == 0)
+                {
                     range.Xmin = block.X;
-                } else {
-                    if ( block.X < range.Xmin ) {
+                }
+                else
+                {
+                    if (block.X < range.Xmin)
+                    {
                         range.Xmin = block.X;
                     }
                 }
 
-                if ( range.Xmax == 0 ) {
+                if (range.Xmax == 0)
+                {
                     range.Xmax = block.X;
-                } else {
-                    if ( block.X > range.Xmax ) {
+                }
+                else
+                {
+                    if (block.X > range.Xmax)
+                    {
                         range.Xmax = block.X;
                     }
                 }
 
-                if ( range.Ymin == 0 ) {
+                if (range.Ymin == 0)
+                {
                     range.Ymin = block.Y;
-                } else {
-                    if ( block.Y < range.Ymin ) {
+                }
+                else
+                {
+                    if (block.Y < range.Ymin)
+                    {
                         range.Ymin = block.Y;
                     }
                 }
 
-                if ( range.Ymax == 0 ) {
+                if (range.Ymax == 0)
+                {
                     range.Ymax = block.Y;
-                } else {
-                    if ( block.Y > range.Ymax ) {
+                }
+                else
+                {
+                    if (block.Y > range.Ymax)
+                    {
                         range.Ymax = block.Y;
                     }
                 }
 
-                if ( range.Zmin == 0 ) {
+                if (range.Zmin == 0)
+                {
                     range.Zmin = block.Z;
-                } else {
-                    if ( block.Z < range.Zmin ) {
+                }
+                else
+                {
+                    if (block.Z < range.Zmin)
+                    {
                         range.Zmin = block.Z;
                     }
                 }
 
-                if ( range.Zmax == 0 ) {
+                if (range.Zmax == 0)
+                {
                     range.Zmax = block.Z;
-                } else {
-                    if ( block.Z > range.Zmax ) {
+                }
+                else
+                {
+                    if (block.Z > range.Zmax)
+                    {
                         range.Zmax = block.Z;
                     }
                 }
@@ -100,10 +131,14 @@ namespace fCraft.Doors {
             return range;
         }
 
-        public bool IsInRange ( Player player ) {
-            if ( ( player.Position.X / 32 ) <= Range.Xmax && ( player.Position.X / 32 ) >= Range.Xmin ) {
-                if ( ( player.Position.Y / 32 ) <= Range.Ymax && ( player.Position.Y / 32 ) >= Range.Ymin ) {
-                    if ( ( ( player.Position.Z / 32 ) - 1 ) <= Range.Zmax && ( ( player.Position.Z / 32 ) - 1 ) >= Range.Zmin ) {
+        public bool IsInRange(Player player)
+        {
+            if ((player.Position.X/32) <= Range.Xmax && (player.Position.X/32) >= Range.Xmin)
+            {
+                if ((player.Position.Y/32) <= Range.Ymax && (player.Position.Y/32) >= Range.Ymin)
+                {
+                    if (((player.Position.Z/32) - 1) <= Range.Zmax && ((player.Position.Z/32) - 1) >= Range.Zmin)
+                    {
                         return true;
                     }
                 }
@@ -112,10 +147,14 @@ namespace fCraft.Doors {
             return false;
         }
 
-        public bool IsInRange ( Vector3I vector ) {
-            if ( vector.X <= Range.Xmax && vector.X >= Range.Xmin ) {
-                if ( vector.Y <= Range.Ymax && vector.Y >= Range.Ymin ) {
-                    if ( vector.Z <= Range.Zmax && vector.Z >= Range.Zmin ) {
+        public bool IsInRange(Vector3I vector)
+        {
+            if (vector.X <= Range.Xmax && vector.X >= Range.Xmin)
+            {
+                if (vector.Y <= Range.Ymax && vector.Y >= Range.Ymin)
+                {
+                    if (vector.Z <= Range.Zmax && vector.Z >= Range.Zmin)
+                    {
                         return true;
                     }
                 }
@@ -124,24 +163,33 @@ namespace fCraft.Doors {
             return false;
         }
 
-        public static String GenerateName ( World world ) {
-            if ( world.Map.Doors != null ) {
-                if ( world.Map.Doors.Count > 0 ) {
+        public static String GenerateName(World world)
+        {
+            if (world.Map.Doors != null)
+            {
+                if (world.Map.Doors.Count > 0)
+                {
                     bool found = false;
 
-                    while ( !found ) {
+                    while (!found)
+                    {
                         bool taken = false;
 
-                        foreach ( Door Door in world.Map.Doors ) {
-                            if ( Door.Name.Equals( "Door" + world.Map.DoorID ) ) {
+                        foreach (Door Door in world.Map.Doors)
+                        {
+                            if (Door.Name.Equals("Door" + world.Map.DoorID))
+                            {
                                 taken = true;
                                 break;
                             }
                         }
 
-                        if ( !taken ) {
+                        if (!taken)
+                        {
                             found = true;
-                        } else {
+                        }
+                        else
+                        {
                             world.Map.DoorID++;
                         }
                     }
@@ -153,11 +201,16 @@ namespace fCraft.Doors {
             return "Door1";
         }
 
-        public static bool DoesNameExist ( World world, String name ) {
-            if ( world.Map.Doors != null ) {
-                if ( world.Map.Doors.Count > 0 ) {
-                    foreach ( Door Door in world.Map.Doors ) {
-                        if ( Door.Name.Equals( name ) ) {
+        public static bool DoesNameExist(World world, String name)
+        {
+            if (world.Map.Doors != null)
+            {
+                if (world.Map.Doors.Count > 0)
+                {
+                    foreach (Door Door in world.Map.Doors)
+                    {
+                        if (Door.Name.Equals(name))
+                        {
                             return true;
                         }
                     }
@@ -167,71 +220,70 @@ namespace fCraft.Doors {
             return false;
         }
 
-        public void Remove ( Player requester ) {
-            NormalBrush brush = new NormalBrush( Block.Air, Block.Air );
-            DrawOperation removeOperation = new CuboidDrawOperation( requester );
+        public void Remove(Player requester)
+        {
+            NormalBrush brush = new NormalBrush(Block.Air, Block.Air);
+            DrawOperation removeOperation = new CuboidDrawOperation(requester);
             removeOperation.AnnounceCompletion = false;
             removeOperation.Brush = brush;
             removeOperation.Context = BlockChangeContext.Unknown;
 
             this.AffectedBlocks = new Vector3I[2];
-            this.AffectedBlocks[0] = new Vector3I( Range.Xmin, Range.Ymin, Range.Zmin );
-            this.AffectedBlocks[1] = new Vector3I( Range.Xmax, Range.Ymax, Range.Zmax );
+            this.AffectedBlocks[0] = new Vector3I(Range.Xmin, Range.Ymin, Range.Zmin);
+            this.AffectedBlocks[1] = new Vector3I(Range.Xmax, Range.Ymax, Range.Zmax);
 
 
-            if ( !removeOperation.Prepare( this.AffectedBlocks ) ) {
-                throw new DoorException( "Unable to remove Door." );
+            if (!removeOperation.Prepare(this.AffectedBlocks))
+            {
+                throw new DoorException("Unable to remove Door.");
             }
 
             removeOperation.Begin();
 
-            lock ( requester.World.Map.Doors.SyncRoot ) {
-                requester.World.Map.Doors.Remove( this );
+            lock (requester.World.Map.Doors.SyncRoot)
+            {
+                requester.World.Map.Doors.Remove(this);
             }
         }
 
-        public string Serialize () {
-            SerializedData data = new SerializedData( this );
-            DataContractSerializer serializer = new DataContractSerializer( typeof( SerializedData ) );
+        public string Serialize()
+        {
+            SerializedData data = new SerializedData(this);
+            DataContractSerializer serializer = new DataContractSerializer(typeof (SerializedData));
             System.IO.MemoryStream s = new System.IO.MemoryStream();
-            serializer.WriteObject( s, data );
-            return Convert.ToBase64String( s.ToArray() );
+            serializer.WriteObject(s, data);
+            return Convert.ToBase64String(s.ToArray());
         }
 
-        public static Door Deserialize ( string name, string sdata, Map map ) {
-            byte[] bdata = Convert.FromBase64String( sdata );
+        public static Door Deserialize(string name, string sdata, Map map)
+        {
+            byte[] bdata = Convert.FromBase64String(sdata);
             Door Door = new Door();
-            DataContractSerializer serializer = new DataContractSerializer( typeof( SerializedData ) );
-            System.IO.MemoryStream s = new System.IO.MemoryStream( bdata );
-            SerializedData data = ( SerializedData )serializer.ReadObject( s );
-            data.UpdateDoor( Door );
+            DataContractSerializer serializer = new DataContractSerializer(typeof (SerializedData));
+            System.IO.MemoryStream s = new System.IO.MemoryStream(bdata);
+            SerializedData data = (SerializedData) serializer.ReadObject(s);
+            data.UpdateDoor(Door);
             return Door;
         }
-        [DataContract]
-        private class SerializedData {
-            [DataMember]
-            public String Name;
-            [DataMember]
-            public String Creator;
-            [DataMember]
-            public DateTime Created;
-            [DataMember]
-            public String World;
-            [DataMember]
-            public int XMin;
-            [DataMember]
-            public int XMax;
-            [DataMember]
-            public int YMin;
-            [DataMember]
-            public int YMax;
-            [DataMember]
-            public int ZMin;
-            [DataMember]
-            public int ZMax;
 
-            public SerializedData ( Door Door ) {
-                lock ( Door ) {
+        [DataContract]
+        private class SerializedData
+        {
+            [DataMember] public DateTime Created;
+            [DataMember] public String Creator;
+            [DataMember] public String Name;
+            [DataMember] public String World;
+            [DataMember] public int XMax;
+            [DataMember] public int XMin;
+            [DataMember] public int YMax;
+            [DataMember] public int YMin;
+            [DataMember] public int ZMax;
+            [DataMember] public int ZMin;
+
+            public SerializedData(Door Door)
+            {
+                lock (Door)
+                {
                     Name = Door.Name;
                     Creator = Door.Creator;
                     Created = Door.Created;
@@ -245,12 +297,13 @@ namespace fCraft.Doors {
                 }
             }
 
-            public void UpdateDoor ( Door Door ) {
+            public void UpdateDoor(Door Door)
+            {
                 Door.Name = Name;
                 Door.Creator = Creator;
                 Door.Created = Created;
                 Door.World = World;
-                Door.Range = new DoorRange( XMin, XMax, YMin, YMax, ZMin, ZMax );
+                Door.Range = new DoorRange(XMin, XMax, YMin, YMax, ZMin, ZMax);
             }
         }
     }

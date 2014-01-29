@@ -45,17 +45,18 @@ namespace fCraft
             }
         }
 
-
         #region GameMainHandler
-        static readonly CommandDescriptor CdGame = new CommandDescriptor
+
+        private static readonly CommandDescriptor CdGame = new CommandDescriptor
         {
             Name = "Game",
             Category = CommandCategory.Game,
-            Permissions = new Permission[] { Permission.ManageGame },
+            Permissions = new Permission[] {Permission.ManageGame},
             IsConsoleSafe = true,
             Usage = "/Game [tdm] [start/stop]",
             Handler = GameHandler
         };
+
         private static void GameHandler(Player player, Command cmd)
         {
             string GameMode = cmd.Next();
@@ -77,14 +78,15 @@ namespace fCraft
             {
                 if (Option.ToLower() == "start")
                 {
-                    ZombieSurvival game = new ZombieSurvival(player.World);//move to world
+                    ZombieSurvival game = new ZombieSurvival(player.World); //move to world
                     game.Start();
                     return;
                 }
                 else if (Option.ToLower() == "stop")
                 {
                     ZombieSurvival.Stop(player);
-                    Server.Message("{0} &cended the game of zombie survival in the world {1}", player.ClassyName, world.ClassyName);
+                    Server.Message("{0} &cended the game of zombie survival in the world {1}", player.ClassyName,
+                        world.ClassyName);
                     return;
                 }
             }
@@ -129,7 +131,7 @@ namespace fCraft
                 }
                 if (Option.ToLower() == "start")
                 {
-                    PropHunt game = new PropHunt(player.World);//move to world
+                    PropHunt game = new PropHunt(player.World); //move to world
                     game.Start();
                     return;
                 }
@@ -140,19 +142,21 @@ namespace fCraft
                 return;
             }
         }
+
         #endregion
 
-
         #region PropHunt
-        static readonly CommandDescriptor CdPropHunt = new CommandDescriptor
+
+        private static readonly CommandDescriptor CdPropHunt = new CommandDescriptor
         {
             Name = "PropHunt",
             Category = CommandCategory.Game,
-            Permissions = new Permission[] { Permission.ManageGame },
+            Permissions = new Permission[] {Permission.ManageGame},
             IsConsoleSafe = true,
             Usage = "/PropHunt add/remove worldname",
             Handler = PropHuntHandler
         };
+
         private static void PropHuntHandler(Player player, Command cmd)
         {
             string Option = cmd.Next();
@@ -180,8 +184,8 @@ namespace fCraft
                 return;
             }
         }
-        #endregion
 
+        #endregion
 
         /*#region TeamHandler
         static readonly CommandDescriptor CdTeam = new CommandDescriptor

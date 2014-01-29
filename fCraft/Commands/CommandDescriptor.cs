@@ -1,21 +1,24 @@
 ﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 
-namespace fCraft {
-
+namespace fCraft
+{
     /// <summary> Delegate for command handlers/callbacks. </summary>
     /// <param name="source"> Player who called the command. </param>
     /// <param name="cmd"> Command arguments. </param>
-    public delegate void CommandHandler ( Player source, Command cmd );
+    public delegate void CommandHandler(Player source, Command cmd);
 
 
-    /// <summary> Describes a chat command. Defines properties, permission requirements, and usage information.
-    /// Specifies a handler method. </summary>
-    public sealed class CommandDescriptor : IClassy {
-
+    /// <summary>
+    ///     Describes a chat command. Defines properties, permission requirements, and usage information.
+    ///     Specifies a handler method.
+    /// </summary>
+    public sealed class CommandDescriptor : IClassy
+    {
         /// <summary> List of aliases. May be null or empty. Default: null </summary>
         [CanBeNull]
         public string[] Aliases { get; set; }
@@ -53,8 +56,10 @@ namespace fCraft {
         /// <summary> List of permissions required to call the command. May be empty or null. Default: null </summary>
         public Permission[] Permissions { get; set; }
 
-        /// <summary> Whether any permission from the list is enough.
-        /// If this is false, ALL permissions are required. </summary>
+        /// <summary>
+        ///     Whether any permission from the list is enough.
+        ///     If this is false, ALL permissions are required.
+        /// </summary>
         public bool AnyPermission { get; set; }
 
         /// <summary> Brief demonstration of command's usage syntax. Defaults to "/Name". </summary>
@@ -67,52 +72,105 @@ namespace fCraft {
         public bool RepeatableSelection { get; set; }
 
 
-        /// <summary> Checks whether this command may be called by players of a given rank. </summary>
-        public bool CanBeCalledBy ( [NotNull] Rank rank ) {
-            if ( rank == null ) throw new ArgumentNullException( "rank" );
-            return Permissions == null ||
-                   Permissions.All( rank.Can ) ||
-                   AnyPermission && Permissions.Any( rank.Can );
-        }
-
-
-        public Rank MinRank {
-            get {
-                if ( AnyPermission ) {
-                    return RankManager.GetMinRankWithAnyPermission( Permissions );
-                } else {
-                    return RankManager.GetMinRankWithAllPermissions( Permissions );
+        public Rank MinRank
+        {
+            get
+            {
+                if (AnyPermission)
+                {
+                    return RankManager.GetMinRankWithAnyPermission(Permissions);
+                }
+                else
+                {
+                    return RankManager.GetMinRankWithAllPermissions(Permissions);
                 }
             }
         }
 
+        public string ClassyName
+        {
+            get
+            {
+                if (ConfigKey.RankColorsInChat.Enabled())
+                {
+                    Rank minRank;
+                    if (Permissions != null && Permissions.Length > 0)
+                    {
+                        minRank = MinRank;
+                    }
+                    else
+                    {
+                        minRank = RankManager.LowestRank;
+                    }
+                    if (minRank == null)
+                    {
+                        return Name;
+                    }
+                    else if (ConfigKey.RankPrefixesInChat.Enabled())
+                    {
+                        return minRank.Color + minRank.Prefix + Name;
+                    }
+                    else
+                    {
+                        return minRank.Color + Name;
+                    }
+                }
+                else
+                {
+                    return Name;
+                }
+            }
+        }
 
-        /// <summary> Checks whether players of the given rank should see this command in /cmds list.
-        /// Takes permissions and the hidden flag into account. </summary>
-        public bool IsVisibleTo ( [NotNull] Rank rank ) {
-            if ( rank == null ) throw new ArgumentNullException( "rank" );
-            return !IsHidden && CanBeCalledBy( rank );
+        /// <summary> Checks whether this command may be called by players of a given rank. </summary>
+        public bool CanBeCalledBy([NotNull] Rank rank)
+        {
+            if (rank == null) throw new ArgumentNullException("rank");
+            return Permissions == null ||
+                   Permissions.All(rank.Can) ||
+                   AnyPermission && Permissions.Any(rank.Can);
+        }
+
+
+        /// <summary>
+        ///     Checks whether players of the given rank should see this command in /cmds list.
+        ///     Takes permissions and the hidden flag into account.
+        /// </summary>
+        public bool IsVisibleTo([NotNull] Rank rank)
+        {
+            if (rank == null) throw new ArgumentNullException("rank");
+            return !IsHidden && CanBeCalledBy(rank);
         }
 
 
         /// <summary> Prints command usage syntax to the given player. </summary>
-        public void PrintUsage ( [NotNull] Player player ) {
-            if ( player == null ) throw new ArgumentNullException( "player" );
-            if ( Usage != null ) {
-                player.Message( "Usage: &H{0}", Usage );
-            } else {
-                player.Message( "Usage: &H/{0}", Name );
+        public void PrintUsage([NotNull] Player player)
+        {
+            if (player == null) throw new ArgumentNullException("player");
+            if (Usage != null)
+            {
+                player.Message("Usage: &H{0}", Usage);
+            }
+            else
+            {
+                player.Message("Usage: &H/{0}", Name);
             }
         }
 
-        /// <summary> Prints a command HelpSection syntax to the given player. 
-        /// If that fails, it will print the usage instead </summary>
-        public void PrintHelpSection ( Player player, string sectionName ) {
+        /// <summary>
+        ///     Prints a command HelpSection syntax to the given player.
+        ///     If that fails, it will print the usage instead
+        /// </summary>
+        public void PrintHelpSection(Player player, string sectionName)
+        {
             string sectionHelp;
-            if ( HelpSections != null && HelpSections.TryGetValue( sectionName.ToLower(), out sectionHelp ) ) {
-                player.MessagePrefixed( "&S    ", sectionHelp );
-            } else {
-                PrintUsage( player ); //if sectionName was incorrect
+            if (HelpSections != null && HelpSections.TryGetValue(sectionName.ToLower(), out sectionHelp))
+            {
+                player.MessagePrefixed("&S    ", sectionHelp);
+            }
+            else
+            {
+                PrintUsage(player); //if sectionName was incorrect
             }
         }
 
@@ -121,42 +179,24 @@ namespace fCraft {
         /// <param name="player"> Player who called the command. </param>
         /// <param name="cmd"> Command arguments. </param>
         /// <param name="raiseEvent"> Whether CommandCalling and CommandCalled events should be raised. </param>
-        /// <returns> True if the command was called succesfully.
-        /// False if the call was cancelled by the CommandCalling event. </returns>
-        public bool Call ( [NotNull] Player player, [NotNull] Command cmd, bool raiseEvent ) {
-            if ( player == null ) throw new ArgumentNullException( "player" );
-            if ( cmd == null ) throw new ArgumentNullException( "cmd" );
-            if ( raiseEvent && CommandManager.RaiseCommandCallingEvent( cmd, this, player ) ) return false;
-            Handler( player, cmd );
-            if ( raiseEvent ) CommandManager.RaiseCommandCalledEvent( cmd, this, player );
+        /// <returns>
+        ///     True if the command was called succesfully.
+        ///     False if the call was cancelled by the CommandCalling event.
+        /// </returns>
+        public bool Call([NotNull] Player player, [NotNull] Command cmd, bool raiseEvent)
+        {
+            if (player == null) throw new ArgumentNullException("player");
+            if (cmd == null) throw new ArgumentNullException("cmd");
+            if (raiseEvent && CommandManager.RaiseCommandCallingEvent(cmd, this, player)) return false;
+            Handler(player, cmd);
+            if (raiseEvent) CommandManager.RaiseCommandCalledEvent(cmd, this, player);
             return true;
         }
 
 
-        public override string ToString () {
-            return String.Format( "CommandDescriptor({0})", Name );
-        }
-
-        public string ClassyName {
-            get {
-                if ( ConfigKey.RankColorsInChat.Enabled() ) {
-                    Rank minRank;
-                    if ( Permissions != null && Permissions.Length > 0 ) {
-                        minRank = MinRank;
-                    } else {
-                        minRank = RankManager.LowestRank;
-                    }
-                    if ( minRank == null ) {
-                        return Name;
-                    } else if ( ConfigKey.RankPrefixesInChat.Enabled() ) {
-                        return minRank.Color + minRank.Prefix + Name;
-                    } else {
-                        return minRank.Color + Name;
-                    }
-                } else {
-                    return Name;
-                }
-            }
+        public override string ToString()
+        {
+            return String.Format("CommandDescriptor({0})", Name);
         }
     }
 }

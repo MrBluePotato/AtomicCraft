@@ -1,4 +1,5 @@
 ﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+
 using System;
 using System.Collections.Generic;
 
@@ -6,15 +7,16 @@ namespace fCraft.Drawing
 {
     public sealed class LineDrawOperation : DrawOperation
     {
-
-        public override string Name
-        {
-            get { return "Line"; }
-        }
+        private IEnumerator<Vector3I> coordEnumerator;
 
         public LineDrawOperation(Player player)
             : base(player)
         {
+        }
+
+        public override string Name
+        {
+            get { return "Line"; }
         }
 
 
@@ -29,7 +31,6 @@ namespace fCraft.Drawing
         }
 
 
-        IEnumerator<Vector3I> coordEnumerator;
         public override int DrawBatch(int maxBlocksToDraw)
         {
             int blocksDone = 0;

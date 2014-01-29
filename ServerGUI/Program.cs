@@ -20,20 +20,23 @@
  *  THE SOFTWARE.
  *
  */
+
 using System;
 using System.Windows.Forms;
 using System.Net;
 
-namespace fCraft.ServerGUI {
-    static class Program {
-
+namespace fCraft.ServerGUI
+{
+    internal static class Program
+    {
         [STAThread]
-        static void Main() {
+        private static void Main()
+        {
             ServicePointManager.ServerCertificateValidationCallback = (a, b, c, d) => { return true; };
             Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault( false );
+            Application.SetCompatibleTextRenderingDefault(false);
 #if DEBUG
-            Application.Run( new MainForm() );
+            Application.Run(new MainForm());
 #else
             try {
                 Application.Run( new MainForm() );

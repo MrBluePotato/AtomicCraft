@@ -25,6 +25,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Part of FemtoCraft | Copyright 2012-2013 Matvei Stefarov <me@matvei.org> | See LICENSE.txt
+
 using System.Collections.Generic;
 using System.Text;
 using JetBrains.Annotations;
@@ -37,21 +38,21 @@ namespace fCraft
 {
     public sealed partial class Player
     {
-        const string CustomBlocksExtName = "CustomBlocks";
-        const int CustomBlocksExtVersion = 1;
-        const string BlockPermissionsExtName = "SetBlockPermissions";
-        const int BlockPermissionsExtVersion = 1;
-        const byte CustomBlocksLevel = 1;
-        const string SelectionBoxExtName = "SelectionBoxExt";
-        const int SelectionBoxExtVersion = 1;
+        private const string CustomBlocksExtName = "CustomBlocks";
+        private const int CustomBlocksExtVersion = 1;
+        private const string BlockPermissionsExtName = "SetBlockPermissions";
+        private const int BlockPermissionsExtVersion = 1;
+        private const byte CustomBlocksLevel = 1;
+        private const string SelectionBoxExtName = "SelectionBoxExt";
+        private const int SelectionBoxExtVersion = 1;
 
         // Note: if more levels are added, change UsesCustomBlocks from bool to int
         public bool UsesCustomBlocks { get; set; }
         public bool SupportsBlockPermissions { get; set; }
         public bool SelectionBoxExt { get; set; }
-        string ClientName { get; set; }
+        private string ClientName { get; set; }
 
-        bool NegotiateProtocolExtension()
+        private bool NegotiateProtocolExtension()
         {
             this.reader = new PacketReader(this.stream);
             // write our ExtInfo and ExtEntry packets
@@ -62,11 +63,12 @@ namespace fCraft
             Logger.Log(LogType.SystemActivity, "Sent ExtInfo and entry packets");
 
             // Expect ExtInfo reply from the client
-            OpCode extInfoReply = (OpCode)reader.ReadByte();
+            OpCode extInfoReply = (OpCode) reader.ReadByte();
             Logger.Log(LogType.Debug, "Expected: {0} / Received: {1}", OpCode.ExtInfo, extInfoReply);
             if (extInfoReply != OpCode.ExtInfo)
             {
-                Logger.Log(LogType.Warning, "Player {0} from {1}: Unexpected ExtInfo reply ({2})", Name, IP, extInfoReply);
+                Logger.Log(LogType.Warning, "Player {0} from {1}: Unexpected ExtInfo reply ({2})", Name, IP,
+                    extInfoReply);
                 return false;
             }
             //read EXT_INFO
@@ -79,11 +81,12 @@ namespace fCraft
             for (int i = 0; i < expectedEntries; i++)
             {
                 // Expect ExtEntry replies (0 or more)
-                OpCode extEntryReply = (OpCode)reader.ReadByte();
+                OpCode extEntryReply = (OpCode) reader.ReadByte();
                 Logger.Log(LogType.Debug, "Expected: {0} / Received: {1}", OpCode.ExtEntry, extEntryReply);
                 if (extEntryReply != OpCode.ExtEntry)
                 {
-                    Logger.Log(LogType.Warning, "Player {0} from {1}: Unexpected ExtEntry reply ({2})", Name, IP, extEntryReply);
+                    Logger.Log(LogType.Warning, "Player {0} from {1}: Unexpected ExtEntry reply ({2})", Name, IP,
+                        extEntryReply);
                     return false;
                 }
                 string extName = reader.ReadString();
@@ -109,9 +112,9 @@ namespace fCraft
             if (clientExts.Count > 0)
             {
                 Logger.Log(LogType.SystemActivity, "Player {0} is using \"{1}\", supporting: {2}",
-                            Name,
-                            ClientName,
-                            clientExts.JoinToString(", "));
+                    Name,
+                    ClientName,
+                    clientExts.JoinToString(", "));
             }
 
             if (sendCustomBlockPacket)
@@ -122,14 +125,15 @@ namespace fCraft
                 writer.Write(Packet.MakeCustomBlockSupportLevel(CustomBlocksLevel).Data);
 
                 // Expect CustomBlockSupportLevel reply
-                OpCode customBlockSupportLevelReply = (OpCode)reader.ReadByte();
-                Logger.Log(LogType.Debug, "Expected: {0} / Received: {1}", OpCode.CustomBlockSupportLevel, customBlockSupportLevelReply);
+                OpCode customBlockSupportLevelReply = (OpCode) reader.ReadByte();
+                Logger.Log(LogType.Debug, "Expected: {0} / Received: {1}", OpCode.CustomBlockSupportLevel,
+                    customBlockSupportLevelReply);
                 if (customBlockSupportLevelReply != OpCode.CustomBlockSupportLevel)
                 {
                     Logger.Log(LogType.Warning, "Player {0} from {1}: Unexpected CustomBlockSupportLevel reply ({2})",
-                                       Name,
-                                       IP,
-                                       customBlockSupportLevelReply);
+                        Name,
+                        IP,
+                        customBlockSupportLevelReply);
                     return false;
                 }
                 byte clientLevel = reader.ReadByte();
@@ -142,16 +146,17 @@ namespace fCraft
         // For non-extended players, use appropriate substitution
         public void ProcessOutgoingSetBlock(ref Packet packet)
         {
-            if (packet.Data[7] > (byte)Map.MaxLegalBlockType && !UsesCustomBlocks)
+            if (packet.Data[7] > (byte) Map.MaxLegalBlockType && !UsesCustomBlocks)
             {
-                packet.Data[7] = (byte)Map.GetFallbackBlock((Block)packet.Data[7]);
+                packet.Data[7] = (byte) Map.GetFallbackBlock((Block) packet.Data[7]);
             }
         }
 
 
         public void SendBlockPermissions()
         {
-            Send(Packet.MakeSetBlockPermission(Block.Bedrock, Can(Permission.PlaceAdmincrete), Can(Permission.DeleteAdmincrete)));
+            Send(Packet.MakeSetBlockPermission(Block.Bedrock, Can(Permission.PlaceAdmincrete),
+                Can(Permission.DeleteAdmincrete)));
         }
     }
 
@@ -178,7 +183,8 @@ namespace fCraft
             return packet;
         }
 
-        public static Packet MakeAddSelectionBox(byte ID, string Label, short StartX, short StartY, short StartZ, short EndX, short EndY, short EndZ, short R, short G, short B, short A)
+        public static Packet MakeAddSelectionBox(byte ID, string Label, short StartX, short StartY, short StartZ,
+            short EndX, short EndY, short EndZ, short R, short G, short B, short A)
         {
             Logger.Log(LogType.Debug, "Send: MakeAddSelectionBox({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11})",
                 ID, Label, StartX, StartY, StartZ, EndX, EndY, EndZ, R, G, B, A);
@@ -209,9 +215,9 @@ namespace fCraft
         public static Packet MakeSetBlockPermission(Block block, bool canPlace, bool canDelete)
         {
             Packet packet = new Packet(OpCode.SetBlockPermissions);
-            packet.Data[1] = (byte)block;
-            packet.Data[2] = (byte)(canPlace ? 1 : 0);
-            packet.Data[3] = (byte)(canDelete ? 1 : 0);
+            packet.Data[1] = (byte) block;
+            packet.Data[2] = (byte) (canPlace ? 1 : 0);
+            packet.Data[3] = (byte) (canDelete ? 1 : 0);
             return packet;
         }
 
@@ -228,27 +234,27 @@ namespace fCraft
         public static Packet EnvWeatherType(int weatherType)
         {
             Packet packet = new Packet(OpCode.EnvWeatherType);
-            packet.Data[1] = (byte)weatherType;
+            packet.Data[1] = (byte) weatherType;
             return packet;
         }
 
-        static void ToNetOrder(short number, [NotNull] byte[] arr, int offset)
+        private static void ToNetOrder(short number, [NotNull] byte[] arr, int offset)
         {
             if (arr == null)
                 throw new Exception("arr");
-            arr[offset] = (byte)((number & 0xff00) >> 8);
-            arr[offset + 1] = (byte)(number & 0x00ff);
+            arr[offset] = (byte) ((number & 0xff00) >> 8);
+            arr[offset + 1] = (byte) (number & 0x00ff);
         }
 
 
-        static void ToNetOrder(int number, [NotNull] byte[] arr, int offset)
+        private static void ToNetOrder(int number, [NotNull] byte[] arr, int offset)
         {
             if (arr == null)
                 throw new ArgumentNullException("arr");
-            arr[offset] = (byte)((number & 0xff000000) >> 24);
-            arr[offset + 1] = (byte)((number & 0x00ff0000) >> 16);
-            arr[offset + 2] = (byte)((number & 0x0000ff00) >> 8);
-            arr[offset + 3] = (byte)(number & 0x000000ff);
+            arr[offset] = (byte) ((number & 0xff000000) >> 24);
+            arr[offset + 1] = (byte) ((number & 0x00ff0000) >> 16);
+            arr[offset + 2] = (byte) ((number & 0x0000ff00) >> 8);
+            arr[offset + 3] = (byte) (number & 0x000000ff);
         }
     }
 
@@ -256,52 +262,52 @@ namespace fCraft
     public sealed partial class Map
     {
         public const Block MaxCustomBlockType = Block.StoneBrick;
-        readonly static Block[] FallbackBlocks = new Block[256];
+        public const Block MaxLegalBlockType = Block.Obsidian;
+        private static readonly Block[] FallbackBlocks = new Block[256];
 
 
-        static void DefineFallbackBlocks()
+        private static void DefineFallbackBlocks()
         {
-            for (int i = 0; i <= (int)Block.Obsidian; i++)
+            for (int i = 0; i <= (int) Block.Obsidian; i++)
             {
-                FallbackBlocks[i] = (Block)i;
+                FallbackBlocks[i] = (Block) i;
             }
-            FallbackBlocks[(int)Block.CobblestoneSlab] = Block.Slab;
-            FallbackBlocks[(int)Block.Rope] = Block.BrownMushroom;
-            FallbackBlocks[(int)Block.Sandstone] = Block.Sand;
-            FallbackBlocks[(int)Block.Snow] = Block.Air;
-            FallbackBlocks[(int)Block.Fire] = Block.StillLava;
-            FallbackBlocks[(int)Block.LightPinkWool] = Block.PinkWool;
-            FallbackBlocks[(int)Block.ForestGreenWool] = Block.GreenWool;
-            FallbackBlocks[(int)Block.BrownWool] = Block.Dirt;
-            FallbackBlocks[(int)Block.DeepBlueWool] = Block.BlueWool;
-            FallbackBlocks[(int)Block.TurquoiseWool] = Block.CyanWool;
-            FallbackBlocks[(int)Block.Ice] = Block.Glass;
-            FallbackBlocks[(int)Block.Tile] = Block.Iron;
-            FallbackBlocks[(int)Block.Magma] = Block.Obsidian;
-            FallbackBlocks[(int)Block.Pillar] = Block.WhiteWool;
-            FallbackBlocks[(int)Block.Crate] = Block.Plank;
-            FallbackBlocks[(int)Block.StoneBrick] = Block.Stone;
+            FallbackBlocks[(int) Block.CobblestoneSlab] = Block.Slab;
+            FallbackBlocks[(int) Block.Rope] = Block.BrownMushroom;
+            FallbackBlocks[(int) Block.Sandstone] = Block.Sand;
+            FallbackBlocks[(int) Block.Snow] = Block.Air;
+            FallbackBlocks[(int) Block.Fire] = Block.StillLava;
+            FallbackBlocks[(int) Block.LightPinkWool] = Block.PinkWool;
+            FallbackBlocks[(int) Block.ForestGreenWool] = Block.GreenWool;
+            FallbackBlocks[(int) Block.BrownWool] = Block.Dirt;
+            FallbackBlocks[(int) Block.DeepBlueWool] = Block.BlueWool;
+            FallbackBlocks[(int) Block.TurquoiseWool] = Block.CyanWool;
+            FallbackBlocks[(int) Block.Ice] = Block.Glass;
+            FallbackBlocks[(int) Block.Tile] = Block.Iron;
+            FallbackBlocks[(int) Block.Magma] = Block.Obsidian;
+            FallbackBlocks[(int) Block.Pillar] = Block.WhiteWool;
+            FallbackBlocks[(int) Block.Crate] = Block.Plank;
+            FallbackBlocks[(int) Block.StoneBrick] = Block.Stone;
         }
 
 
         public static Block GetFallbackBlock(Block block)
         {
-            return FallbackBlocks[(int)block];
+            return FallbackBlocks[(int) block];
         }
 
-        public const Block MaxLegalBlockType = Block.Obsidian;
         public unsafe byte[] GetFallbackMap()
         {
-            byte[] translatedBlocks = (byte[])Blocks.Clone();
+            byte[] translatedBlocks = (byte[]) Blocks.Clone();
             int volume = translatedBlocks.Length;
             fixed (byte* ptr = translatedBlocks)
             {
                 for (int i = 0; i < volume; i++)
                 {
                     byte block = ptr[i];
-                    if (block > (byte)MaxLegalBlockType)
+                    if (block > (byte) MaxLegalBlockType)
                     {
-                        ptr[i] = (byte)FallbackBlocks[block];
+                        ptr[i] = (byte) FallbackBlocks[block];
                     }
                 }
             }

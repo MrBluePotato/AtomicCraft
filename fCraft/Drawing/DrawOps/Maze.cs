@@ -26,7 +26,8 @@ namespace RandomMaze
 {
     internal static class MazeUtil
     {
-        static private Random _r = new Random();
+        private static Random _r = new Random();
+
         public static void RndPermutate<T>(this IList<T> a)
         {
             for (int i = a.Count - 1; i > 0; --i)
@@ -38,25 +39,48 @@ namespace RandomMaze
             }
         }
     }
+
     internal struct Direction
     {
+        public delegate void StickCallbackDelegate(
+            ref int coord, int coordFrom);
+
+        public delegate void WallCallbackDelegate(
+            ref int longSide1, ref int longSide2, int long1From, int long2From);
+
+        public const int AllMask = 0x3F;
+        private static string[] _names = {"E", "N", "W", "S", "Down", "Up"};
+        private static int[] _dx = {1, 0, -1, 0, 0, 0};
+        private static int[] _dy = {0, 1, 0, -1, 0, 0};
+        private static int[] _dz = {0, 0, 0, 0, -1, 1};
+
+        public static readonly Direction[] All =
+        {
+            new Direction() {_d = 0}, new Direction() {_d = 1},
+            new Direction() {_d = 2}, new Direction() {_d = 3},
+            new Direction() {_d = 4}, new Direction() {_d = 5}
+        };
+
         private int _d;
 
         public int MoveX(int x)
         {
             return x + _dx[_d];
         }
+
         public int MoveY(int y)
         {
             return y + _dy[_d];
         }
+
         public int MoveZ(int z)
         {
             return z + _dz[_d];
         }
+
         public Direction Invert()
         {
-            return _d < 4 ? new Direction() { _d = (_d + 2) % 4 } : new Direction() { _d = 9 - _d };
+            return _d < 4 ? new Direction() {_d = (_d + 2)%4} : new Direction() {_d = 9 - _d};
         }
 
         public static Direction[] GetRndPermutation()
@@ -73,24 +97,13 @@ namespace RandomMaze
             return _names[_d];
         }
 
-        private static string[] _names = { "E", "N", "W", "S", "Down", "Up" };
-        private static int[] _dx = { 1, 0, -1, 0, 0, 0 };
-        private static int[] _dy = { 0, 1, 0, -1, 0, 0 };
-        private static int[] _dz = { 0, 0, 0, 0, -1, 1 };
-
-        public const int AllMask = 0x3F;
-        public static readonly Direction[] All = { new Direction() { _d = 0 }, new Direction() { _d = 1 }, 
-													new Direction() { _d = 2 }, new Direction() { _d = 3 }, 
-													new Direction() { _d = 4 }, new Direction() { _d = 5 } };
         public int Mask()
         {
             return 0x1 << _d;
         }
 
-        public delegate void WallCallbackDelegate(
-            ref int longSide1, ref int longSide2, int long1From, int long2From);
-
-        internal void ArrangeCoords(ref int x, ref int y, ref int z, int xFrom, int yFrom, int zFrom, int cellSize, WallCallbackDelegate fun)
+        internal void ArrangeCoords(ref int x, ref int y, ref int z, int xFrom, int yFrom, int zFrom, int cellSize,
+            WallCallbackDelegate fun)
         {
             switch (_d)
             {
@@ -120,9 +133,9 @@ namespace RandomMaze
                     break;
             }
         }
-        public delegate void StickCallbackDelegate(
-            ref int coord, int coordFrom);
-        internal void ArrangeCoords(ref int x, ref int y, ref int z, int xFrom, int yFrom, int zFrom, int cellSize, StickCallbackDelegate fun)
+
+        internal void ArrangeCoords(ref int x, ref int y, ref int z, int xFrom, int yFrom, int zFrom, int cellSize,
+            StickCallbackDelegate fun)
         {
             switch (_d)
             {
@@ -150,15 +163,20 @@ namespace RandomMaze
 
     internal class Cell
     {
+        public int IndexInPath = -1;
+        public bool IsDestination = false;
         public Path Path = null;
-        public bool Used() { return null != Path; }
+
         public int X;
         public int Y;
         public int Z;
-        public bool IsDestination = false;
-        public int IndexInPath = -1;
 
         private int _walls = Direction.AllMask;
+
+        public bool Used()
+        {
+            return null != Path;
+        }
 
         public void RemoveWall(Direction d)
         {
@@ -170,26 +188,26 @@ namespace RandomMaze
             return (_walls & d.Mask()) != 0;
         }
 
-		internal bool IsOnSolutionPath()
-		{
-			return (Path.ReachedDestination && IndexInPath<=Path.GoesToDestinationUpTo);
-		}
-	}
+        internal bool IsOnSolutionPath()
+        {
+            return (Path.ReachedDestination && IndexInPath <= Path.GoesToDestinationUpTo);
+        }
+    }
 
     internal class Path
     {
         private static int _counter = 0;
 
-        private Maze _maze;
-        private List<Cell> _cells = new List<Cell>();
-
         public bool Extendable = true;
-        public bool ReachedDestination = false;
         public int GoesToDestinationUpTo = -1;
         public int Index;
+        public bool ReachedDestination = false;
+        private List<Cell> _cells = new List<Cell>();
 
-        private Path _parent = null;
         private int _forkedAtParents = -1;
+        private Maze _maze;
+        private Path _parent = null;
+        private bool _wallAtEndRemoved = false;
 
         public Path(Maze maze, Cell start)
         {
@@ -197,6 +215,7 @@ namespace RandomMaze
             Add(new Direction(), start); //direction doesnt matter if _cells is empty
             Index = _counter++;
         }
+
         public bool TryExtend() //returns true if a cell was added to the path
         {
             Cell last = _cells.Last();
@@ -230,7 +249,7 @@ namespace RandomMaze
                     if (next.Used()) //taken already
                         continue;
                     ConnectCells(cell, next, dir[i]);
-                    return new Path(_maze, next) { _parent = this, _forkedAtParents = j };
+                    return new Path(_maze, next) {_parent = this, _forkedAtParents = j};
                 }
             }
             return null;
@@ -271,7 +290,6 @@ namespace RandomMaze
             cell2.RemoveWall(d.Invert());
         }
 
-        private bool _wallAtEndRemoved = false;
         public bool TryRemoveWallAtEnd()
         {
             if (_wallAtEndRemoved || _cells.Count < 5) //did already or too short
@@ -286,9 +304,11 @@ namespace RandomMaze
                 Cell next = _maze.GetCell(dir[i].MoveX(last.X), dir[i].MoveY(last.Y), dir[i].MoveY(last.Z));
                 if (null == next) //outside
                     continue;
-                if (ReferenceEquals(next.Path, this) && Math.Abs(last.IndexInPath - next.IndexInPath) < 10) //same path only if distance >=10
+                if (ReferenceEquals(next.Path, this) && Math.Abs(last.IndexInPath - next.IndexInPath) < 10)
+                    //same path only if distance >=10
                     continue;
-                if (next.IndexInPath + (null == next.Path._parent ? 0 : next.Path._forkedAtParents) < 5) //only take long paths, consider the immediate parent too
+                if (next.IndexInPath + (null == next.Path._parent ? 0 : next.Path._forkedAtParents) < 5)
+                    //only take long paths, consider the immediate parent too
                     continue;
                 ConnectCells(last, next, dir[i]);
                 _wallAtEndRemoved = true;
@@ -301,7 +321,6 @@ namespace RandomMaze
 
     internal class Maze
     {
-        private Cell[][][] _cells;
         private const double ForkProbability = 0.38;
 
         public int XSize;
@@ -309,11 +328,12 @@ namespace RandomMaze
         public int ZSize;
 
         public List<Path> _allPaths = new List<Path>();
+        private Cell[][][] _cells;
 
         public Maze(int xSize, int ySize, int zSize) //2d at the moment
         {
-			if (xSize < 1 || ySize < 1 || zSize<1)
-				throw new ArgumentException("maze size must be at least 1x1x1");
+            if (xSize < 1 || ySize < 1 || zSize < 1)
+                throw new ArgumentException("maze size must be at least 1x1x1");
 
             XSize = xSize;
             YSize = ySize;
@@ -327,7 +347,7 @@ namespace RandomMaze
                 {
                     _cells[i][j] = new Cell[zSize];
                     for (int k = 0; k < _cells[i][j].Length; ++k)
-                        _cells[i][j][k] = new Cell() { X = i, Y = j, Z = k };
+                        _cells[i][j][k] = new Cell() {X = i, Y = j, Z = k};
                 }
             }
             _cells[xSize - 1][ySize - 1][zSize - 1].IsDestination = true;
@@ -340,7 +360,7 @@ namespace RandomMaze
 
         private void Mazefy()
         {
-            int count = XSize * YSize * ZSize - 1; //-1 accounts on the first path
+            int count = XSize*YSize*ZSize - 1; //-1 accounts on the first path
 
             List<Path> extendible = new List<Path>();
             List<Path> forkable = new List<Path>();
@@ -365,7 +385,8 @@ namespace RandomMaze
                 }
                 if (count <= 0)
                     break;
-                if (extendible.Count == 0 || r.NextDouble() < ForkProbability / (forkable.Count + 1) && forkable.Count > 0)//fork when either we are totally entangled or just randomly
+                if (extendible.Count == 0 || r.NextDouble() < ForkProbability/(forkable.Count + 1) && forkable.Count > 0)
+                    //fork when either we are totally entangled or just randomly
                 {
                     int idx = r.Next(forkable.Count);
                     Path p = forkable[idx];
@@ -384,18 +405,19 @@ namespace RandomMaze
                         --count;
                     }
                 }
-                if (count > 0 && extendible.Count == 0 && forkable.Count == 0)//algorithm failed :^( - should never ever happen
+                if (count > 0 && extendible.Count == 0 && forkable.Count == 0)
+                    //algorithm failed :^( - should never ever happen
                     throw new Exception("failed to build the maze for reason unknown");
             }
             //remove some walls to add cycles and alternative paths
-            if (XSize * YSize * ZSize > 90)
+            if (XSize*YSize*ZSize > 90)
                 AddCycles();
         }
 
         private void AddCycles()
         {
             Random r = new Random();
-            for (int i = 0; i < Math.Sqrt(XSize * YSize * ZSize) / 10.0 + 1; ++i)
+            for (int i = 0; i < Math.Sqrt(XSize*YSize*ZSize)/10.0 + 1; ++i)
             {
                 for (int tries = 0; tries < 5; ++tries) //try some times to remove a wall somewhere, it may fail though
                 {

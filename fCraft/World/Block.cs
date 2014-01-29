@@ -1,6 +1,7 @@
 ﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
 
-namespace fCraft {
+namespace fCraft
+{
     /// <summary> Enumeration of all standard Minecraft Classic block types. </summary>
     public enum Block : byte
     {

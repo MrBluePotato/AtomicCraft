@@ -1,4 +1,5 @@
 // Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,69 +11,68 @@ namespace fCraft.MapConversion
 {
     public sealed class MapDat : IMapConverter
     {
-
-        static readonly byte[] Mapping = new byte[256];
+        private static readonly byte[] Mapping = new byte[256];
 
         static MapDat()
         {
-            Mapping[50] = (byte)Block.Air;      // torch
-            Mapping[51] = (byte)Block.Lava;     // fire
-            Mapping[52] = (byte)Block.Glass;    // spawner
-            Mapping[53] = (byte)Block.Slab;    // wood stairs
-            Mapping[54] = (byte)Block.Plank;     // chest
-            Mapping[55] = (byte)Block.Air;      // redstone wire
-            Mapping[56] = (byte)Block.IronOre;  // diamond ore
-            Mapping[57] = (byte)Block.AquaWool;     // diamond block
-            Mapping[58] = (byte)Block.Log;      // workbench
-            Mapping[59] = (byte)Block.Leaves;   // crops
-            Mapping[60] = (byte)Block.Dirt;     // soil
-            Mapping[61] = (byte)Block.Stone;    // furnace
-            Mapping[62] = (byte)Block.Stone;    // burning furnance
-            Mapping[63] = (byte)Block.Air;      // sign post
-            Mapping[64] = (byte)Block.Air;      // wooden door
-            Mapping[65] = (byte)Block.Air;      // ladder
-            Mapping[50] = (byte)Block.CobblestoneSlab;   // torch
-            Mapping[51] = (byte)Block.Rope;         // fire
-            Mapping[52] = (byte)Block.Sandstone;    // spawner
-            Mapping[53] = (byte)Block.Snow;         // wood stairs
-            Mapping[54] = (byte)Block.Fire;         // chest
-            Mapping[55] = (byte)Block.LightPinkWool;    // redstone wire
-            Mapping[56] = (byte)Block.DeepBlueWool;    // diamond ore
-            Mapping[57] = (byte)Block.BrownWool;        // diamond block
-            Mapping[58] = (byte)Block.DeepBlueWool;     // workbench
-            Mapping[59] = (byte)Block.TurquoiseWool;    // crops
-            Mapping[60] = (byte)Block.Ice;          // soil
-            Mapping[61] = (byte)Block.Tile;         // furnace
-            Mapping[62] = (byte)Block.Magma;        // burning furnance
-            Mapping[63] = (byte)Block.Pillar;       // sign post
-            Mapping[64] = (byte)Block.Crate;        // wooden door
-            Mapping[65] = (byte)Block.StoneBrick;   // ladder
-            Mapping[66] = (byte)Block.Air;      // rails
-            Mapping[67] = (byte)Block.CobblestoneSlab;    // cobblestone stairs
-            Mapping[68] = (byte)Block.Air;      // wall sign
-            Mapping[69] = (byte)Block.Air;      // lever
-            Mapping[70] = (byte)Block.Air;      // pressure plate
-            Mapping[71] = (byte)Block.Air;      // iron door
-            Mapping[72] = (byte)Block.Air;      // wooden pressure plate
-            Mapping[73] = (byte)Block.IronOre;  // redstone ore
-            Mapping[74] = (byte)Block.IronOre;  // glowing redstone ore
-            Mapping[75] = (byte)Block.Air;      // redstone torch (off)
-            Mapping[76] = (byte)Block.Air;      // redstone torch (on)
-            Mapping[77] = (byte)Block.Air;      // stone button
-            Mapping[78] = (byte)Block.Air;      // snow
-            Mapping[79] = (byte)Block.Glass;    // ice
-            Mapping[80] = (byte)Block.WhiteWool;    // snow block
-            Mapping[81] = (byte)Block.Leaves;   // cactus
-            Mapping[82] = (byte)Block.GrayWool;     // clay
-            Mapping[83] = (byte)Block.Leaves;   // reed
-            Mapping[84] = (byte)Block.Log;      // jukebox
-            Mapping[85] = (byte)Block.Plank;     // fence
-            Mapping[86] = (byte)Block.OrangeWool;   // pumpkin
-            Mapping[87] = (byte)Block.Dirt;     // netherstone
-            Mapping[88] = (byte)Block.Gravel;   // slow sand
-            Mapping[89] = (byte)Block.Sand;     // lightstone
-            Mapping[90] = (byte)Block.PurpleWool;   // portal
-            Mapping[91] = (byte)Block.OrangeWool;   // jack-o-lantern
+            Mapping[50] = (byte) Block.Air; // torch
+            Mapping[51] = (byte) Block.Lava; // fire
+            Mapping[52] = (byte) Block.Glass; // spawner
+            Mapping[53] = (byte) Block.Slab; // wood stairs
+            Mapping[54] = (byte) Block.Plank; // chest
+            Mapping[55] = (byte) Block.Air; // redstone wire
+            Mapping[56] = (byte) Block.IronOre; // diamond ore
+            Mapping[57] = (byte) Block.AquaWool; // diamond block
+            Mapping[58] = (byte) Block.Log; // workbench
+            Mapping[59] = (byte) Block.Leaves; // crops
+            Mapping[60] = (byte) Block.Dirt; // soil
+            Mapping[61] = (byte) Block.Stone; // furnace
+            Mapping[62] = (byte) Block.Stone; // burning furnance
+            Mapping[63] = (byte) Block.Air; // sign post
+            Mapping[64] = (byte) Block.Air; // wooden door
+            Mapping[65] = (byte) Block.Air; // ladder
+            Mapping[50] = (byte) Block.CobblestoneSlab; // torch
+            Mapping[51] = (byte) Block.Rope; // fire
+            Mapping[52] = (byte) Block.Sandstone; // spawner
+            Mapping[53] = (byte) Block.Snow; // wood stairs
+            Mapping[54] = (byte) Block.Fire; // chest
+            Mapping[55] = (byte) Block.LightPinkWool; // redstone wire
+            Mapping[56] = (byte) Block.DeepBlueWool; // diamond ore
+            Mapping[57] = (byte) Block.BrownWool; // diamond block
+            Mapping[58] = (byte) Block.DeepBlueWool; // workbench
+            Mapping[59] = (byte) Block.TurquoiseWool; // crops
+            Mapping[60] = (byte) Block.Ice; // soil
+            Mapping[61] = (byte) Block.Tile; // furnace
+            Mapping[62] = (byte) Block.Magma; // burning furnance
+            Mapping[63] = (byte) Block.Pillar; // sign post
+            Mapping[64] = (byte) Block.Crate; // wooden door
+            Mapping[65] = (byte) Block.StoneBrick; // ladder
+            Mapping[66] = (byte) Block.Air; // rails
+            Mapping[67] = (byte) Block.CobblestoneSlab; // cobblestone stairs
+            Mapping[68] = (byte) Block.Air; // wall sign
+            Mapping[69] = (byte) Block.Air; // lever
+            Mapping[70] = (byte) Block.Air; // pressure plate
+            Mapping[71] = (byte) Block.Air; // iron door
+            Mapping[72] = (byte) Block.Air; // wooden pressure plate
+            Mapping[73] = (byte) Block.IronOre; // redstone ore
+            Mapping[74] = (byte) Block.IronOre; // glowing redstone ore
+            Mapping[75] = (byte) Block.Air; // redstone torch (off)
+            Mapping[76] = (byte) Block.Air; // redstone torch (on)
+            Mapping[77] = (byte) Block.Air; // stone button
+            Mapping[78] = (byte) Block.Air; // snow
+            Mapping[79] = (byte) Block.Glass; // ice
+            Mapping[80] = (byte) Block.WhiteWool; // snow block
+            Mapping[81] = (byte) Block.Leaves; // cactus
+            Mapping[82] = (byte) Block.GrayWool; // clay
+            Mapping[83] = (byte) Block.Leaves; // reed
+            Mapping[84] = (byte) Block.Log; // jukebox
+            Mapping[85] = (byte) Block.Plank; // fence
+            Mapping[86] = (byte) Block.OrangeWool; // pumpkin
+            Mapping[87] = (byte) Block.Dirt; // netherstone
+            Mapping[88] = (byte) Block.Gravel; // slow sand
+            Mapping[89] = (byte) Block.Sand; // lightstone
+            Mapping[90] = (byte) Block.PurpleWool; // portal
+            Mapping[91] = (byte) Block.OrangeWool; // jack-o-lantern
             // all others default to 0/air
         }
 
@@ -147,16 +147,6 @@ namespace fCraft.MapConversion
         }
 
 
-        public static byte MapBlock(byte block)
-        {
-            return Mapping[block];
-        }
-
-        public static Block MapBlock(Block block)
-        {
-            return (Block)Mapping[(byte)block];
-        }
-
         public Map Load([NotNull] string fileName)
         {
             if (fileName == null) throw new ArgumentNullException("fileName");
@@ -202,7 +192,7 @@ namespace fCraft.MapConversion
                     Position spawn = new Position();
                     while (pointer < headerEnd)
                     {
-                        switch ((char)data[pointer])
+                        switch ((char) data[pointer])
                         {
                             case 'Z':
                                 offset++;
@@ -225,33 +215,33 @@ namespace fCraft.MapConversion
                         Array.Copy(data, headerEnd + offset - 4, temp, 0, 4);
                         if (MemCmp(data, pointer, "width"))
                         {
-                            width = (ushort)IPAddress.HostToNetworkOrder(BitConverter.ToInt32(temp, 0));
+                            width = (ushort) IPAddress.HostToNetworkOrder(BitConverter.ToInt32(temp, 0));
                         }
                         else if (MemCmp(data, pointer, "depth"))
                         {
-                            height = (ushort)IPAddress.HostToNetworkOrder(BitConverter.ToInt32(temp, 0));
+                            height = (ushort) IPAddress.HostToNetworkOrder(BitConverter.ToInt32(temp, 0));
                         }
                         else if (MemCmp(data, pointer, "height"))
                         {
-                            length = (ushort)IPAddress.HostToNetworkOrder(BitConverter.ToInt32(temp, 0));
+                            length = (ushort) IPAddress.HostToNetworkOrder(BitConverter.ToInt32(temp, 0));
                         }
                         else if (MemCmp(data, pointer, "xSpawn"))
                         {
-                            spawn.X = (short)(IPAddress.HostToNetworkOrder(BitConverter.ToInt32(temp, 0)) * 32 + 16);
+                            spawn.X = (short) (IPAddress.HostToNetworkOrder(BitConverter.ToInt32(temp, 0))*32 + 16);
                         }
                         else if (MemCmp(data, pointer, "ySpawn"))
                         {
-                            spawn.Z = (short)(IPAddress.HostToNetworkOrder(BitConverter.ToInt32(temp, 0)) * 32 + 16);
+                            spawn.Z = (short) (IPAddress.HostToNetworkOrder(BitConverter.ToInt32(temp, 0))*32 + 16);
                         }
                         else if (MemCmp(data, pointer, "zSpawn"))
                         {
-                            spawn.Y = (short)(IPAddress.HostToNetworkOrder(BitConverter.ToInt32(temp, 0)) * 32 + 16);
+                            spawn.Y = (short) (IPAddress.HostToNetworkOrder(BitConverter.ToInt32(temp, 0))*32 + 16);
                         }
 
                         pointer += skip;
                     }
 
-                    map = new Map(null, width, length, height, false) { Spawn = spawn };
+                    map = new Map(null, width, length, height, false) {Spawn = spawn};
 
                     if (!map.ValidateHeader())
                     {
@@ -296,8 +286,18 @@ namespace fCraft.MapConversion
             throw new NotImplementedException();
         }
 
+        public static byte MapBlock(byte block)
+        {
+            return Mapping[block];
+        }
 
-        static bool MemCmp([NotNull] IList<byte> data, int offset, [NotNull] string value)
+        public static Block MapBlock(Block block)
+        {
+            return (Block) Mapping[(byte) block];
+        }
+
+
+        private static bool MemCmp([NotNull] IList<byte> data, int offset, [NotNull] string value)
         {
             if (data == null) throw new ArgumentNullException("data");
             if (value == null) throw new ArgumentNullException("value");

@@ -22,7 +22,7 @@ using System.Text;
 
 namespace fCraft.Utils
 {
-    class BroMode
+    internal class BroMode
     {
         private static BroMode instance;
         private static List<String> broNames;
@@ -65,11 +65,11 @@ namespace fCraft.Utils
                     "Haley Broel Osment",
                     "Brometheus",
                     "Fidel Castbro",
-					"Broul Castbro",
-					"Leonid Brozhnev",
-					"Brotello Putin Brodimir Brodimirovich <tm>",
-					"Brangela Merkel",
-					"Brovio Brobrusconi",
+                    "Broul Castbro",
+                    "Leonid Brozhnev",
+                    "Brotello Putin Brodimir Brodimirovich <tm>",
+                    "Brangela Merkel",
+                    "Brovio Brobrusconi",
                     "Brol Pot",
                     "Elvis Costellbro",
                     "Amy Broehler",
@@ -166,7 +166,7 @@ namespace fCraft.Utils
             return instance;
         }
 
-        static void Player_Connected(object sender, Events.PlayerConnectedEventArgs e)
+        private static void Player_Connected(object sender, Events.PlayerConnectedEventArgs e)
         {
             if (Active)
             {
@@ -174,7 +174,7 @@ namespace fCraft.Utils
             }
         }
 
-        static void Player_Disconnected(object sender, Events.PlayerDisconnectedEventArgs e)
+        private static void Player_Disconnected(object sender, Events.PlayerDisconnectedEventArgs e)
         {
             if (Active)
             {
@@ -233,7 +233,9 @@ namespace fCraft.Utils
                                 if (found)
                                 {
                                     player.Message("Giving you name: " + broNames[index]);
-                                    player.Info.DisplayedName = Color.ReplacePercentCodes(player.Info.Rank.Color + player.Info.Rank.Prefix + broNames[index]);
+                                    player.Info.DisplayedName =
+                                        Color.ReplacePercentCodes(player.Info.Rank.Color + player.Info.Rank.Prefix +
+                                                                  broNames[index]);
                                     namesRegistered++;
                                     registeredBroNames[index] = player;
                                 }
@@ -264,7 +266,8 @@ namespace fCraft.Utils
                 {
                     if (registeredBroNames.ContainsKey(i) && registeredBroNames[i].Name.Equals(p.Name))
                     {
-                        Logger.Log(LogType.SystemActivity, "Unregistering bro name '" + broNames[i] + "' for player '" + p.Name + "'");
+                        Logger.Log(LogType.SystemActivity,
+                            "Unregistering bro name '" + broNames[i] + "' for player '" + p.Name + "'");
                         registeredBroNames.Remove(i);
                         namesRegistered--;
                         if (!p.changedName)

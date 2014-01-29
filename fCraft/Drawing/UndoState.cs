@@ -1,4 +1,5 @@
 ﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
@@ -6,16 +7,16 @@ namespace fCraft.Drawing
 {
     public sealed class UndoState
     {
+        public readonly List<UndoBlock> Buffer;
+        public readonly DrawOperation Op;
+        public readonly object SyncRoot = new object();
+        public bool IsTooLargeToUndo;
+
         public UndoState(DrawOperation op)
         {
             Op = op;
             Buffer = new List<UndoBlock>();
         }
-
-        public readonly DrawOperation Op;
-        public readonly List<UndoBlock> Buffer;
-        public bool IsTooLargeToUndo;
-        public readonly object SyncRoot = new object();
 
         public bool Add(Vector3I coord, Block block)
         {
@@ -69,9 +70,9 @@ namespace fCraft.Drawing
     {
         public UndoBlock(Vector3I coord, Block block)
         {
-            X = (short)coord.X;
-            Y = (short)coord.Y;
-            Z = (short)coord.Z;
+            X = (short) coord.X;
+            Y = (short) coord.Y;
+            Z = (short) coord.Z;
             Block = block;
         }
 
