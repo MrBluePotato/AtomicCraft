@@ -1,5 +1,4 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
@@ -8,7 +7,6 @@ using JetBrains.Annotations;
 
 namespace fCraft
 {
-
     public static class IPAddressUtil
     {
         /// <summary> Checks whether an IP address may belong to LAN (192.168.0.0/16 or 10.0.0.0/24). </summary>
@@ -23,7 +21,7 @@ namespace fCraft
         public static uint AsUInt([NotNull] this IPAddress thisAddr)
         {
             if (thisAddr == null) throw new ArgumentNullException("thisAddr");
-            return (uint)IPAddress.HostToNetworkOrder(BitConverter.ToInt32(thisAddr.GetAddressBytes(), 0));
+            return (uint) IPAddress.HostToNetworkOrder(BitConverter.ToInt32(thisAddr.GetAddressBytes(), 0));
         }
 
         public static int AsInt([NotNull] this IPAddress thisAddr)
@@ -44,7 +42,7 @@ namespace fCraft
             if (thisAddr == null) throw new ArgumentNullException("thisAddr");
             if (range > 32) throw new ArgumentOutOfRangeException("range");
             int thisAsInt = thisAddr.AsInt();
-            int mask = (int)NetMask(range);
+            int mask = (int) NetMask(range);
             return new IPAddress(IPAddress.HostToNetworkOrder(thisAsInt & mask));
         }
 
@@ -53,8 +51,8 @@ namespace fCraft
             if (thisAddr == null) throw new ArgumentNullException("thisAddr");
             if (range > 32) throw new ArgumentOutOfRangeException("range");
             int thisAsInt = thisAddr.AsInt();
-            int mask = (int)~NetMask(range);
-            return new IPAddress((uint)IPAddress.HostToNetworkOrder(thisAsInt | mask));
+            int mask = (int) ~NetMask(range);
+            return new IPAddress((uint) IPAddress.HostToNetworkOrder(thisAsInt | mask));
         }
 
         public static uint NetMask(byte range)
@@ -74,10 +72,11 @@ namespace fCraft
 
     public static class DateTimeUtil
     {
-        static readonly NumberFormatInfo NumberFormatter = CultureInfo.InvariantCulture.NumberFormat;
+        private const long TicksPerMillisecond = 10000;
+        private static readonly NumberFormatInfo NumberFormatter = CultureInfo.InvariantCulture.NumberFormat;
         public static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         public static readonly long TicksToUnixEpoch;
-        const long TicksPerMillisecond = 10000;
+        private static CultureInfo cultureInfo = CultureInfo.CurrentCulture;
 
         static DateTimeUtil()
         {
@@ -90,95 +89,10 @@ namespace fCraft
             return UnixEpoch.AddSeconds(timestamp);
         }
 
-
-        #region To Unix Time
-
-        /// <summary> Converts a DateTime to Utc Unix Timestamp. </summary>
-        public static long ToUnixTime(this DateTime date)
-        {
-            return (long)date.Subtract(UnixEpoch).TotalSeconds;
-        }
-
-
-        public static long ToUnixTimeLegacy(this DateTime date)
-        {
-            return (date.Ticks - TicksToUnixEpoch) / TicksPerMillisecond;
-        }
-
-
-        /// <summary> Converts a DateTime to a string containing the Utc Unix Timestamp.
-        /// If the date equals DateTime.MinValue, returns an empty string. </summary>
-        public static string ToUnixTimeString(this DateTime date)
-        {
-            if (date == DateTime.MinValue)
-            {
-                return "";
-            }
-            else
-            {
-                return date.ToUnixTime().ToString(NumberFormatter);
-            }
-        }
-
-
-        /// <summary> Appends a Utc Unix Timestamp to the given StringBuilder.
-        /// If the date equals DateTime.MinValue, nothing is appended. </summary>
-        public static StringBuilder ToUnixTimeString(this DateTime date, StringBuilder sb)
-        {
-            if (date != DateTime.MinValue)
-            {
-                sb.Append(date.ToUnixTime());
-            }
-            return sb;
-        }
-
-        #endregion
-
-
-        #region To Date Time
-
-        /// <summary> Creates a DateTime from a Utc Unix Timestamp. </summary>
-        public static DateTime ToDateTime(this long timestamp)
-        {
-            return UnixEpoch.AddSeconds(timestamp);
-        }
-
-
-        /// <summary> Tries to create a DateTime from a string containing a Utc Unix Timestamp.
-        /// If the string was empty, returns false and does not affect result. </summary>
-        public static bool ToDateTime(this string str, ref DateTime result)
-        {
-            long t;
-            if (str.Length > 1 && Int64.TryParse(str, out t))
-            {
-                result = UnixEpoch.AddSeconds(Int64.Parse(str));
-                return true;
-            }
-            return false;
-        }
-
-
-        public static DateTime ToDateTimeLegacy(long timestamp)
-        {
-            return new DateTime(timestamp * TicksPerMillisecond + TicksToUnixEpoch, DateTimeKind.Utc);
-        }
-
-
-        public static bool ToDateTimeLegacy(this string str, ref DateTime result)
-        {
-            if (str.Length <= 1)
-            {
-                return false;
-            }
-            result = ToDateTimeLegacy(Int64.Parse(str));
-            return true;
-        }
-
-        #endregion
-
-
-        /// <summary> Converts a TimeSpan to a string containing the number of seconds.
-        /// If the timestamp is zero seconds, returns an empty string. </summary>
+        /// <summary>
+        ///     Converts a TimeSpan to a string containing the number of seconds.
+        ///     If the timestamp is zero seconds, returns an empty string.
+        /// </summary>
         public static string ToTickString(this TimeSpan time)
         {
             if (time == TimeSpan.Zero)
@@ -187,19 +101,21 @@ namespace fCraft
             }
             else
             {
-                return (time.Ticks / TimeSpan.TicksPerSecond).ToString(NumberFormatter);
+                return (time.Ticks/TimeSpan.TicksPerSecond).ToString(NumberFormatter);
             }
         }
 
 
         public static long ToSeconds(this TimeSpan time)
         {
-            return (time.Ticks / TimeSpan.TicksPerSecond);
+            return (time.Ticks/TimeSpan.TicksPerSecond);
         }
 
 
-        /// <summary> Tries to create a TimeSpan from a string containing the number of seconds.
-        /// If the string was empty, returns false and sets result to TimeSpan.Zero </summary>
+        /// <summary>
+        ///     Tries to create a TimeSpan from a string containing the number of seconds.
+        ///     If the string was empty, returns false and sets result to TimeSpan.Zero
+        /// </summary>
         public static bool ToTimeSpan([NotNull] this string str, out TimeSpan result)
         {
             if (str == null) throw new ArgumentNullException("str");
@@ -211,7 +127,7 @@ namespace fCraft
             long ticks;
             if (Int64.TryParse(str, out ticks))
             {
-                result = new TimeSpan(ticks * TimeSpan.TicksPerSecond);
+                result = new TimeSpan(ticks*TimeSpan.TicksPerSecond);
                 return true;
             }
             else
@@ -226,7 +142,7 @@ namespace fCraft
         {
             if (str.Length > 1)
             {
-                result = new TimeSpan(Int64.Parse(str) * TicksPerMillisecond);
+                result = new TimeSpan(Int64.Parse(str)*TicksPerMillisecond);
                 return true;
             }
             else
@@ -235,14 +151,61 @@ namespace fCraft
             }
         }
 
+        /// <summary>
+        ///     Tries to parse a data in a culture-specific ways.
+        ///     This method is, unfortunately, necessary because in versions 0.520-0.522,
+        ///     fCraft saved dates in a culture-specific format. This means that if the
+        ///     server's culture settings were changed, or if the PlayerDB and IPBanList
+        ///     files were moved between machines, all dates became unparseable.
+        /// </summary>
+        /// <param name="dateString"> String to parse. </param>
+        /// <param name="date"> Date to output. </param>
+        /// <returns> True if date string could be parsed and was not empty/MinValue. </returns>
+        public static bool TryParseLocalDate([NotNull] string dateString, out DateTime date)
+        {
+            if (dateString == null) throw new ArgumentNullException("dateString");
+            if (dateString.Length <= 1)
+            {
+                date = DateTime.MinValue;
+                return false;
+            }
+            else
+            {
+                if (!DateTime.TryParse(dateString, cultureInfo, DateTimeStyles.None, out date))
+                {
+                    CultureInfo[] cultureList = CultureInfo.GetCultures(CultureTypes.FrameworkCultures);
+                    foreach (CultureInfo otherCultureInfo in cultureList)
+                    {
+                        cultureInfo = otherCultureInfo;
+                        try
+                        {
+                            if (DateTime.TryParse(dateString, cultureInfo, DateTimeStyles.None, out date))
+                            {
+                                return true;
+                            }
+                        }
+                        catch (NotSupportedException)
+                        {
+                        }
+                    }
+                    throw new Exception("Could not find a culture that would be able to parse date/time formats.");
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
 
         #region MiniString
+
+        public static readonly TimeSpan MaxTimeSpan = TimeSpan.FromDays(9999);
 
         public static StringBuilder ToTickString(this TimeSpan time, StringBuilder sb)
         {
             if (time != TimeSpan.Zero)
             {
-                sb.Append(time.Ticks / TimeSpan.TicksPerSecond);
+                sb.Append(time.Ticks/TimeSpan.TicksPerSecond);
             }
             return sb;
         }
@@ -260,7 +223,7 @@ namespace fCraft
             }
             else if (span.TotalHours < 48)
             {
-                return String.Format("{0}h{1}m", (int)Math.Floor(span.TotalHours), span.Minutes);
+                return String.Format("{0}h{1}m", (int) Math.Floor(span.TotalHours), span.Minutes);
             }
             else if (span.TotalDays < 15)
             {
@@ -268,7 +231,7 @@ namespace fCraft
             }
             else
             {
-                return String.Format("{0:0}w{1:0}d", Math.Floor(span.TotalDays / 7), Math.Floor(span.TotalDays) % 7);
+                return String.Format("{0:0}w{1:0}d", Math.Floor(span.TotalDays/7), Math.Floor(span.TotalDays)%7);
             }
         }
 
@@ -286,13 +249,12 @@ namespace fCraft
             catch (OverflowException)
             {
             }
-            catch (FormatException) { }
+            catch (FormatException)
+            {
+            }
             result = TimeSpan.Zero;
             return false;
         }
-
-
-        public static readonly TimeSpan MaxTimeSpan = TimeSpan.FromDays(9999);
 
 
         public static TimeSpan ParseMiniTimespan([NotNull] this string text)
@@ -339,7 +301,7 @@ namespace fCraft
                                 result += TimeSpan.FromDays(number);
                                 break;
                             case 'w':
-                                result += TimeSpan.FromDays(number * 7);
+                                result += TimeSpan.FromDays(number*7);
                                 break;
                             default:
                                 throw new FormatException();
@@ -352,7 +314,6 @@ namespace fCraft
 
         #endregion
 
-
         #region CompactString
 
         public static string ToCompactString(this DateTime date)
@@ -364,62 +325,109 @@ namespace fCraft
         public static string ToCompactString(this TimeSpan span)
         {
             return String.Format("{0}.{1:00}:{2:00}:{3:00}",
-                                  span.Days, span.Hours, span.Minutes, span.Seconds);
+                span.Days, span.Hours, span.Minutes, span.Seconds);
         }
 
         #endregion
 
+        #region To Unix Time
 
-        static CultureInfo cultureInfo = CultureInfo.CurrentCulture;
-
-        /// <summary> Tries to parse a data in a culture-specific ways.
-        /// This method is, unfortunately, necessary because in versions 0.520-0.522,
-        /// fCraft saved dates in a culture-specific format. This means that if the
-        /// server's culture settings were changed, or if the PlayerDB and IPBanList
-        /// files were moved between machines, all dates became unparseable. </summary>
-        /// <param name="dateString"> String to parse. </param>
-        /// <param name="date"> Date to output. </param>
-        /// <returns> True if date string could be parsed and was not empty/MinValue. </returns>
-        public static bool TryParseLocalDate([NotNull] string dateString, out DateTime date)
+        /// <summary> Converts a DateTime to Utc Unix Timestamp. </summary>
+        public static long ToUnixTime(this DateTime date)
         {
-            if (dateString == null) throw new ArgumentNullException("dateString");
-            if (dateString.Length <= 1)
+            return (long) date.Subtract(UnixEpoch).TotalSeconds;
+        }
+
+
+        public static long ToUnixTimeLegacy(this DateTime date)
+        {
+            return (date.Ticks - TicksToUnixEpoch)/TicksPerMillisecond;
+        }
+
+
+        /// <summary>
+        ///     Converts a DateTime to a string containing the Utc Unix Timestamp.
+        ///     If the date equals DateTime.MinValue, returns an empty string.
+        /// </summary>
+        public static string ToUnixTimeString(this DateTime date)
+        {
+            if (date == DateTime.MinValue)
             {
-                date = DateTime.MinValue;
-                return false;
+                return "";
             }
             else
             {
-                if (!DateTime.TryParse(dateString, cultureInfo, DateTimeStyles.None, out date))
-                {
-                    CultureInfo[] cultureList = CultureInfo.GetCultures(CultureTypes.FrameworkCultures);
-                    foreach (CultureInfo otherCultureInfo in cultureList)
-                    {
-                        cultureInfo = otherCultureInfo;
-                        try
-                        {
-                            if (DateTime.TryParse(dateString, cultureInfo, DateTimeStyles.None, out date))
-                            {
-                                return true;
-                            }
-                        }
-                        catch (NotSupportedException) { }
-                    }
-                    throw new Exception("Could not find a culture that would be able to parse date/time formats.");
-                }
-                else
-                {
-                    return true;
-                }
+                return date.ToUnixTime().ToString(NumberFormatter);
             }
         }
+
+
+        /// <summary>
+        ///     Appends a Utc Unix Timestamp to the given StringBuilder.
+        ///     If the date equals DateTime.MinValue, nothing is appended.
+        /// </summary>
+        public static StringBuilder ToUnixTimeString(this DateTime date, StringBuilder sb)
+        {
+            if (date != DateTime.MinValue)
+            {
+                sb.Append(date.ToUnixTime());
+            }
+            return sb;
+        }
+
+        #endregion
+
+        #region To Date Time
+
+        /// <summary> Creates a DateTime from a Utc Unix Timestamp. </summary>
+        public static DateTime ToDateTime(this long timestamp)
+        {
+            return UnixEpoch.AddSeconds(timestamp);
+        }
+
+
+        /// <summary>
+        ///     Tries to create a DateTime from a string containing a Utc Unix Timestamp.
+        ///     If the string was empty, returns false and does not affect result.
+        /// </summary>
+        public static bool ToDateTime(this string str, ref DateTime result)
+        {
+            long t;
+            if (str.Length > 1 && Int64.TryParse(str, out t))
+            {
+                result = UnixEpoch.AddSeconds(Int64.Parse(str));
+                return true;
+            }
+            return false;
+        }
+
+
+        public static DateTime ToDateTimeLegacy(long timestamp)
+        {
+            return new DateTime(timestamp*TicksPerMillisecond + TicksToUnixEpoch, DateTimeKind.Utc);
+        }
+
+
+        public static bool ToDateTimeLegacy(this string str, ref DateTime result)
+        {
+            if (str.Length <= 1)
+            {
+                return false;
+            }
+            result = ToDateTimeLegacy(Int64.Parse(str));
+            return true;
+        }
+
+        #endregion
     }
 
 
     public static class EnumerableUtil
     {
-        /// <summary> Joins all items in a collection into one comma-separated string.
-        /// If the items are not strings, .ToString() is called on them. </summary>
+        /// <summary>
+        ///     Joins all items in a collection into one comma-separated string.
+        ///     If the items are not strings, .ToString() is called on them.
+        /// </summary>
         public static string JoinToString<T>([NotNull] this IEnumerable<T> items)
         {
             if (items == null) throw new ArgumentNullException("items");
@@ -435,8 +443,10 @@ namespace fCraft
         }
 
 
-        /// <summary> Joins all items in a collection into one string separated with the given separator.
-        /// If the items are not strings, .ToString() is called on them. </summary>
+        /// <summary>
+        ///     Joins all items in a collection into one string separated with the given separator.
+        ///     If the items are not strings, .ToString() is called on them.
+        /// </summary>
         public static string JoinToString<T>([NotNull] this IEnumerable<T> items, [NotNull] string separator)
         {
             if (items == null) throw new ArgumentNullException("items");
@@ -453,9 +463,12 @@ namespace fCraft
         }
 
 
-        /// <summary> Joins all items in a collection into one string separated with the given separator.
-        /// A specified string conversion function is called on each item before contactenation. </summary>
-        public static string JoinToString<T>([NotNull] this IEnumerable<T> items, [NotNull] Func<T, string> stringConversionFunction)
+        /// <summary>
+        ///     Joins all items in a collection into one string separated with the given separator.
+        ///     A specified string conversion function is called on each item before contactenation.
+        /// </summary>
+        public static string JoinToString<T>([NotNull] this IEnumerable<T> items,
+            [NotNull] Func<T, string> stringConversionFunction)
         {
             if (items == null) throw new ArgumentNullException("items");
             if (stringConversionFunction == null) throw new ArgumentNullException("stringConversionFunction");
@@ -471,9 +484,12 @@ namespace fCraft
         }
 
 
-        /// <summary> Joins all items in a collection into one string separated with the given separator.
-        /// A specified string conversion function is called on each item before contactenation. </summary>
-        public static string JoinToString<T>([NotNull] this IEnumerable<T> items, [NotNull] string separator, [NotNull] Func<T, string> stringConversionFunction)
+        /// <summary>
+        ///     Joins all items in a collection into one string separated with the given separator.
+        ///     A specified string conversion function is called on each item before contactenation.
+        /// </summary>
+        public static string JoinToString<T>([NotNull] this IEnumerable<T> items, [NotNull] string separator,
+            [NotNull] Func<T, string> stringConversionFunction)
         {
             if (items == null) throw new ArgumentNullException("items");
             if (separator == null) throw new ArgumentNullException("separator");
@@ -499,7 +515,7 @@ namespace fCraft
     }
 
 
-    unsafe static class FormatUtil
+    internal static unsafe class FormatUtil
     {
         [NotNull]
         public static string ToStringInvariant(this int i)
@@ -527,57 +543,57 @@ namespace fCraft
             if (number >= 10000000)
             {
                 // 8.
-                copy = number % 100000000;
-                digit = copy / 10000000;
-                builder.Append((char)(digit + 48));
+                copy = number%100000000;
+                digit = copy/10000000;
+                builder.Append((char) (digit + 48));
             }
             if (number >= 1000000)
             {
                 // 7.
-                copy = number % 10000000;
-                digit = copy / 1000000;
-                builder.Append((char)(digit + 48));
+                copy = number%10000000;
+                digit = copy/1000000;
+                builder.Append((char) (digit + 48));
             }
             if (number >= 100000)
             {
                 // 6.
-                copy = number % 1000000;
-                digit = copy / 100000;
-                builder.Append((char)(digit + 48));
+                copy = number%1000000;
+                digit = copy/100000;
+                builder.Append((char) (digit + 48));
             }
             if (number >= 10000)
             {
                 // 5.
-                copy = number % 100000;
-                digit = copy / 10000;
-                builder.Append((char)(digit + 48));
+                copy = number%100000;
+                digit = copy/10000;
+                builder.Append((char) (digit + 48));
             }
             if (number >= 1000)
             {
                 // 4.
-                copy = number % 10000;
-                digit = copy / 1000;
-                builder.Append((char)(digit + 48));
+                copy = number%10000;
+                digit = copy/1000;
+                builder.Append((char) (digit + 48));
             }
             if (number >= 100)
             {
                 // 3.
-                copy = number % 1000;
-                digit = copy / 100;
-                builder.Append((char)(digit + 48));
+                copy = number%1000;
+                digit = copy/100;
+                builder.Append((char) (digit + 48));
             }
             if (number >= 10)
             {
                 // 2.
-                copy = number % 100;
-                digit = copy / 10;
-                builder.Append((char)(digit + 48));
+                copy = number%100;
+                digit = copy/10;
+                builder.Append((char) (digit + 48));
             }
             if (number >= 0)
             {
                 // 1.
-                copy = number % 10;
-                builder.Append((char)(copy + 48));
+                copy = number%10;
+                builder.Append((char) (copy + 48));
             }
             return builder;
         }
@@ -592,7 +608,7 @@ namespace fCraft
             {
                 for (int i = 0; i < length; ++i)
                 {
-                    value = 10 * value + (characters[i] - 48);
+                    value = 10*value + (characters[i] - 48);
                 }
             }
             return value;
@@ -612,17 +628,17 @@ namespace fCraft
     }
 
 
-    public unsafe static class BufferUtil
+    public static unsafe class BufferUtil
     {
         public static void MemSet([NotNull] this byte[] array, byte value)
         {
             if (array == null) throw new ArgumentNullException("array");
-            byte[] rawValue = new[] { value, value, value, value, value, value, value, value };
+            byte[] rawValue = new[] {value, value, value, value, value, value, value, value};
             Int64 fillValue = BitConverter.ToInt64(rawValue, 0);
 
             fixed (byte* ptr = array)
             {
-                Int64* dest = (Int64*)ptr;
+                Int64* dest = (Int64*) ptr;
                 int length = array.Length;
                 while (length >= 8)
                 {
@@ -630,7 +646,7 @@ namespace fCraft
                     dest++;
                     length -= 8;
                 }
-                byte* bDest = (byte*)dest;
+                byte* bDest = (byte*) dest;
                 for (byte i = 0; i < length; i++)
                 {
                     *bDest = value;
@@ -652,19 +668,19 @@ namespace fCraft
                 throw new ArgumentOutOfRangeException("startIndex");
             }
 
-            byte[] rawValue = new[] { value, value, value, value, value, value, value, value };
+            byte[] rawValue = new[] {value, value, value, value, value, value, value, value};
             Int64 fillValue = BitConverter.ToInt64(rawValue, 0);
 
             fixed (byte* ptr = &array[startIndex])
             {
-                Int64* dest = (Int64*)ptr;
+                Int64* dest = (Int64*) ptr;
                 while (length >= 8)
                 {
                     *dest = fillValue;
                     dest++;
                     length -= 8;
                 }
-                byte* bDest = (byte*)dest;
+                byte* bDest = (byte*) dest;
                 for (byte i = 0; i < length; i++)
                 {
                     *bDest = value;
@@ -682,33 +698,32 @@ namespace fCraft
             {
                 do
                 {
-                    *((int*)dest) = *((int*)src);
-                    *((int*)(dest + 4)) = *((int*)(src + 4));
-                    *((int*)(dest + 8)) = *((int*)(src + 8));
-                    *((int*)(dest + 12)) = *((int*)(src + 12));
+                    *((int*) dest) = *((int*) src);
+                    *((int*) (dest + 4)) = *((int*) (src + 4));
+                    *((int*) (dest + 8)) = *((int*) (src + 8));
+                    *((int*) (dest + 12)) = *((int*) (src + 12));
                     dest += 0x10;
                     src += 0x10;
-                }
-                while ((len -= 0x10) >= 0x10);
+                } while ((len -= 0x10) >= 0x10);
             }
             if (len > 0)
             {
                 if ((len & 8) != 0)
                 {
-                    *((int*)dest) = *((int*)src);
-                    *((int*)(dest + 4)) = *((int*)(src + 4));
+                    *((int*) dest) = *((int*) src);
+                    *((int*) (dest + 4)) = *((int*) (src + 4));
                     dest += 8;
                     src += 8;
                 }
                 if ((len & 4) != 0)
                 {
-                    *((int*)dest) = *((int*)src);
+                    *((int*) dest) = *((int*) src);
                     dest += 4;
                     src += 4;
                 }
                 if ((len & 2) != 0)
                 {
-                    *((short*)dest) = *((short*)src);
+                    *((short*) dest) = *((short*) src);
                     dest += 2;
                     src += 2;
                 }
@@ -736,8 +751,8 @@ namespace fCraft
             if (value == null) throw new ArgumentNullException("value");
             try
             {
-                output = (TEnum)Enum.Parse(typeof(TEnum), value, ignoreCase);
-                return Enum.IsDefined(typeof(TEnum), output);
+                output = (TEnum) Enum.Parse(typeof (TEnum), value, ignoreCase);
+                return Enum.IsDefined(typeof (TEnum), output);
             }
             catch (ArgumentException)
             {

@@ -1,5 +1,4 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -18,23 +17,17 @@ namespace fCraft
     /// <summary> Checks for updates, and keeps track of current version/revision. </summary>
     public static class Updater
     {
+        public const string LatestStable = "0.301_r1";
 
         public static readonly ReleaseInfo CurrentRelease = new ReleaseInfo(
             301,
             1,
             ReleaseFlags.Bugfix
 #if DEBUG
- | ReleaseFlags.Dev
+            | ReleaseFlags.Dev
 #endif
-);
+            );
 
-        public static string UserAgent
-        {
-            get { return "AtomicCraft " + CurrentRelease.VersionString; }
-        }
-
-        public const string LatestStable = "0.301_r1";
-        public static string UpdateUrl { get; set; }
         public static int WebVersion;
         public static string WebVersionFullString;
         public static string DownloadLocation;
@@ -43,6 +36,47 @@ namespace fCraft
         public static string Changelog;
         public static string DevVersion;
         public static string CurrentDevVersion;
+
+        public static string UserAgent
+        {
+            get { return "AtomicCraft " + CurrentRelease.VersionString; }
+        }
+
+        public static string UpdateUrl { get; set; }
+
+        public static bool RunAtShutdown { get; set; }
+
+        #region Events
+
+        /// <summary>
+        ///     Occurs when fCraft is about to check for updates (cancellable).
+        ///     The update Url may be overridden.
+        /// </summary>
+        public static event EventHandler<CheckingForUpdatesEventArgs> CheckingForUpdates;
+
+
+        /// <summary> Occurs when fCraft has just checked for updates. </summary>
+        public static event EventHandler<CheckedForUpdatesEventArgs> CheckedForUpdates;
+
+
+        private static bool RaiseCheckingForUpdatesEvent(ref string updateUrl)
+        {
+            var h = CheckingForUpdates;
+            if (h == null) return false;
+            var e = new CheckingForUpdatesEventArgs(updateUrl);
+            h(null, e);
+            updateUrl = e.Url;
+            return e.Cancel;
+        }
+
+
+        private static void RaiseCheckedForUpdatesEvent(string url, UpdaterResult result)
+        {
+            var h = CheckedForUpdates;
+            if (h != null) h(null, new CheckedForUpdatesEventArgs(url, result));
+        }
+
+        #endregion
 
         public static bool UpdateCheck()
         {
@@ -53,7 +87,11 @@ namespace fCraft
                 {
                     if (mode == ReleaseMode.Dev)
                     {
-                        using (Stream stream = client.OpenRead("http://build.atomiccraft.net/guestAuth/app/rest/buildTypes/id:bt34/builds/status:SUCCESS/number"))
+                        using (
+                            Stream stream =
+                                client.OpenRead(
+                                    "http://build.atomiccraft.net/guestAuth/app/rest/buildTypes/id:bt34/builds/status:SUCCESS/number")
+                            )
                         {
                             stream.ReadTimeout = 1000;
                             using (StreamReader reader = new StreamReader(stream))
@@ -64,7 +102,6 @@ namespace fCraft
                         if (!File.Exists("dev.txt"))
                         {
                             File.WriteAllText("dev.txt", DevVersion);
-
                         }
                         using (StreamReader reader = new StreamReader("dev.txt"))
                         {
@@ -79,7 +116,9 @@ namespace fCraft
                         }
                         if (CurrentDevVersion != DevVersion)
                         {
-                            DevUpdaterLocation = ("http://build.AtomicCraft.net/guestAuth/repository/download/bt34/.lastSuccessful/AtomicCraft+-+Build+" + Updater.DevVersion + ".zip!UpdateInstaller.exe");
+                            DevUpdaterLocation =
+                                ("http://build.AtomicCraft.net/guestAuth/repository/download/bt34/.lastSuccessful/AtomicCraft+-+Build+" +
+                                 Updater.DevVersion + ".zip!UpdateInstaller.exe");
                             File.Delete("dev.txt");
                             File.WriteAllText("dev.txt", DevVersion);
                             return true;
@@ -88,7 +127,8 @@ namespace fCraft
 
                     else if (mode == ReleaseMode.Public)
                     {
-                        using (Stream stream = client.OpenRead("http://dl.atomiccraft.net/AtomicCraft/public/update.txt"))
+                        using (
+                            Stream stream = client.OpenRead("http://dl.atomiccraft.net/AtomicCraft/public/update.txt"))
                         {
                             stream.ReadTimeout = 1000;
                             using (StreamReader reader = new StreamReader(stream))
@@ -111,7 +151,8 @@ namespace fCraft
                     {
                         if (WebVersion > Updater.CurrentRelease.Version)
                         {
-                            Logger.Log(LogType.Warning, "An update of AtomicCraft is available, you can get it at: " + DownloadLocation);
+                            Logger.Log(LogType.Warning,
+                                "An update of AtomicCraft is available, you can get it at: " + DownloadLocation);
                             return true;
                         }
                     }
@@ -124,51 +165,11 @@ namespace fCraft
                 return false;
             }
         }
-
-        public static bool RunAtShutdown { get; set; }
-
-
-        #region Events
-
-        /// <summary> Occurs when fCraft is about to check for updates (cancellable).
-        /// The update Url may be overridden. </summary>
-        public static event EventHandler<CheckingForUpdatesEventArgs> CheckingForUpdates;
-
-
-        /// <summary> Occurs when fCraft has just checked for updates. </summary>
-        public static event EventHandler<CheckedForUpdatesEventArgs> CheckedForUpdates;
-
-
-        static bool RaiseCheckingForUpdatesEvent(ref string updateUrl)
-        {
-            var h = CheckingForUpdates;
-            if (h == null) return false;
-            var e = new CheckingForUpdatesEventArgs(updateUrl);
-            h(null, e);
-            updateUrl = e.Url;
-            return e.Cancel;
-        }
-
-
-        static void RaiseCheckedForUpdatesEvent(string url, UpdaterResult result)
-        {
-            var h = CheckedForUpdates;
-            if (h != null) h(null, new CheckedForUpdatesEventArgs(url, result));
-        }
-
-        #endregion
     }
 
 
     public sealed class UpdaterResult
     {
-        public static UpdaterResult NoUpdate
-        {
-            get
-            {
-                return new UpdaterResult(false, null, new ReleaseInfo[0]);
-            }
-        }
         internal UpdaterResult(bool updateAvailable, Uri downloadUri, IEnumerable<ReleaseInfo> releases)
         {
             UpdateAvailable = updateAvailable;
@@ -176,6 +177,12 @@ namespace fCraft
             History = releases.OrderByDescending(r => r.Revision).ToArray();
             LatestRelease = releases.FirstOrDefault();
         }
+
+        public static UpdaterResult NoUpdate
+        {
+            get { return new UpdaterResult(false, null, new ReleaseInfo[0]); }
+        }
+
         public bool UpdateAvailable { get; private set; }
         public Uri DownloadUri { get; private set; }
         public ReleaseInfo[] History { get; private set; }
@@ -194,9 +201,15 @@ namespace fCraft
 
         public ReleaseFlags Flags { get; private set; }
 
-        public string FlagsString { get { return ReleaseFlagsToString(Flags); } }
+        public string FlagsString
+        {
+            get { return ReleaseFlagsToString(Flags); }
+        }
 
-        public string[] FlagsList { get { return ReleaseFlagsToStringArray(Flags); } }
+        public string[] FlagsList
+        {
+            get { return ReleaseFlagsToStringArray(Flags); }
+        }
 
         public int Version { get; private set; }
 
@@ -206,10 +219,7 @@ namespace fCraft
 
         public TimeSpan Age
         {
-            get
-            {
-                return DateTime.UtcNow.Subtract(Date);
-            }
+            get { return DateTime.UtcNow.Subtract(Date); }
         }
 
         public string VersionString
@@ -226,8 +236,8 @@ namespace fCraft
                     formatString += "_u";
                 }
                 return String.Format(CultureInfo.InvariantCulture, formatString,
-                                      Decimal.Divide(Version, 1000),
-                                      Revision);
+                    Decimal.Divide(Version, 1000),
+                    Revision);
             }
         }
 
@@ -299,11 +309,13 @@ namespace fCraft
             List<string> list = new List<string>();
             if ((flags & ReleaseFlags.APIChange) == ReleaseFlags.APIChange) list.Add("API Changes");
             if ((flags & ReleaseFlags.Bugfix) == ReleaseFlags.Bugfix) list.Add("Fixes");
-            if ((flags & ReleaseFlags.ConfigFormatChange) == ReleaseFlags.ConfigFormatChange) list.Add("Config Changes");
+            if ((flags & ReleaseFlags.ConfigFormatChange) == ReleaseFlags.ConfigFormatChange)
+                list.Add("Config Changes");
             if ((flags & ReleaseFlags.Dev) == ReleaseFlags.Dev) list.Add("Developer");
             if ((flags & ReleaseFlags.Feature) == ReleaseFlags.Feature) list.Add("New Features");
             if ((flags & ReleaseFlags.MapFormatChange) == ReleaseFlags.MapFormatChange) list.Add("Map Format Changes");
-            if ((flags & ReleaseFlags.PlayerDBFormatChange) == ReleaseFlags.PlayerDBFormatChange) list.Add("PlayerDB Changes");
+            if ((flags & ReleaseFlags.PlayerDBFormatChange) == ReleaseFlags.PlayerDBFormatChange)
+                list.Add("PlayerDB Changes");
             if ((flags & ReleaseFlags.Security) == ReleaseFlags.Security) list.Add("Security Patch");
             if ((flags & ReleaseFlags.Unstable) == ReleaseFlags.Unstable) list.Add("Unstable");
             if ((flags & ReleaseFlags.Optimized) == ReleaseFlags.Optimized) list.Add("Optimized");
@@ -316,7 +328,6 @@ namespace fCraft
         }
     }
 
-
     #region Enums
 
     /// <summary> Updater behavior. </summary>
@@ -328,11 +339,13 @@ namespace fCraft
         /// <summary> Checks for updates and notifies of availability (in console/log). </summary>
         Notify,
 
-        /// <summary> Checks for updates, downloads them if available, and prompts to install.
-        /// Behavior is frontend-specific: in ServerGUI, a dialog is shown with the list of changes and
-        /// options to update immediately or next time. In ServerCLI, asks to type in 'y' to confirm updating
-        /// or press any other key to skip. '''Note: Requires user interaction
-        /// (if you restart the server remotely while unattended, it may get stuck on this dialog).''' </summary>
+        /// <summary>
+        ///     Checks for updates, downloads them if available, and prompts to install.
+        ///     Behavior is frontend-specific: in ServerGUI, a dialog is shown with the list of changes and
+        ///     options to update immediately or next time. In ServerCLI, asks to type in 'y' to confirm updating
+        ///     or press any other key to skip. '''Note: Requires user interaction
+        ///     (if you restart the server remotely while unattended, it may get stuck on this dialog).'''
+        /// </summary>
         Prompt,
 
         /// <summary> Checks for updates, automatically downloads and installs the updates, and restarts the server. </summary>
@@ -350,8 +363,10 @@ namespace fCraft
     }
 
 
-    /// <summary> A list of release flags/attributes.
-    /// Use binary flag logic (value & flag == flag) or Release.IsFlagged() to test for flags. </summary>
+    /// <summary>
+    ///     A list of release flags/attributes.
+    ///     Use binary flag logic (value & flag == flag) or Release.IsFlagged() to test for flags.
+    /// </summary>
     [Flags]
     public enum ReleaseFlags
     {
@@ -366,8 +381,10 @@ namespace fCraft
         /// <summary> Config.xml format was changed (and version was incremented) in this release. </summary>
         ConfigFormatChange = 4,
 
-        /// <summary> This is a developer-only release, not to be used on live servers.
-        /// Untested/undertested releases are often marked as such. </summary>
+        /// <summary>
+        ///     This is a developer-only release, not to be used on live servers.
+        ///     Untested/undertested releases are often marked as such.
+        /// </summary>
         Dev = 8,
 
         /// <summary> A notable new feature was added in this release. </summary>
@@ -391,7 +408,6 @@ namespace fCraft
 
     #endregion
 }
-
 
 namespace fCraft.Events
 {

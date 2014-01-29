@@ -1,21 +1,4 @@
-﻿//Copyright (C) <2011 - 2014>  <Jon Baker, Glenn Mariën and Lao Tszy>
-
-//This program is free software: you can redistribute it and/or modify
-//it under the terms of the GNU General Public License as published by
-//the Free Software Foundation, either version 3 of the License, or
-//(at your option) any later version.
-
-//This program is distributed in the hope that it will be useful,
-//but WITHOUT ANY WARRANTY; without even the implied warranty of
-//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//GNU General Public License for more details.
-
-//You should have received a copy of the GNU General Public License
-//along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-//Copyright (C) <2011 - 2014> Jon Baker (http://au70.net)
-
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
@@ -26,17 +9,19 @@ namespace fCraft
 {
     public class GunGlassTimer
     {
-        private Timer _timer;
-        private bool _started;
-        private Player _player;
         private const int Tick = 125;
         private object _objectLock = new object();
+        private Player _player;
+        private bool _started;
+        private Timer _timer;
+
         public GunGlassTimer(Player player)
         {
             _player = player;
             _started = false;
             _timer = new Timer(callback, null, Timeout.Infinite, Timeout.Infinite);
         }
+
         public void Start()
         {
             lock (_objectLock)
@@ -48,6 +33,7 @@ namespace fCraft
                 }
             }
         }
+
         public void Stop()
         {
             lock (_objectLock)
@@ -56,18 +42,24 @@ namespace fCraft
                 _timer.Change(Timeout.Infinite, Timeout.Infinite);
             }
         }
+
         private void callback(object state)
         {
             try
             {
                 if (_player.IsOnline && _player != null)
                 {
-                    if (_player.GunMode){
+                    if (_player.GunMode)
+                    {
                         GunClass.gunMove(_player);
-                    }else{
+                    }
+                    else
+                    {
                         Stop();
                     }
-                }else{
+                }
+                else
+                {
                     Stop();
                 }
             }
@@ -75,7 +67,7 @@ namespace fCraft
             {
                 Logger.Log(LogType.Error, "GunGlassTimer: " + e);
             }
-            
+
             lock (_objectLock)
             {
                 if (_started)
@@ -83,27 +75,33 @@ namespace fCraft
             }
         }
     }
-    class GunClass
+
+    internal class GunClass
     {
-        public static void Init()
-        {
-            Player.Clicking += ClickedGlass;//
-            Player.JoinedWorld += changedWorld;//
-            Player.Moving += movePortal;//
-            Player.Disconnected += playerDisconnected;//
-            Player.PlacingBlock += playerPlaced;
-            CommandManager.RegisterCommand(CdGun);
-        }
-        static readonly CommandDescriptor CdGun = new CommandDescriptor
+        private static readonly CommandDescriptor CdGun = new CommandDescriptor
         {
             Name = "Gun",
             Category = CommandCategory.Moderation,
             IsConsoleSafe = false,
-            Permissions = new[] { Permission.Gun },
+            Permissions = new[] {Permission.Gun},
             Usage = "/Gun",
-            Help = "Fire At Will! TNT blocks explode TNT with physics on, Blue blocks make a Blue Portal, Orange blocks make an Orange Portal.",
+            Help =
+                "Fire At Will! TNT blocks explode TNT with physics on, Blue blocks make a Blue Portal, Orange blocks make an Orange Portal.",
             Handler = GunHandler
         };
+
+        private static TntBulletBehavior _tntBulletBehavior = new TntBulletBehavior();
+        private static BulletBehavior _bulletBehavior = new BulletBehavior();
+
+        public static void Init()
+        {
+            Player.Clicking += ClickedGlass; //
+            Player.JoinedWorld += changedWorld; //
+            Player.Moving += movePortal; //
+            Player.Disconnected += playerDisconnected; //
+            Player.PlacingBlock += playerPlaced;
+            CommandManager.RegisterCommand(CdGun);
+        }
 
         public static void GunHandler(Player player, Command cmd)
         {
@@ -170,19 +168,19 @@ namespace fCraft
         public static void gunMove(Player player)
         {
             World world = player.World;
-			if (null==world)
-				return;
+            if (null == world)
+                return;
             try
             {
                 lock (world.SyncRoot)
                 {
-					if (null==world.Map)
-						return;
-                    if(player.IsOnline)
+                    if (null == world.Map)
+                        return;
+                    if (player.IsOnline)
                     {
                         Position p = player.Position;
-                        double ksi = 2.0 * Math.PI * (-player.Position.L) / 256.0;
-                        double phi = 2.0 * Math.PI * (player.Position.R - 64) / 256.0;
+                        double ksi = 2.0*Math.PI*(-player.Position.L)/256.0;
+                        double phi = 2.0*Math.PI*(player.Position.R - 64)/256.0;
                         double sphi = Math.Sin(phi);
                         double cphi = Math.Cos(phi);
                         double sksi = Math.Sin(ksi);
@@ -194,9 +192,10 @@ namespace fCraft
                             {
                                 foreach (Vector3I block in player.GunCache.Values)
                                 {
-                                    if(player.IsOnline)
+                                    if (player.IsOnline)
                                     {
-                                        player.Send(PacketWriter.MakeSetBlock(block.X, block.Y, block.Z, world.Map.GetBlock(block)));
+                                        player.Send(PacketWriter.MakeSetBlock(block.X, block.Y, block.Z,
+                                            world.Map.GetBlock(block)));
                                         Vector3I removed;
                                         player.GunCache.TryRemove(block.ToString(), out removed);
                                     }
@@ -211,9 +210,10 @@ namespace fCraft
                                 if (player.IsOnline)
                                 {
                                     //4 is the distance betwen the player and the glass wall
-                                    Vector3I glassBlockPos = new Vector3I((int)(cphi * cksi * 4 - sphi * (0.5 + y) - cphi * sksi * (0.5 + z)),
-										  (int)(sphi * cksi * 4 + cphi * (0.5 + y) - sphi * sksi * (0.5 + z)),
-										  (int)(sksi * 4 + cksi * (0.5 + z)));
+                                    Vector3I glassBlockPos =
+                                        new Vector3I((int) (cphi*cksi*4 - sphi*(0.5 + y) - cphi*sksi*(0.5 + z)),
+                                            (int) (sphi*cksi*4 + cphi*(0.5 + y) - sphi*sksi*(0.5 + z)),
+                                            (int) (sksi*4 + cksi*(0.5 + z)));
                                     glassBlockPos += p.ToBlockCoords();
                                     if (world.Map.GetBlock(glassBlockPos) == Block.Air)
                                     {
@@ -231,7 +231,6 @@ namespace fCraft
                 Logger.Log(LogType.SeriousError, "GunGlass: " + ex);
             }
         }
-        
 
 
         public static void playerPlaced(object sender, PlayerPlacingBlockEventArgs e)
@@ -255,9 +254,6 @@ namespace fCraft
             }
         }
 
-		private static TntBulletBehavior _tntBulletBehavior=new TntBulletBehavior();
-        private static BulletBehavior _bulletBehavior = new BulletBehavior();
-
         public static void ClickedGlass(object sender, PlayerClickingEventArgs e)
         {
             if (e.Player.GunMode && !e.Player.Info.IsHidden && !e.Player.Info.IsFrozen)
@@ -273,11 +269,13 @@ namespace fCraft
                         {
                             if (e.Player.CanFireTNT())
                             {
-                                double ksi = 2.0 * Math.PI * (-e.Player.Position.L) / 256.0;
+                                double ksi = 2.0*Math.PI*(-e.Player.Position.L)/256.0;
                                 double r = Math.Cos(ksi);
-                                double phi = 2.0 * Math.PI * (e.Player.Position.R - 64) / 256.0;
-                                Vector3F dir = new Vector3F((float)(r * Math.Cos(phi)), (float)(r * Math.Sin(phi)), (float)(Math.Sin(ksi)));
-                                world.AddPhysicsTask(new Particle(world, e.Coords, dir, e.Player, Block.TNT, _tntBulletBehavior), 0);
+                                double phi = 2.0*Math.PI*(e.Player.Position.R - 64)/256.0;
+                                Vector3F dir = new Vector3F((float) (r*Math.Cos(phi)), (float) (r*Math.Sin(phi)),
+                                    (float) (Math.Sin(ksi)));
+                                world.AddPhysicsTask(
+                                    new Particle(world, e.Coords, dir, e.Player, Block.TNT, _tntBulletBehavior), 0);
                             }
                         }
                         else
@@ -285,10 +283,11 @@ namespace fCraft
                             Block block = e.Block;
                             if (block == Block.BlueWool) block = Block.Water;
                             if (block == Block.OrangeWool) block = Block.Lava;
-                            double ksi = 2.0 * Math.PI * (-e.Player.Position.L) / 256.0;
+                            double ksi = 2.0*Math.PI*(-e.Player.Position.L)/256.0;
                             double r = Math.Cos(ksi);
-                            double phi = 2.0 * Math.PI * (e.Player.Position.R - 64) / 256.0;
-                            Vector3F dir = new Vector3F((float)(r * Math.Cos(phi)), (float)(r * Math.Sin(phi)), (float)(Math.Sin(ksi)));
+                            double phi = 2.0*Math.PI*(e.Player.Position.R - 64)/256.0;
+                            Vector3F dir = new Vector3F((float) (r*Math.Cos(phi)), (float) (r*Math.Sin(phi)),
+                                (float) (Math.Sin(ksi)));
                             world.AddPhysicsTask(new Particle(world, e.Coords, dir, e.Player, block, _bulletBehavior), 0);
                         }
                     }
@@ -305,7 +304,7 @@ namespace fCraft
                 {
                     return;
                 }
-                Vector3I newPos = new Vector3I(e.NewPosition.X / 32, e.NewPosition.Y / 32, (e.NewPosition.Z / 32));
+                Vector3I newPos = new Vector3I(e.NewPosition.X/32, e.NewPosition.Y/32, (e.NewPosition.Z/32));
                 foreach (Player p in e.Player.World.Players)
                 {
                     foreach (Vector3I block in p.bluePortal)
@@ -318,10 +317,10 @@ namespace fCraft
                                 {
                                     e.Player.TeleportTo(new Position
                                     {
-                                        X = (short)(((p.orangePortal[0].X) + 0.5) * 32),
-                                        Y = (short)(((p.orangePortal[0].Y) + 0.5) * 32),
-                                        Z = (short)(((p.orangePortal[0].Z) + 1.59375) * 32),
-                                        R = (byte)(p.blueOut - 128),
+                                        X = (short) (((p.orangePortal[0].X) + 0.5)*32),
+                                        Y = (short) (((p.orangePortal[0].Y) + 0.5)*32),
+                                        Z = (short) (((p.orangePortal[0].Z) + 1.59375)*32),
+                                        R = (byte) (p.blueOut - 128),
                                         L = e.Player.Position.L
                                     });
                                 }
@@ -340,10 +339,10 @@ namespace fCraft
                                 {
                                     e.Player.TeleportTo(new Position
                                     {
-                                        X = (short)(((p.bluePortal[0].X + 0.5)) * 32),
-                                        Y = (short)(((p.bluePortal[0].Y + 0.5)) * 32),
-                                        Z = (short)(((p.bluePortal[0].Z) + 1.59375) * 32), //fixed point 1.59375 lol.
-                                        R = (byte)(p.orangeOut - 128),
+                                        X = (short) (((p.bluePortal[0].X + 0.5))*32),
+                                        Y = (short) (((p.bluePortal[0].Y + 0.5))*32),
+                                        Z = (short) (((p.bluePortal[0].Z) + 1.59375)*32), //fixed point 1.59375 lol.
+                                        R = (byte) (p.orangeOut - 128),
                                         L = e.Player.Position.L
                                     });
                                 }
@@ -403,15 +402,19 @@ namespace fCraft
                     {
                         if (e.Player.bluePortal.Count > 0)
                         {
-                            e.OldWorld.Map.Blocks[e.OldWorld.Map.Index(e.Player.bluePortal[0])] = (byte)e.Player.blueOld[0];
-                            e.OldWorld.Map.Blocks[e.OldWorld.Map.Index(e.Player.bluePortal[1])] = (byte)e.Player.blueOld[1];
+                            e.OldWorld.Map.Blocks[e.OldWorld.Map.Index(e.Player.bluePortal[0])] =
+                                (byte) e.Player.blueOld[0];
+                            e.OldWorld.Map.Blocks[e.OldWorld.Map.Index(e.Player.bluePortal[1])] =
+                                (byte) e.Player.blueOld[1];
                             e.Player.blueOld.Clear();
                             e.Player.bluePortal.Clear();
                         }
                         if (e.Player.orangePortal.Count > 0)
                         {
-                            e.OldWorld.Map.Blocks[e.OldWorld.Map.Index(e.Player.orangePortal[0])] = (byte)e.Player.orangeOld[0];
-                            e.OldWorld.Map.Blocks[e.OldWorld.Map.Index(e.Player.orangePortal[1])] = (byte)e.Player.orangeOld[1];
+                            e.OldWorld.Map.Blocks[e.OldWorld.Map.Index(e.Player.orangePortal[0])] =
+                                (byte) e.Player.orangeOld[0];
+                            e.OldWorld.Map.Blocks[e.OldWorld.Map.Index(e.Player.orangePortal[1])] =
+                                (byte) e.Player.orangeOld[1];
                             e.Player.orangeOld.Clear();
                             e.Player.orangePortal.Clear();
                         }
@@ -461,13 +464,17 @@ namespace fCraft
                     {
                         if (e.Player.bluePortal.Count > 0)
                         {
-                            e.Player.World.Map.Blocks[e.Player.World.Map.Index(e.Player.bluePortal[0])] = (byte)e.Player.blueOld[0];
-                            e.Player.World.Map.Blocks[e.Player.World.Map.Index(e.Player.bluePortal[1])] = (byte)e.Player.blueOld[1];
+                            e.Player.World.Map.Blocks[e.Player.World.Map.Index(e.Player.bluePortal[0])] =
+                                (byte) e.Player.blueOld[0];
+                            e.Player.World.Map.Blocks[e.Player.World.Map.Index(e.Player.bluePortal[1])] =
+                                (byte) e.Player.blueOld[1];
                         }
                         if (e.Player.orangePortal.Count > 0)
                         {
-                            e.Player.WorldMap.Blocks[e.Player.WorldMap.Index(e.Player.orangePortal[0])] = (byte)e.Player.orangeOld[0];
-                            e.Player.WorldMap.Blocks[e.Player.WorldMap.Index(e.Player.orangePortal[1])] = (byte)e.Player.orangeOld[1];
+                            e.Player.WorldMap.Blocks[e.Player.WorldMap.Index(e.Player.orangePortal[0])] =
+                                (byte) e.Player.orangeOld[0];
+                            e.Player.WorldMap.Blocks[e.Player.WorldMap.Index(e.Player.orangePortal[1])] =
+                                (byte) e.Player.orangeOld[1];
                         }
                     }
                 }
@@ -477,14 +484,15 @@ namespace fCraft
                 Logger.Log(LogType.SeriousError, "GunPortalDisconnected: " + ex);
             }
         }
+
         public static void removal(ConcurrentDictionary<String, Vector3I> bullets, Map map)
         {
             foreach (Vector3I bp in bullets.Values)
             {
                 map.QueueUpdate(new BlockUpdate(null,
-                    (short)bp.X,
-                    (short)bp.Y,
-                    (short)bp.Z,
+                    (short) bp.X,
+                    (short) bp.Y,
+                    (short) bp.Z,
                     Block.Air));
                 Vector3I removed;
                 bullets.TryRemove(bp.ToString(), out removed);

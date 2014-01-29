@@ -1,18 +1,4 @@
-﻿//Copyright (C) <2011 - 2014>  <Jon Baker, Glenn Mariën and Lao Tszy>
-
-//This program is free software: you can redistribute it and/or modify
-//it under the terms of the GNU General Public License as published by
-//the Free Software Foundation, either version 3 of the License, or
-//(at your option) any later version.
-
-//This program is distributed in the hope that it will be useful,
-//but WITHOUT ANY WARRANTY; without even the implied warranty of
-//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//GNU General Public License for more details.
-
-//You should have received a copy of the GNU General Public License
-//along with this program.  If not, see <http://www.gnu.org/licenses/>.
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,29 +19,32 @@ namespace fCraft
             {
                 Player player = e.Player;
                 World world = player.World;
-				if (null==world)
-					return;
-				lock (world.SyncRoot)
+                if (null == world)
+                    return;
+                lock (world.SyncRoot)
                 {
-					if (null!=world.Map && world.IsLoaded && world.plantPhysics)
-					{
-						if (e.NewBlock == Block.Sapling)
-						{
-							world.AddPhysicsTask(new PlantTask(world, (short)e.Coords.X, (short)e.Coords.Y, (short)e.Coords.Z), PlantTask.GetRandomDelay());
-						}
-                		Vector3I z = new Vector3I(e.Coords.X, e.Coords.Y, e.Coords.Z - 1);
-						if (world.Map.GetBlock(z) == Block.Grass && e.NewBlock!= Block.Air)
-						{
-							world.Map.QueueUpdate(new BlockUpdate(null, z, Block.Dirt));
-						}
-						else if (Physics.CanSquash(world.Map.GetBlock(z)) && e.NewBlock!=Block.Air)
-						{
-							e.Result = CanPlaceResult.Revert;
-							Player.RaisePlayerPlacedBlockEvent(player, world.Map, z, world.Map.GetBlock(z), e.NewBlock, BlockChangeContext.Physics);
-							world.Map.QueueUpdate(new BlockUpdate(null, z, e.NewBlock));
-						}
-					}
-				}
+                    if (null != world.Map && world.IsLoaded && world.plantPhysics)
+                    {
+                        if (e.NewBlock == Block.Sapling)
+                        {
+                            world.AddPhysicsTask(
+                                new PlantTask(world, (short) e.Coords.X, (short) e.Coords.Y, (short) e.Coords.Z),
+                                PlantTask.GetRandomDelay());
+                        }
+                        Vector3I z = new Vector3I(e.Coords.X, e.Coords.Y, e.Coords.Z - 1);
+                        if (world.Map.GetBlock(z) == Block.Grass && e.NewBlock != Block.Air)
+                        {
+                            world.Map.QueueUpdate(new BlockUpdate(null, z, Block.Dirt));
+                        }
+                        else if (Physics.CanSquash(world.Map.GetBlock(z)) && e.NewBlock != Block.Air)
+                        {
+                            e.Result = CanPlaceResult.Revert;
+                            Player.RaisePlayerPlacedBlockEvent(player, world.Map, z, world.Map.GetBlock(z), e.NewBlock,
+                                BlockChangeContext.Physics);
+                            world.Map.QueueUpdate(new BlockUpdate(null, z, e.NewBlock));
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -67,11 +56,6 @@ namespace fCraft
 
     public class GrassTask : PhysicsTask //one per world
     {
-        private struct Coords //System.Tuple is a class and comparing to this struct causes a significant overhead, thus not used here
-        {
-            public short X;
-            public short Y;
-        }
         private const int Delay = 150; //not too often, since it has to scan the whole column at some (x, y)
         private short _i = 0; //current position
 
@@ -86,31 +70,33 @@ namespace fCraft
                 w = _map.Width;
                 l = _map.Length;
             }
-            _rndCoords = new Coords[w * l]; //up to 250K per world with grass physics
+            _rndCoords = new Coords[w*l]; //up to 250K per world with grass physics
             for (short i = 0; i < w; ++i)
                 for (short j = 0; j < l; ++j)
-                    _rndCoords[i * l + j] = new Coords() { X = i, Y = j };
+                    _rndCoords[i*l + j] = new Coords() {X = i, Y = j};
             Util.RndPermutate(_rndCoords);
         }
 
         protected override int PerformInternal()
         {
             if (_world == null || _map == null) return 0;
-			if (!_world.plantPhysics || 0 >= _rndCoords.Length) //+sanity check, now we are sure that we have at least 1 element in _rndCoords
+            if (!_world.plantPhysics || 0 >= _rndCoords.Length)
+                //+sanity check, now we are sure that we have at least 1 element in _rndCoords
                 return 0;
 
-			if (_i >= _rndCoords.Length)
-				_i = 0;
-            Coords c = _rndCoords[_i++]; 
-           
+            if (_i >= _rndCoords.Length)
+                _i = 0;
+            Coords c = _rndCoords[_i++];
+
 
             bool shadowed = false;
-            for (short z = (short)(_map.Height - 1); z >= 0; --z)
+            for (short z = (short) (_map.Height - 1); z >= 0; --z)
             {
                 if (_map == null) return 0;
                 Block b = _map.GetBlock(c.X, c.Y, z);
 
-                if (!shadowed && Block.Dirt == b) //we have found dirt and there were nothing casting shadows above, so change it to grass and return
+                if (!shadowed && Block.Dirt == b)
+                    //we have found dirt and there were nothing casting shadows above, so change it to grass and return
                 {
                     _map.QueueUpdate(new BlockUpdate(null, c.X, c.Y, z, Block.Grass));
                     shadowed = true;
@@ -131,7 +117,8 @@ namespace fCraft
                 }
 
                 if (!shadowed)
-                    shadowed = CastsShadow(b); //check if the rest of the column is under a block which casts shadow and thus prevents plants from growing and makes grass to die
+                    shadowed = CastsShadow(b);
+                        //check if the rest of the column is under a block which casts shadow and thus prevents plants from growing and makes grass to die
             }
             return Delay;
         }
@@ -153,6 +140,13 @@ namespace fCraft
                     return true;
             }
         }
+
+        private struct Coords
+            //System.Tuple is a class and comparing to this struct causes a significant overhead, thus not used here
+        {
+            public short X;
+            public short Y;
+        }
     }
 
 
@@ -161,13 +155,6 @@ namespace fCraft
         private const int MinDelay = 3000;
         private const int MaxDelay = 8000;
         private static Random _r = new Random();
-
-        private enum TreeType
-        {
-            NoGrow,
-            Normal,
-            Palm,
-        }
 
         private short _x, _y, _z;
 
@@ -179,21 +166,22 @@ namespace fCraft
             _z = z;
         }
 
-        static public int GetRandomDelay()
+        public static int GetRandomDelay()
         {
             return (_r.Next(MinDelay, MaxDelay));
         }
 
         protected override int PerformInternal()
         {
-            if (_map.GetBlock(_x, _y, _z) != Block.Sapling) //superflous task added by grass scanner or deleted plant. just forget it
+            if (_map.GetBlock(_x, _y, _z) != Block.Sapling)
+                //superflous task added by grass scanner or deleted plant. just forget it
                 return 0;
 
             TreeType type = TypeByBlock(_map.GetBlock(_x, _y, _z - 1));
             if (TreeType.NoGrow == type)
                 return 0;
 
-            short height = (short)_r.Next(4, 7);
+            short height = (short) _r.Next(4, 7);
             if (CanGrow(height))
                 MakeTrunks(height, type);
 
@@ -241,12 +229,19 @@ namespace fCraft
         {
             for (short i = 0; i < height; ++i)
             {
-                _map.QueueUpdate(new BlockUpdate(null, _x, _y, (short)(_z + i), Block.Log));
+                _map.QueueUpdate(new BlockUpdate(null, _x, _y, (short) (_z + i), Block.Log));
             }
             if (TreeType.Normal == type)
                 TreeGeneration.MakeNormalFoliage(_world, new Vector3I(_x, _y, _z), height + 1);
             else
                 TreeGeneration.MakePalmFoliage(_world, new Vector3I(_x, _y, _z), height);
+        }
+
+        private enum TreeType
+        {
+            NoGrow,
+            Normal,
+            Palm,
         }
     }
 }

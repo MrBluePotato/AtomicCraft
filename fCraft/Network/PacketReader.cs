@@ -1,20 +1,20 @@
-﻿// Part of FemtoCraft | Copyright 2012-2014 Matvei Stefarov <me@matvei.org>
-
-using System.IO;
+﻿using System.IO;
 using System.Net;
 using System.Text;
 
 namespace fCraft
 {
-    sealed class PacketReader : BinaryReader
+    internal sealed class PacketReader : BinaryReader
     {
         public PacketReader(Stream stream) :
-            base(stream) { }
+            base(stream)
+        {
+        }
 
 
         public OpCode ReadOpCode()
         {
-            return (OpCode)ReadByte();
+            return (OpCode) ReadByte();
         }
 
 

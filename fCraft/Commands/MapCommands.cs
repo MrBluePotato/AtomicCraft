@@ -5,7 +5,7 @@ using System.Text;
 
 namespace fCraft
 {
-    class MapCommands
+    internal class MapCommands
     {
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Drawing;
+
 //Copyright (C) <2011 - 2014> <Jon Baker, Glenn Mariën and Lao Tszy>
 
 //This program is free software: you can redistribute it and/or modify
@@ -18,11 +19,11 @@ using System.Drawing;
 
 //You should have received a copy of the GNU General Public License
 //along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace fCraft
 {
-    static class DevCommands
+    internal static class DevCommands
     {
-
         public static void Init()
         {
             /*
