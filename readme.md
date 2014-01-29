@@ -7,11 +7,13 @@ The website is currently experiencing technical difficulties. A link will be pos
 
 2) Full Classic Protocol Extension support (Classicube) (30% complete)
 
-3) Factions (0% complete)
+3) UPnP Port Forwarding (0% complete)
 
-4) Web Administration Panel (0% complete)
+4) Factions (0% complete)
 
-5) Improved Global Chat (50% complete)
+5) Web Administration Panel (0% complete)
+
+6) Improved Global Chat (50% complete)
 
 
 ## About AtomicCraft
