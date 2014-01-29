@@ -1,4 +1,26 @@
-﻿using System;
+﻿/*
+ *  Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the "Software"), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in
+ *  all copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
+ *
+ */
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -12,23 +34,21 @@ using fCraft.UpdateInstaller.Properties;
 
 namespace fCraft.UpdateInstaller
 {
-    internal static class Program
+    static class Program
     {
-        private const string ConfigFileNameDefault = "config.xml",
-            BackupFileNameFormat = "AtomicCraftData_{0:yyyyMMdd'_'HH'-'mm'-'ss}_BeforeUpdate.zip";
+        const string ConfigFileNameDefault = "config.xml",
+                     BackupFileNameFormat = "AtomicCraftData_{0:yyyyMMdd'_'HH'-'mm'-'ss}_BeforeUpdate.zip";
 
         public const string DataBackupDirectory = "databackups";
 
-        private static readonly string[] FilesToBackup = new[]
-        {
+        static readonly string[] FilesToBackup = new[]{
             "PlayerDB.txt",
             "config.xml",
             "ipbans.txt",
             "worlds.xml"
         };
 
-        private static readonly string[] LegacyFiles = new[]
-        {
+        static readonly string[] LegacyFiles = new[]{
             "fCraftConsole.exe",
             "fCraftUI.exe",
             "ConfigTool.exe",
@@ -37,7 +57,7 @@ namespace fCraft.UpdateInstaller
         };
 
 
-        private static int Main(string[] args)
+        static int Main(string[] args)
         {
             string restartTarget = null;
             string configFileName = ConfigFileNameDefault;
@@ -73,7 +93,7 @@ namespace fCraft.UpdateInstaller
 
             // Parse update settings
             string runBefore = null,
-                runAfter = null;
+                   runAfter = null;
             bool doBackup = true;
 
             try
@@ -118,7 +138,7 @@ namespace fCraft.UpdateInstaller
                 catch (Exception ex)
                 {
                     Console.Error.WriteLine("Failed to run pre-update process, aborting update application: {0}", ex);
-                    return (int) ReturnCodes.FailedToRunPreUpdateCommand;
+                    return (int)ReturnCodes.FailedToRunPreUpdateCommand;
                 }
             }
 
@@ -128,6 +148,7 @@ namespace fCraft.UpdateInstaller
             {
                 using (ZipStorer zs = ZipStorer.Open(ms, FileAccess.Read))
                 {
+
                     var allFiles = zs.ReadCentralDir().Select(entry => entry.FilenameInZip).Union(LegacyFiles);
 
                     // ensure that AtomicCraft files are writable
@@ -141,9 +162,8 @@ namespace fCraft.UpdateInstaller
                             {
                                 FileInfo fi = new FileInfo(fileName);
                                 if (!fi.Exists) continue;
-                                using (fi.OpenWrite())
-                                {
-                                }
+                                using (fi.OpenWrite()) { }
+
                             }
                             catch (Exception ex)
                             {
@@ -154,7 +174,7 @@ namespace fCraft.UpdateInstaller
                                 else
                                 {
                                     Console.Error.WriteLine("ERROR: could not write to {0}: {1} - {2}",
-                                        fileName, ex.GetType().Name, ex.Message);
+                                                             fileName, ex.GetType().Name, ex.Message);
                                     Console.WriteLine();
                                 }
                                 allPassed = false;
@@ -208,7 +228,7 @@ namespace fCraft.UpdateInstaller
                 catch (Exception ex)
                 {
                     Console.Error.WriteLine("Failed to run post-update process, aborting restart: {0}", ex);
-                    return (int) ReturnCodes.FailedToRunPostUpdateCommand;
+                    return (int)ReturnCodes.FailedToRunPostUpdateCommand;
                 }
             }
 
@@ -237,7 +257,7 @@ namespace fCraft.UpdateInstaller
                 if (!File.Exists(restartTarget))
                 {
                     Console.Error.WriteLine("Restart target not found, quitting: {0}", restartTarget);
-                    return (int) ReturnCodes.RestartTargetNotFound;
+                    return (int)ReturnCodes.RestartTargetNotFound;
                 }
                 string argString = String.Join(" ", argsList.ToArray());
                 Console.WriteLine("Starting: {0} {1}", restartTarget, argString);
@@ -253,11 +273,11 @@ namespace fCraft.UpdateInstaller
                 }
             }
 
-            return (int) ReturnCodes.Ok;
+            return (int)ReturnCodes.Ok;
         }
 
 
-        private static void DoBackup()
+        static void DoBackup()
         {
             if (!Directory.Exists(DataBackupDirectory))
             {
@@ -281,7 +301,7 @@ namespace fCraft.UpdateInstaller
         }
 
 
-        private static string TrimQuotes(this string str)
+        static string TrimQuotes(this string str)
         {
             if (str.StartsWith("\"") && str.EndsWith("\""))
             {
@@ -294,7 +314,7 @@ namespace fCraft.UpdateInstaller
         }
     }
 
-    internal enum ReturnCodes
+    enum ReturnCodes
     {
         Ok = 0,
         FailedToRunPreUpdateCommand = 1,

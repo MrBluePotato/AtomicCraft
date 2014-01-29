@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -15,25 +16,24 @@ namespace fCraft.ConfigGUI
     {
         #region Loading & Applying Config
 
-        private void LoadConfig()
+        void LoadConfig()
         {
             string missingFileMsg = null;
             if (!File.Exists(Paths.WorldListFileName) && !File.Exists(Paths.ConfigFileName))
             {
-                missingFileMsg =
-                    String.Format("Configuration ({0}) and world list ({1}) were not found. Using defaults.",
-                        Paths.ConfigFileName,
-                        Paths.WorldListFileName);
+                missingFileMsg = String.Format("Configuration ({0}) and world list ({1}) were not found. Using defaults.",
+                                                Paths.ConfigFileName,
+                                                Paths.WorldListFileName);
             }
             else if (!File.Exists(Paths.ConfigFileName))
             {
                 missingFileMsg = String.Format("Configuration ({0}) was not found. Using defaults.",
-                    Paths.ConfigFileName);
+                                                 Paths.ConfigFileName);
             }
             else if (!File.Exists(Paths.WorldListFileName))
             {
                 missingFileMsg = String.Format("World list ({0}) was not found. Assuming 0 worlds.",
-                    Paths.WorldListFileName);
+                                                Paths.WorldListFileName);
             }
             if (missingFileMsg != null)
             {
@@ -69,14 +69,17 @@ namespace fCraft.ConfigGUI
             AddChangeHandler(tabs, SomethingChanged);
             AddChangeHandler(bResetTab, SomethingChanged);
             AddChangeHandler(bResetAll, SomethingChanged);
-            dgvWorlds.CellValueChanged += delegate { SomethingChanged(null, null); };
+            dgvWorlds.CellValueChanged += delegate
+            {
+                SomethingChanged(null, null);
+            };
 
             AddChangeHandler(tabChat, HandleTabChatChange);
             bApply.Enabled = false;
         }
 
 
-        private void LoadWorldList()
+        void LoadWorldList()
         {
             if (Worlds.Count > 0) Worlds.Clear();
             if (!File.Exists(Paths.WorldListFileName)) return;
@@ -112,8 +115,7 @@ namespace fCraft.ConfigGUI
                 }
                 if (errorLog.Length > 0)
                 {
-                    MessageBox.Show(
-                        "Some errors occured while loading the world list:" + Environment.NewLine + errorLog, "Warning");
+                    MessageBox.Show("Some errors occured while loading the world list:" + Environment.NewLine + errorLog, "Warning");
                 }
 
                 FillWorldList();
@@ -129,6 +131,7 @@ namespace fCraft.ConfigGUI
                         }
                     }
                 }
+
             }
             catch (Exception ex)
             {
@@ -139,7 +142,7 @@ namespace fCraft.ConfigGUI
         }
 
 
-        private void ApplyTabGeneral()
+        void ApplyTabGeneral()
         {
             HbBox1.Checked = ConfigKey.HbSaverKey.Enabled();
             GCcheckBox.Checked = ConfigKey.GCKey.Enabled();
@@ -190,7 +193,7 @@ namespace fCraft.ConfigGUI
         }
 
 
-        private void ApplyTabChat()
+        void ApplyTabChat()
         {
             xRankColorsInChat.Checked = ConfigKey.RankColorsInChat.Enabled();
             xRankPrefixesInChat.Checked = ConfigKey.RankPrefixesInChat.Enabled();
@@ -235,12 +238,11 @@ namespace fCraft.ConfigGUI
         }
 
 
-        private void ApplyTabWorlds()
+        void ApplyTabWorlds()
         {
             if (rankNameList == null)
             {
-                rankNameList = new BindingList<string>
-                {
+                rankNameList = new BindingList<string> {
                     WorldListEntry.DefaultRankOption
                 };
                 foreach (Rank rank in RankManager.Ranks)
@@ -253,6 +255,7 @@ namespace fCraft.ConfigGUI
 
                 LoadWorldList();
                 dgvWorlds.DataSource = Worlds;
+
             }
             else
             {
@@ -295,7 +298,7 @@ namespace fCraft.ConfigGUI
         }
 
 
-        private void ApplyTabRanks()
+        void ApplyTabRanks()
         {
             selectedRank = null;
             RebuildRankList();
@@ -303,7 +306,7 @@ namespace fCraft.ConfigGUI
         }
 
 
-        private void ApplyTabSecurity()
+        void ApplyTabSecurity()
         {
             ApplyEnum(cVerifyNames, ConfigKey.VerifyNames, NameVerificationMode.Balanced);
 
@@ -355,7 +358,7 @@ namespace fCraft.ConfigGUI
         }
 
 
-        private void ApplyTabSavingAndBackup()
+        void ApplyTabSavingAndBackup()
         {
             xSaveInterval.Checked = (ConfigKey.SaveInterval.GetInt() > 0);
             nSaveInterval.Value = ConfigKey.SaveInterval.GetInt();
@@ -381,7 +384,7 @@ namespace fCraft.ConfigGUI
         }
 
 
-        private void ApplyTabLogging()
+        void ApplyTabLogging()
         {
             foreach (ListViewItem item in vConsoleOptions.Items)
             {
@@ -400,7 +403,7 @@ namespace fCraft.ConfigGUI
         }
 
 
-        private void ApplyTabIRC()
+        void ApplyTabIRC()
         {
             xIRCBotEnabled.Checked = ConfigKey.IRCBotEnabled.Enabled();
             gIRCNetwork.Enabled = xIRCBotEnabled.Checked;
@@ -432,7 +435,7 @@ namespace fCraft.ConfigGUI
             xIRCBotAnnounceServerEvents.Checked = ConfigKey.IRCBotAnnounceServerEvents.Enabled();
         }
 
-        private void ApplyTabEcon()
+        void ApplyTabEcon()
         {
             CurrencyBoxSl.Text = ConfigKey.CurrencyKeySl.GetString();
             CurrencyBoxPl.Text = ConfigKey.CurrencyKeyPl.GetString();
@@ -456,8 +459,7 @@ namespace fCraft.ConfigGUI
             LottoMin.Value = ConfigKey.LottoMinKey.GetInt();
             LottoTime.Value = ConfigKey.LottoTimeKey.GetInt();
         }
-
-        private void ApplyTabAdvanced()
+        void ApplyTabAdvanced()
         {
             xRelayAllBlockUpdates.Checked = ConfigKey.RelayAllBlockUpdates.Enabled();
             xNoPartialPositionUpdates.Checked = ConfigKey.NoPartialPositionUpdates.Enabled();
@@ -472,20 +474,15 @@ namespace fCraft.ConfigGUI
                 switch (ConfigKey.ProcessPriority.GetEnum<ProcessPriorityClass>())
                 {
                     case ProcessPriorityClass.High:
-                        cProcessPriority.SelectedIndex = 1;
-                        break;
+                        cProcessPriority.SelectedIndex = 1; break;
                     case ProcessPriorityClass.AboveNormal:
-                        cProcessPriority.SelectedIndex = 2;
-                        break;
+                        cProcessPriority.SelectedIndex = 2; break;
                     case ProcessPriorityClass.Normal:
-                        cProcessPriority.SelectedIndex = 3;
-                        break;
+                        cProcessPriority.SelectedIndex = 3; break;
                     case ProcessPriorityClass.BelowNormal:
-                        cProcessPriority.SelectedIndex = 4;
-                        break;
+                        cProcessPriority.SelectedIndex = 4; break;
                     case ProcessPriorityClass.Idle:
-                        cProcessPriority.SelectedIndex = 5;
-                        break;
+                        cProcessPriority.SelectedIndex = 5; break;
                 }
             }
 
@@ -505,7 +502,7 @@ namespace fCraft.ConfigGUI
             else
             {
                 xMaxUndo.Checked = false;
-                nMaxUndo.Value = (int) ConfigKey.MaxUndo.GetDefault();
+                nMaxUndo.Value = (int)ConfigKey.MaxUndo.GetDefault();
             }
             nMaxUndoStates.Value = ConfigKey.MaxUndoStates.GetInt();
 
@@ -525,32 +522,33 @@ namespace fCraft.ConfigGUI
         }
 
 
-        private static void ApplyEnum<TEnum>([NotNull] ComboBox box, ConfigKey key, TEnum def) where TEnum : struct
+        static void ApplyEnum<TEnum>([NotNull] ComboBox box, ConfigKey key, TEnum def) where TEnum : struct
         {
             if (box == null) throw new ArgumentNullException("box");
-            if (!typeof (TEnum).IsEnum) throw new ArgumentException("Enum type required");
+            if (!typeof(TEnum).IsEnum) throw new ArgumentException("Enum type required");
             try
             {
                 if (key.IsBlank())
                 {
-                    box.SelectedIndex = (int) (object) def;
+                    box.SelectedIndex = (int)(object)def;
                 }
                 else
                 {
-                    box.SelectedIndex = (int) Enum.Parse(typeof (TEnum), key.GetString(), true);
+                    box.SelectedIndex = (int)Enum.Parse(typeof(TEnum), key.GetString(), true);
                 }
             }
             catch (ArgumentException)
             {
-                box.SelectedIndex = (int) (object) def;
+                box.SelectedIndex = (int)(object)def;
             }
         }
 
         #endregion
 
+
         #region Saving Config
 
-        private void SaveConfig()
+        void SaveConfig()
         {
             // General
             ConfigKey.HbSaverKey.TrySetValue(HbBox1.Checked);
@@ -762,23 +760,17 @@ namespace fCraft.ConfigGUI
             switch (cProcessPriority.SelectedIndex)
             {
                 case 0:
-                    ConfigKey.ProcessPriority.ResetValue();
-                    break;
+                    ConfigKey.ProcessPriority.ResetValue(); break;
                 case 1:
-                    ConfigKey.ProcessPriority.TrySetValue(ProcessPriorityClass.High);
-                    break;
+                    ConfigKey.ProcessPriority.TrySetValue(ProcessPriorityClass.High); break;
                 case 2:
-                    ConfigKey.ProcessPriority.TrySetValue(ProcessPriorityClass.AboveNormal);
-                    break;
+                    ConfigKey.ProcessPriority.TrySetValue(ProcessPriorityClass.AboveNormal); break;
                 case 3:
-                    ConfigKey.ProcessPriority.TrySetValue(ProcessPriorityClass.Normal);
-                    break;
+                    ConfigKey.ProcessPriority.TrySetValue(ProcessPriorityClass.Normal); break;
                 case 4:
-                    ConfigKey.ProcessPriority.TrySetValue(ProcessPriorityClass.BelowNormal);
-                    break;
+                    ConfigKey.ProcessPriority.TrySetValue(ProcessPriorityClass.BelowNormal); break;
                 case 5:
-                    ConfigKey.ProcessPriority.TrySetValue(ProcessPriorityClass.Idle);
-                    break;
+                    ConfigKey.ProcessPriority.TrySetValue(ProcessPriorityClass.Idle); break;
             }
 
             ConfigKey.BlockUpdateThrottling.TrySetValue(Convert.ToInt32(nThrottling.Value));
@@ -795,7 +787,7 @@ namespace fCraft.ConfigGUI
         }
 
 
-        private void SaveWorldList()
+        void SaveWorldList()
         {
             const string worldListTempFileName = Paths.WorldListFileName + ".tmp";
             try
@@ -817,27 +809,27 @@ namespace fCraft.ConfigGUI
             catch (Exception ex)
             {
                 MessageBox.Show(String.Format("An error occured while trying to save world list ({0}): {1}{2}",
-                    Paths.WorldListFileName,
-                    Environment.NewLine,
-                    ex));
+                                                Paths.WorldListFileName,
+                                                Environment.NewLine,
+                                                ex));
             }
         }
 
 
-        private static void WriteEnum<TEnum>([NotNull] ComboBox box, ConfigKey key) where TEnum : struct
+        static void WriteEnum<TEnum>([NotNull] ComboBox box, ConfigKey key) where TEnum : struct
         {
             if (box == null) throw new ArgumentNullException("box");
-            if (!typeof (TEnum).IsEnum) throw new ArgumentException("Enum type required");
+            if (!typeof(TEnum).IsEnum) throw new ArgumentException("Enum type required");
             try
             {
-                TEnum val = (TEnum) Enum.Parse(typeof (TEnum), box.SelectedIndex.ToString(), true);
+                TEnum val = (TEnum)Enum.Parse(typeof(TEnum), box.SelectedIndex.ToString(), true);
                 key.TrySetValue(val);
             }
             catch (ArgumentException)
             {
                 Logger.Log(LogType.Error,
-                    "ConfigUI.WriteEnum<{0}>: Could not parse value for {1}. Using default ({2}).",
-                    typeof (TEnum).Name, key, key.GetString());
+                            "ConfigUI.WriteEnum<{0}>: Could not parse value for {1}. Using default ({2}).",
+                            typeof(TEnum).Name, key, key.GetString());
             }
         }
 

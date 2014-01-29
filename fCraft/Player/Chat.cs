@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using fCraft.Events;
@@ -7,25 +8,21 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 
-namespace fCraft
-{
+namespace fCraft {
     /// <summary> Helper class for handling player-generated chat. </summary>
-    public static class Chat
-    {
+    public static class Chat {
         public static List<string> Swears = new List<string>();
         public static IEnumerable<Regex> badWordMatchers;
-        private static System.Text.ASCIIEncoding enc = new System.Text.ASCIIEncoding();
+        static System.Text.ASCIIEncoding enc = new System.Text.ASCIIEncoding();
 
         #region SendGlobal
-
         /// <summary> Sends a global (white) chat. </summary>
         /// <param name="player"> Player writing the message. </param>
         /// <param name="rawMessage"> Message text. </param>
         /// <returns> True if message was sent, false if it was cancelled by an event callback. </returns>
-        public static bool SendGlobal([NotNull] Player player, [NotNull] string rawMessage)
-        {
-            if (player == null) throw new ArgumentNullException("player");
-            if (rawMessage == null) throw new ArgumentNullException("rawMessage");
+        public static bool SendGlobal( [NotNull] Player player, [NotNull] string rawMessage ) {
+            if( player == null ) throw new ArgumentNullException( "player" );
+            if( rawMessage == null ) throw new ArgumentNullException( "rawMessage" );
             string OriginalMessage = rawMessage;
             if (Server.Moderation && !Server.VoicedPlayers.Contains(player) && player.World != null)
             {
@@ -35,9 +32,7 @@ namespace fCraft
             rawMessage = rawMessage.Replace("$name", player.ClassyName);
             rawMessage = rawMessage.Replace("$kicks", player.Info.TimesKickedOthers.ToString());
             rawMessage = rawMessage.Replace("$bans", player.Info.TimesBannedOthers.ToString());
-            rawMessage = rawMessage.Replace("$awesome",
-                "It is my professional opinion, that " + ConfigKey.ServerName.GetString() +
-                " is the best server on Minecraft");
+            rawMessage = rawMessage.Replace("$awesome", "It is my professional opinion, that " + ConfigKey.ServerName.GetString() + " is the best server on Minecraft");
             rawMessage = rawMessage.Replace("$server", ConfigKey.ServerName.GetString());
             rawMessage = rawMessage.Replace("$motd", ConfigKey.MOTD.GetString());
             rawMessage = rawMessage.Replace("$date", DateTime.UtcNow.ToShortDateString());
@@ -55,8 +50,7 @@ namespace fCraft
                         if (caps > ConfigKey.MaxCaps.GetInt())
                         {
                             rawMessage = rawMessage.ToLower();
-                            player.Message(
-                                "Your message was changed to lowercase as it exceeded the maximum amount of capital letters.");
+                            player.Message("Your message was changed to lowercase as it exceeded the maximum amount of capital letters.");
                         }
                     }
                 }
@@ -107,120 +101,143 @@ namespace fCraft
                 }
 
                 string output = badWordMatchers.
-                    Aggregate(rawMessage, (current, matcher) => matcher.Replace(current, CensoredText));
+                   Aggregate(rawMessage, (current, matcher) => matcher.Replace(current, CensoredText));
                 rawMessage = output;
             }
 
             var recepientList = Server.Players.NotIgnoring(player);
 
-            string formattedMessage = String.Format("{0}&F: {1}",
-                player.ClassyName,
-                rawMessage);
+            string formattedMessage = String.Format( "{0}&F: {1}",
+                                                     player.ClassyName,
+                                                     rawMessage );
 
-            var e = new ChatSendingEventArgs(player,
-                rawMessage,
-                formattedMessage,
-                ChatMessageType.Global,
-                recepientList);
+            var e = new ChatSendingEventArgs( player,
+                                              rawMessage,
+                                              formattedMessage,
+                                              ChatMessageType.Global,
+                                              recepientList );
 
-            if (!SendInternal(e)) return false;
+            if( !SendInternal( e ) ) return false;
 
-            Logger.Log(LogType.GlobalChat,
-                "{0}: {1}", player.Name, OriginalMessage);
+            Logger.Log( LogType.GlobalChat,
+                        "{0}: {1}", player.Name, OriginalMessage );
             return true;
         }
-
         #endregion
-
         #region Emotes
 
-        private static readonly char[] UnicodeReplacements = " ☺☻♥♦♣♠•◘○\n♂♀♪♫☼►◄↕‼¶§▬↨↑↓→←∟↔▲▼".ToCharArray();
+        static readonly char[] UnicodeReplacements = " ☺☻♥♦♣♠•◘○\n♂♀♪♫☼►◄↕‼¶§▬↨↑↓→←∟↔▲▼".ToCharArray();
 
         /// <summary> List of chat keywords, and emotes that they stand for. </summary>
-        public static readonly Dictionary<string, char> EmoteKeywords = new Dictionary<string, char>
-        {
-            {":)", '\u0001'}, // ☺
-            {"smile", '\u0001'},
-            {"smile2", '\u0002'}, // ☻
+        public static readonly Dictionary<string, char> EmoteKeywords = new Dictionary<string, char> {
+            { ":)", '\u0001' }, // ☺
+            { "smile", '\u0001' },
 
-            {"heart", '\u0003'}, // ♥
-            {"hearts", '\u0003'},
-            {"<3", '\u0003'},
-            {"diamond", '\u0004'}, // ♦
-            {"diamonds", '\u0004'},
-            {"rhombus", '\u0004'},
-            {"club", '\u0005'}, // ♣
-            {"clubs", '\u0005'},
-            {"clover", '\u0005'},
-            {"shamrock", '\u0005'},
-            {"spade", '\u0006'}, // ♠
-            {"spades", '\u0006'},
-            {"*", '\u0007'}, // •
-            {"bullet", '\u0007'},
-            {"dot", '\u0007'},
-            {"point", '\u0007'},
-            {"hole", '\u0008'}, // ◘
+            { "smile2", '\u0002' }, // ☻
 
-            {"circle", '\u0009'}, // ○
-            {"o", '\u0009'},
-            {"male", '\u000B'}, // ♂
-            {"mars", '\u000B'},
-            {"female", '\u000C'}, // ♀
-            {"venus", '\u000C'},
-            {"8", '\u000D'}, // ♪
-            {"note", '\u000D'},
-            {"quaver", '\u000D'},
-            {"notes", '\u000E'}, // ♫
-            {"music", '\u000E'},
-            {"sun", '\u000F'}, // ☼
-            {"celestia", '\u000F'},
-            {">>", '\u0010'}, // ►
-            {"right2", '\u0010'},
-            {"<<", '\u0011'}, // ◄
-            {"left2", '\u0011'},
-            {"updown", '\u0012'}, // ↕
-            {"^v", '\u0012'},
-            {"!!", '\u0013'}, // ‼
+            { "heart", '\u0003' }, // ♥
+            { "hearts", '\u0003' },
+            { "<3", '\u0003' },
 
-            {"p", '\u0014'}, // ¶
-            {"para", '\u0014'},
-            {"pilcrow", '\u0014'},
-            {"paragraph", '\u0014'},
-            {"s", '\u0015'}, // §
-            {"sect", '\u0015'},
-            {"section", '\u0015'},
-            {"-", '\u0016'}, // ▬
-            {"_", '\u0016'},
-            {"bar", '\u0016'},
-            {"half", '\u0016'},
-            {"updown2", '\u0017'}, // ↨
-            {"^v_", '\u0017'},
-            {"^", '\u0018'}, // ↑
-            {"up", '\u0018'},
-            {"v", '\u0019'}, // ↓
-            {"down", '\u0019'},
-            {">", '\u001A'}, // →
-            {"->", '\u001A'},
-            {"right", '\u001A'},
-            {"<", '\u001B'}, // ←
-            {"<-", '\u001B'},
-            {"left", '\u001B'},
-            {"l", '\u001C'}, // ∟
-            {"angle", '\u001C'},
-            {"corner", '\u001C'},
-            {"<>", '\u001D'}, // ↔
-            {"<->", '\u001D'},
-            {"leftright", '\u001D'},
-            {"^^", '\u001E'}, // ▲
-            {"up2", '\u001E'},
-            {"vv", '\u001F'}, // ▼
-            {"down2", '\u001F'},
-            {"house", '\u007F'} // ⌂
+            { "diamond", '\u0004' }, // ♦
+            { "diamonds", '\u0004' },
+            { "rhombus", '\u0004' },
+
+            { "club", '\u0005' }, // ♣
+            { "clubs", '\u0005' },
+            { "clover", '\u0005' },
+            { "shamrock", '\u0005' },
+
+            { "spade", '\u0006' }, // ♠
+            { "spades", '\u0006' },
+
+            { "*", '\u0007' }, // •
+            { "bullet", '\u0007' },
+            { "dot", '\u0007' },
+            { "point", '\u0007' },
+
+            { "hole", '\u0008' }, // ◘
+
+            { "circle", '\u0009' }, // ○
+            { "o", '\u0009' },
+
+            { "male", '\u000B' }, // ♂
+            { "mars", '\u000B' },
+
+            { "female", '\u000C' }, // ♀
+            { "venus", '\u000C' },
+
+            { "8", '\u000D' }, // ♪
+            { "note", '\u000D' },
+            { "quaver", '\u000D' },
+
+            { "notes", '\u000E' }, // ♫
+            { "music", '\u000E' },
+
+            { "sun", '\u000F' }, // ☼
+            { "celestia", '\u000F' },
+
+            { ">>", '\u0010' }, // ►
+            { "right2", '\u0010' },
+
+            { "<<", '\u0011' }, // ◄
+            { "left2", '\u0011' },
+
+            { "updown", '\u0012' }, // ↕
+            { "^v", '\u0012' },
+
+            { "!!", '\u0013' }, // ‼
+
+            { "p", '\u0014' }, // ¶
+            { "para", '\u0014' },
+            { "pilcrow", '\u0014' },
+            { "paragraph", '\u0014' },
+
+            { "s", '\u0015' }, // §
+            { "sect", '\u0015' },
+            { "section", '\u0015' },
+
+            { "-", '\u0016' }, // ▬
+            { "_", '\u0016' },
+            { "bar", '\u0016' },
+            { "half", '\u0016' },
+
+            { "updown2", '\u0017' }, // ↨
+            { "^v_", '\u0017' },
+
+            { "^", '\u0018' }, // ↑
+            { "up", '\u0018' },
+
+            { "v", '\u0019' }, // ↓
+            { "down", '\u0019' },
+
+            { ">", '\u001A' }, // →
+            { "->", '\u001A' },
+            { "right", '\u001A' },
+
+            { "<", '\u001B' }, // ←
+            { "<-", '\u001B' },
+            { "left", '\u001B' },
+
+            { "l", '\u001C' }, // ∟
+            { "angle", '\u001C' },
+            { "corner", '\u001C' },
+
+            { "<>", '\u001D' }, // ↔
+            { "<->", '\u001D' },
+            { "leftright", '\u001D' },
+
+            { "^^", '\u001E' }, // ▲
+            { "up2", '\u001E' },
+
+            { "vv", '\u001F' }, // ▼
+            { "down2", '\u001F' },
+
+            { "house", '\u007F' } // ⌂
         };
 
 
-        private static readonly Regex EmoteSymbols = new Regex("[\x00-\x1F\x7F☺☻♥♦♣♠•◘○\n♂♀♪♫☼►◄↕‼¶§▬↨↑↓→←∟↔▲▼⌂]");
-
+        static readonly Regex EmoteSymbols = new Regex("[\x00-\x1F\x7F☺☻♥♦♣♠•◘○\n♂♀♪♫☼►◄↕‼¶§▬↨↑↓→←∟↔▲▼⌂]");
         /// <summary> Strips all emote symbols (ASCII control characters). Does not strip UTF-8 equivalents of emotes. </summary>
         /// <param name="message"> Message to strip emotes from. </param>
         /// <returns> Message with its emotes stripped. </returns>
@@ -232,10 +249,8 @@ namespace fCraft
         }
 
 
-        /// <summary>
-        ///     Replaces emote keywords with actual emotes, using Chat.EmoteKeywords mapping.
-        ///     Keywords are enclosed in curly braces, and are case-insensitive.
-        /// </summary>
+        /// <summary> Replaces emote keywords with actual emotes, using Chat.EmoteKeywords mapping. 
+        /// Keywords are enclosed in curly braces, and are case-insensitive. </summary>
         /// <param name="message"> String to process. </param>
         /// <returns> Processed string. </returns>
         /// <exception cref="ArgumentNullException"> input is null. </exception>
@@ -298,10 +313,8 @@ namespace fCraft
         }
 
 
-        /// <summary>
-        ///     Substitutes percent color codes (e.g. %C) with equivalent ampersand color codes (&amp;C).
-        ///     Also replaces newline codes (%N) with actual newlines (\n).
-        /// </summary>
+        /// <summary> Substitutes percent color codes (e.g. %C) with equivalent ampersand color codes (&amp;C).
+        /// Also replaces newline codes (%N) with actual newlines (\n). </summary>
         /// <param name="message"> Message to process. </param>
         /// <param name="allowNewlines"> Whether newlines are allowed. </param>
         /// <returns> Processed string. </returns>
@@ -434,10 +447,8 @@ namespace fCraft
         }
 
 
-        /// <summary>
-        ///     Replaces UTF-8 symbol characters with ASCII control characters, matching Code Page 437.
-        ///     Opposite of ReplaceEmotesWithUncode.
-        /// </summary>
+        /// <summary> Replaces UTF-8 symbol characters with ASCII control characters, matching Code Page 437.
+        /// Opposite of ReplaceEmotesWithUncode. </summary>
         /// <param name="input"> String to process. </param>
         /// <returns> Processed string, with its UTF-8 symbol characters replaced. </returns>
         /// <exception cref="ArgumentNullException"> input is null. </exception>
@@ -448,17 +459,15 @@ namespace fCraft
             StringBuilder sb = new StringBuilder(input);
             for (int i = 1; i < UnicodeReplacements.Length; i++)
             {
-                sb.Replace(UnicodeReplacements[i], (char) i);
+                sb.Replace(UnicodeReplacements[i], (char)i);
             }
             sb.Replace('⌂', '\u007F');
             return sb.ToString();
         }
 
 
-        /// <summary>
-        ///     Replaces ASCII control characters with UTF-8 symbol characters, matching Code Page 437.
-        ///     Opposite of ReplaceUncodeWithEmotes.
-        /// </summary>
+        /// <summary> Replaces ASCII control characters with UTF-8 symbol characters, matching Code Page 437. 
+        /// Opposite of ReplaceUncodeWithEmotes. </summary>
         /// <param name="input"> String to process. </param>
         /// <returns> Processed string, with its ASCII control characters replaced. </returns>
         /// <exception cref="ArgumentNullException"> input is null. </exception>
@@ -469,7 +478,7 @@ namespace fCraft
             StringBuilder sb = new StringBuilder(input);
             for (int i = 1; i < UnicodeReplacements.Length; i++)
             {
-                sb.Replace((char) i, UnicodeReplacements[i]);
+                sb.Replace((char)i, UnicodeReplacements[i]);
             }
             sb.Replace('\u007F', '⌂');
             return sb.ToString();
@@ -477,236 +486,216 @@ namespace fCraft
 
         #endregion
 
-        #region SendAdmin
 
+        #region SendAdmin
         public static bool SendAdmin(Player player, string rawMessage)
         {
             if (player == null) throw new ArgumentNullException("player");
             if (rawMessage == null) throw new ArgumentNullException("rawMessage");
             var recepientList = Server.Players.Can(Permission.ReadAdminChat)
-                .NotIgnoring(player);
+                                              .NotIgnoring(player);
 
             string formattedMessage = String.Format("&9(Admin){0}&b: {1}",
-                player.ClassyName,
-                rawMessage);
+                                                     player.ClassyName,
+                                                     rawMessage);
 
             var e = new ChatSendingEventArgs(player,
-                rawMessage,
-                formattedMessage,
-                ChatMessageType.Staff,
-                recepientList);
+                                              rawMessage,
+                                              formattedMessage,
+                                              ChatMessageType.Staff,
+                                              recepientList);
 
             if (!SendInternal(e)) return false;
 
             Logger.Log(LogType.GlobalChat, "(Admin){0}: {1}", player.Name, rawMessage);
             return true;
         }
-
         #endregion
 
         #region SendCustom
-
         public static bool SendCustom(Player player, string rawMessage)
         {
             if (player == null) throw new ArgumentNullException("player");
             if (rawMessage == null) throw new ArgumentNullException("rawMessage");
             var recepientList = Server.Players.Can(Permission.ReadCustomChat)
-                .NotIgnoring(player);
+                                              .NotIgnoring(player);
 
             string formattedMessage = String.Format(Color.Custom + "({2}){0}&b: {1}",
-                player.ClassyName,
-                rawMessage, ConfigKey.CustomChatName.GetString());
+                                                     player.ClassyName,
+                                                     rawMessage, ConfigKey.CustomChatName.GetString());
 
             var e = new ChatSendingEventArgs(player,
-                rawMessage,
-                formattedMessage,
-                ChatMessageType.Staff,
-                recepientList);
+                                              rawMessage,
+                                              formattedMessage,
+                                              ChatMessageType.Staff,
+                                              recepientList);
 
             if (!SendInternal(e)) return false;
 
-            Logger.Log(LogType.GlobalChat, "({2}){0}: {1}", player.Name, rawMessage,
-                ConfigKey.CustomChatName.GetString());
+            Logger.Log(LogType.GlobalChat, "({2}){0}: {1}", player.Name, rawMessage, ConfigKey.CustomChatName.GetString());
             return true;
         }
-
         #endregion
 
         #region SendMe
-
         /// <summary> Sends an action message (/Me). </summary>
         /// <param name="player"> Player writing the message. </param>
         /// <param name="rawMessage"> Message text. </param>
         /// <returns> True if message was sent, false if it was cancelled by an event callback. </returns>
-        public static bool SendMe([NotNull] Player player, [NotNull] string rawMessage)
-        {
-            if (player == null) throw new ArgumentNullException("player");
-            if (rawMessage == null) throw new ArgumentNullException("rawMessage");
-            var recepientList = Server.Players.NotIgnoring(player);
+        public static bool SendMe( [NotNull] Player player, [NotNull] string rawMessage ) {
+            if( player == null ) throw new ArgumentNullException( "player" );
+            if( rawMessage == null ) throw new ArgumentNullException( "rawMessage" );
+            var recepientList = Server.Players.NotIgnoring( player );
 
-            string formattedMessage = String.Format("&M*{0} {1}",
-                player.Name,
-                rawMessage);
+            string formattedMessage = String.Format( "&M*{0} {1}",
+                                                     player.Name,
+                                                     rawMessage );
 
-            var e = new ChatSendingEventArgs(player,
-                rawMessage,
-                formattedMessage,
-                ChatMessageType.Me,
-                recepientList);
+            var e = new ChatSendingEventArgs( player,
+                                              rawMessage,
+                                              formattedMessage,
+                                              ChatMessageType.Me,
+                                              recepientList );
 
-            if (!SendInternal(e)) return false;
+            if( !SendInternal( e ) ) return false;
 
-            Logger.Log(LogType.GlobalChat,
-                "(me){0}: {1}", player.Name, rawMessage);
+            Logger.Log( LogType.GlobalChat,
+                        "(me){0}: {1}", player.Name, rawMessage );
             return true;
         }
-
         #endregion
 
         #region SendPM
-
         /// <summary> Sends a private message (PM). Does NOT send a copy of the message to the sender. </summary>
         /// <param name="from"> Sender player. </param>
         /// <param name="to"> Recepient player. </param>
         /// <param name="rawMessage"> Message text. </param>
         /// <returns> True if message was sent, false if it was cancelled by an event callback. </returns>
-        public static bool SendPM([NotNull] Player from, [NotNull] Player to, [NotNull] string rawMessage)
-        {
-            if (from == null) throw new ArgumentNullException("from");
-            if (to == null) throw new ArgumentNullException("to");
-            if (rawMessage == null) throw new ArgumentNullException("rawMessage");
-            var recepientList = new[] {to};
-            string formattedMessage = String.Format("&Pfrom {0}: {1}",
-                from.Name, rawMessage);
+        public static bool SendPM( [NotNull] Player from, [NotNull] Player to, [NotNull] string rawMessage ) {
+            if( from == null ) throw new ArgumentNullException( "from" );
+            if( to == null ) throw new ArgumentNullException( "to" );
+            if( rawMessage == null ) throw new ArgumentNullException( "rawMessage" );
+            var recepientList = new[] { to };
+            string formattedMessage = String.Format( "&Pfrom {0}: {1}",
+                                                     from.Name, rawMessage );
 
-            var e = new ChatSendingEventArgs(from,
-                rawMessage,
-                formattedMessage,
-                ChatMessageType.PM,
-                recepientList);
+            var e = new ChatSendingEventArgs( from,
+                                              rawMessage,
+                                              formattedMessage,
+                                              ChatMessageType.PM,
+                                              recepientList );
 
-            if (!SendInternal(e)) return false;
+            if( !SendInternal( e ) ) return false;
 
-            Logger.Log(LogType.PrivateChat,
-                "{0} to {1}: {2}",
-                from.Name, to.Name, rawMessage);
+            Logger.Log( LogType.PrivateChat,
+                        "{0} to {1}: {2}",
+                        from.Name, to.Name, rawMessage );
             return true;
         }
-
         #endregion
 
         #region SendRank
-
         /// <summary> Sends a rank-wide message (@@Rank message). </summary>
         /// <param name="player"> Player writing the message. </param>
         /// <param name="rank"> Target rank. </param>
         /// <param name="rawMessage"> Message text. </param>
         /// <returns> True if message was sent, false if it was cancelled by an event callback. </returns>
-        public static bool SendRank([NotNull] Player player, [NotNull] Rank rank, [NotNull] string rawMessage)
-        {
-            if (player == null) throw new ArgumentNullException("player");
-            if (rank == null) throw new ArgumentNullException("rank");
-            if (rawMessage == null) throw new ArgumentNullException("rawMessage");
-            var recepientList = rank.Players.NotIgnoring(player).Union(player);
+        public static bool SendRank( [NotNull] Player player, [NotNull] Rank rank, [NotNull] string rawMessage ) {
+            if( player == null ) throw new ArgumentNullException( "player" );
+            if( rank == null ) throw new ArgumentNullException( "rank" );
+            if( rawMessage == null ) throw new ArgumentNullException( "rawMessage" );
+            var recepientList = rank.Players.NotIgnoring( player ).Union( player );
 
-            string formattedMessage = String.Format("&P({0}&P){1}: {2}",
-                rank.ClassyName,
-                player.Name,
-                rawMessage);
+            string formattedMessage = String.Format( "&P({0}&P){1}: {2}",
+                                                     rank.ClassyName,
+                                                     player.Name,
+                                                     rawMessage );
 
-            var e = new ChatSendingEventArgs(player,
-                rawMessage,
-                formattedMessage,
-                ChatMessageType.Rank,
-                recepientList);
+            var e = new ChatSendingEventArgs( player,
+                                              rawMessage,
+                                              formattedMessage,
+                                              ChatMessageType.Rank,
+                                              recepientList );
 
-            if (!SendInternal(e)) return false;
+            if( !SendInternal( e ) ) return false;
 
-            Logger.Log(LogType.RankChat,
-                "(rank {0}){1}: {2}",
-                rank.Name, player.Name, rawMessage);
+            Logger.Log( LogType.RankChat,
+                        "(rank {0}){1}: {2}",
+                        rank.Name, player.Name, rawMessage );
             return true;
         }
-
         #endregion
 
         #region SendSay
-
         /// <summary> Sends a global announcement (/Say). </summary>
         /// <param name="player"> Player writing the message. </param>
         /// <param name="rawMessage"> Message text. </param>
         /// <returns> True if message was sent, false if it was cancelled by an event callback. </returns>
-        public static bool SendSay([NotNull] Player player, [NotNull] string rawMessage)
-        {
-            if (player == null) throw new ArgumentNullException("player");
-            if (rawMessage == null) throw new ArgumentNullException("rawMessage");
-            var recepientList = Server.Players.NotIgnoring(player);
+        public static bool SendSay( [NotNull] Player player, [NotNull] string rawMessage ) {
+            if( player == null ) throw new ArgumentNullException( "player" );
+            if( rawMessage == null ) throw new ArgumentNullException( "rawMessage" );
+            var recepientList = Server.Players.NotIgnoring( player );
 
             string formattedMessage = Color.Say + rawMessage;
 
-            var e = new ChatSendingEventArgs(player,
-                rawMessage,
-                formattedMessage,
-                ChatMessageType.Say,
-                recepientList);
+            var e = new ChatSendingEventArgs( player,
+                                              rawMessage,
+                                              formattedMessage,
+                                              ChatMessageType.Say,
+                                              recepientList );
 
-            if (!SendInternal(e)) return false;
+            if( !SendInternal( e ) ) return false;
 
-            Logger.Log(LogType.GlobalChat,
-                "(say){0}: {1}", player.Name, rawMessage);
+            Logger.Log( LogType.GlobalChat,
+                        "(say){0}: {1}", player.Name, rawMessage );
             return true;
         }
-
         #endregion
 
         #region SendStaff
-
         /// <summary> Sends a staff message (/Staff). </summary>
         /// <param name="player"> Player writing the message. </param>
         /// <param name="rawMessage"> Message text. </param>
         /// <returns> True if message was sent, false if it was cancelled by an event callback. </returns>
-        public static bool SendStaff([NotNull] Player player, [NotNull] string rawMessage)
-        {
-            if (player == null) throw new ArgumentNullException("player");
-            if (rawMessage == null) throw new ArgumentNullException("rawMessage");
-            var recepientList = Server.Players.Can(Permission.ReadStaffChat)
-                .NotIgnoring(player)
-                .Union(player);
+        public static bool SendStaff( [NotNull] Player player, [NotNull] string rawMessage ) {
+            if( player == null ) throw new ArgumentNullException( "player" );
+            if( rawMessage == null ) throw new ArgumentNullException( "rawMessage" );
+            var recepientList = Server.Players.Can( Permission.ReadStaffChat )
+                                              .NotIgnoring( player )
+                                              .Union( player );
 
-            string formattedMessage = String.Format("&P(staff){0}&P: {1}",
-                player.ClassyName,
-                rawMessage);
+            string formattedMessage = String.Format( "&P(staff){0}&P: {1}",
+                                                     player.ClassyName,
+                                                     rawMessage );
 
-            var e = new ChatSendingEventArgs(player,
-                rawMessage,
-                formattedMessage,
-                ChatMessageType.Staff,
-                recepientList);
+            var e = new ChatSendingEventArgs( player,
+                                              rawMessage,
+                                              formattedMessage,
+                                              ChatMessageType.Staff,
+                                              recepientList );
 
-            if (!SendInternal(e)) return false;
+            if( !SendInternal( e ) ) return false;
 
-            Logger.Log(LogType.GlobalChat,
-                "(staff){0}: {1}", player.Name, rawMessage);
+            Logger.Log( LogType.GlobalChat,
+                        "(staff){0}: {1}", player.Name, rawMessage );
             return true;
         }
-
         #endregion
 
-        private static bool SendInternal([NotNull] ChatSendingEventArgs e)
-        {
-            if (e == null) throw new ArgumentNullException("e");
-            if (RaiseSendingEvent(e)) return false;
 
-            int recepients = e.RecepientList.Message(e.FormattedMessage);
+        static bool SendInternal( [NotNull] ChatSendingEventArgs e ) {
+            if( e == null ) throw new ArgumentNullException( "e" );
+            if( RaiseSendingEvent( e ) ) return false;
+
+            int recepients = e.RecepientList.Message( e.FormattedMessage );
 
             // Only increment the MessagesWritten count if someone other than
             // the player was on the recepient list.
-            if (recepients > 1 || (recepients == 1 && e.RecepientList.First() != e.Player))
-            {
+            if( recepients > 1 || (recepients == 1 && e.RecepientList.First() != e.Player) ) {
                 e.Player.Info.ProcessMessageWritten();
             }
 
-            RaiseSentEvent(e, recepients);
+            RaiseSentEvent( e, recepients );
             return true;
         }
 
@@ -714,63 +703,52 @@ namespace fCraft
         /// <summary> Checks for unprintable or illegal characters in a message. </summary>
         /// <param name="message"> Message to check. </param>
         /// <returns> True if message contains invalid chars. False if message is clean. </returns>
-        public static bool ContainsInvalidChars(string message)
-        {
+        public static bool ContainsInvalidChars( string message ) {
             return message.Any(t => t < ' ' || t == '&' || t > '~');
         }
 
 
         /// <summary> Determines the type of player-supplies message based on its syntax. </summary>
-        internal static RawMessageType GetRawMessageType(string message)
-        {
-            if (string.IsNullOrEmpty(message)) return RawMessageType.Invalid;
-            if (message == "/") return RawMessageType.RepeatCommand;
-            if (message.Equals("/ok", StringComparison.OrdinalIgnoreCase)) return RawMessageType.Confirmation;
-            if (message.EndsWith(" /")) return RawMessageType.PartialMessage;
-            if (message.EndsWith(" //")) message = message.Substring(0, message.Length - 1);
+        internal static RawMessageType GetRawMessageType( string message ) {
+            if( string.IsNullOrEmpty( message ) ) return RawMessageType.Invalid;
+            if( message == "/" ) return RawMessageType.RepeatCommand;
+            if( message.Equals( "/ok", StringComparison.OrdinalIgnoreCase ) ) return RawMessageType.Confirmation;
+            if( message.EndsWith( " /" ) ) return RawMessageType.PartialMessage;
+            if( message.EndsWith( " //" ) ) message = message.Substring( 0, message.Length - 1 );
 
-            switch (message[0])
-            {
+            switch( message[0] ) {
                 case '/':
-                    if (message.Length < 2)
-                    {
+                    if( message.Length < 2 ) {
                         // message too short to be a command
                         return RawMessageType.Invalid;
                     }
-                    if (message[1] == '/')
-                    {
+                    if( message[1] == '/' ) {
                         // escaped slash in the beginning: "//blah"
                         return RawMessageType.Chat;
                     }
-                    if (message[1] != ' ')
-                    {
+                    if( message[1] != ' ' ) {
                         // normal command: "/cmd"
                         return RawMessageType.Command;
                     }
                     return RawMessageType.Invalid;
 
                 case '@':
-                    if (message.Length < 4 || message.IndexOf(' ') == -1)
-                    {
+                    if( message.Length < 4 || message.IndexOf( ' ' ) == -1 ) {
                         // message too short to be a PM or rank chat
                         return RawMessageType.Invalid;
                     }
-                    if (message[1] == '@')
-                    {
+                    if( message[1] == '@' ) {
                         return RawMessageType.RankChat;
                     }
-                    if (message[1] == '-' && message[2] == ' ')
-                    {
+                    if( message[1] == '-' && message[2] == ' ' ) {
                         // name shortcut: "@- blah"
                         return RawMessageType.PrivateChat;
                     }
-                    if (message[1] == ' ' && message.IndexOf(' ', 2) != -1)
-                    {
+                    if( message[1] == ' ' && message.IndexOf( ' ', 2 ) != -1 ) {
                         // alternative PM notation: "@ name blah"
                         return RawMessageType.PrivateChat;
                     }
-                    if (message[1] != ' ')
-                    {
+                    if( message[1] != ' ' ) {
                         // primary PM notation: "@name blah"
                         return RawMessageType.PrivateChat;
                     }
@@ -779,23 +757,21 @@ namespace fCraft
             return RawMessageType.Chat;
         }
 
+
         #region Events
 
-        private static bool RaiseSendingEvent(ChatSendingEventArgs args)
-        {
+        static bool RaiseSendingEvent( ChatSendingEventArgs args ) {
             var h = Sending;
-            if (h == null) return false;
-            h(null, args);
+            if( h == null ) return false;
+            h( null, args );
             return args.Cancel;
         }
 
 
-        private static void RaiseSentEvent(ChatSendingEventArgs args, int count)
-        {
+        static void RaiseSentEvent( ChatSendingEventArgs args, int count ) {
             var h = Sent;
-            if (h != null)
-                h(null, new ChatSentEventArgs(args.Player, args.Message, args.FormattedMessage,
-                    args.MessageType, args.RecepientList, count));
+            if( h != null ) h( null, new ChatSentEventArgs( args.Player, args.Message, args.FormattedMessage,
+                                                            args.MessageType, args.RecepientList, count ) );
         }
 
 
@@ -809,8 +785,7 @@ namespace fCraft
     }
 
 
-    public enum ChatMessageType
-    {
+    public enum ChatMessageType {
         Other,
 
         Global,
@@ -824,9 +799,9 @@ namespace fCraft
     }
 
 
+
     /// <summary> Type of message sent by the player. Determined by CommandManager.GetMessageType() </summary>
-    public enum RawMessageType
-    {
+    public enum RawMessageType {
         /// <summary> Unparseable chat syntax (rare). </summary>
         Invalid,
 
@@ -855,15 +830,10 @@ namespace fCraft
 
 #region Events
 
-namespace fCraft.Events
-{
-    public sealed class ChatSendingEventArgs : EventArgs, IPlayerEvent, ICancellableEvent
-    {
-        public readonly IEnumerable<Player> RecepientList;
-
-        internal ChatSendingEventArgs(Player player, string message, string formattedMessage,
-            ChatMessageType messageType, IEnumerable<Player> recepientList)
-        {
+namespace fCraft.Events {
+    public sealed class ChatSendingEventArgs : EventArgs, IPlayerEvent, ICancellableEvent {
+        internal ChatSendingEventArgs( Player player, string message, string formattedMessage,
+                                       ChatMessageType messageType, IEnumerable<Player> recepientList ) {
             Player = player;
             Message = message;
             MessageType = messageType;
@@ -871,19 +841,18 @@ namespace fCraft.Events
             FormattedMessage = formattedMessage;
         }
 
+        public Player Player { get; private set; }
         public string Message { get; private set; }
         public string FormattedMessage { get; set; }
         public ChatMessageType MessageType { get; private set; }
+        public readonly IEnumerable<Player> RecepientList;
         public bool Cancel { get; set; }
-        public Player Player { get; private set; }
     }
 
 
-    public sealed class ChatSentEventArgs : EventArgs, IPlayerEvent
-    {
-        internal ChatSentEventArgs(Player player, string message, string formattedMessage,
-            ChatMessageType messageType, IEnumerable<Player> recepientList, int recepientCount)
-        {
+    public sealed class ChatSentEventArgs : EventArgs, IPlayerEvent {
+        internal ChatSentEventArgs( Player player, string message, string formattedMessage,
+                                    ChatMessageType messageType, IEnumerable<Player> recepientList, int recepientCount ) {
             Player = player;
             Message = message;
             MessageType = messageType;
@@ -892,13 +861,12 @@ namespace fCraft.Events
             RecepientCount = recepientCount;
         }
 
+        public Player Player { get; private set; }
         public string Message { get; private set; }
         public string FormattedMessage { get; private set; }
         public ChatMessageType MessageType { get; private set; }
         public IEnumerable<Player> RecepientList { get; private set; }
         public int RecepientCount { get; private set; }
-        public Player Player { get; private set; }
     }
-
-    #endregion
+#endregion
 }

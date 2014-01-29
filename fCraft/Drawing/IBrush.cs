@@ -1,15 +1,12 @@
-﻿using JetBrains.Annotations;
+﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+using JetBrains.Annotations;
 
 // ReSharper disable UnusedMemberInSuper.Global
+namespace fCraft.Drawing {
 
-namespace fCraft.Drawing
-{
-    /// <summary>
-    ///     Class that desribes a type of brush in general, and allows creating new brushes with /Brush.
-    ///     One instance of IBrushFactory for each type of brush is kept by the BrushManager.
-    /// </summary>
-    public interface IBrushFactory
-    {
+    /// <summary> Class that desribes a type of brush in general, and allows creating new brushes with /Brush.
+    /// One instance of IBrushFactory for each type of brush is kept by the BrushManager. </summary>
+    public interface IBrushFactory {
         [NotNull]
         string Name { get; }
 
@@ -21,22 +18,17 @@ namespace fCraft.Drawing
         string[] Aliases { get; }
 
         /// <summary> Creates a new brush for a player, based on given parameters. </summary>
-        /// <param name="player">
-        ///     Player who will be using this brush.
-        ///     Errors and warnings about the brush creation should be communicated by messaging the player.
-        /// </param>
+        /// <param name="player"> Player who will be using this brush.
+        /// Errors and warnings about the brush creation should be communicated by messaging the player. </param>
         /// <param name="cmd"> Parameters passed to the /Brush command (after the brush name). </param>
         /// <returns> A newly-made brush, or null if there was some problem with parameters/permissions. </returns>
-        IBrush MakeBrush([NotNull] Player player, [NotNull] Command cmd);
+        IBrush MakeBrush( [NotNull] Player player, [NotNull] Command cmd );
     }
 
 
-    /// <summary>
-    ///     Class that describes a configured brush, and allows creating instances for specific DrawOperations.
-    ///     Configuration-free brush types may combine IBrushFactory and IBrushType into one class.
-    /// </summary>
-    public interface IBrush
-    {
+    /// <summary> Class that describes a configured brush, and allows creating instances for specific DrawOperations.
+    /// Configuration-free brush types may combine IBrushFactory and IBrushType into one class. </summary>
+    public interface IBrush {
         /// <summary> IBrushFactory associated with this brush type. </summary>
         [NotNull]
         IBrushFactory Factory { get; }
@@ -46,27 +38,20 @@ namespace fCraft.Drawing
         string Description { get; }
 
         /// <summary> Creates an instance for this configured brush, for use with a specific DrawOperation. </summary>
-        /// <param name="player">
-        ///     Player who will be using this brush.
-        ///     Errors and warnings about the brush creation should be communicated by messaging the player.
-        /// </param>
-        /// <param name="cmd">
-        ///     Parameters passed to the DrawOperation.
-        ///     If any are given, these parameters should generally replace any stored configuration.
-        /// </param>
+        /// <param name="player"> Player who will be using this brush.
+        /// Errors and warnings about the brush creation should be communicated by messaging the player. </param>
+        /// <param name="cmd"> Parameters passed to the DrawOperation.
+        /// If any are given, these parameters should generally replace any stored configuration. </param>
         /// <param name="op"> DrawOperation that will be using this brush. </param>
         /// <returns> A newly-made brush, or null if there was some problem with parameters/permissions. </returns>
-        IBrushInstance MakeInstance([NotNull] Player player, [NotNull] Command cmd, [NotNull] DrawOperation op);
+        IBrushInstance MakeInstance( [NotNull] Player player, [NotNull] Command cmd, [NotNull] DrawOperation op );
     }
 
 
-    /// <summary>
-    ///     Class that describes an individual instance of a configured brush.
-    ///     Each brush instance will only be used for one DrawOperation, so it can store state.
-    ///     Stateless brush types may combine IBrush and IBrushInstance into one class.
-    /// </summary>
-    public interface IBrushInstance
-    {
+    /// <summary> Class that describes an individual instance of a configured brush.
+    /// Each brush instance will only be used for one DrawOperation, so it can store state.
+    /// Stateless brush types may combine IBrush and IBrushInstance into one class. </summary>
+    public interface IBrushInstance {
         /// <summary> Configured brush that created this instance. </summary>
         [NotNull]
         IBrush Brush { get; }
@@ -78,23 +63,19 @@ namespace fCraft.Drawing
         /// <summary> Whether the brush is capable of providing alternate blocks (e.g. for filling hollow DrawOps).</summary>
         bool HasAlternateBlock { get; }
 
-        /// <summary>
-        ///     Called when the DrawOperation starts. Should be used to verify that the brush is ready for use.
-        ///     Resources used by the brush should be obtained here.
-        /// </summary>
+        /// <summary> Called when the DrawOperation starts. Should be used to verify that the brush is ready for use.
+        /// Resources used by the brush should be obtained here. </summary>
         /// <param name="player"> Player who started the DrawOperation. </param>
         /// <param name="op"> DrawOperation that will be using this brush. </param>
         /// <returns> Whether this brush instance has successfully began or not. </returns>
-        bool Begin([NotNull] Player player, [NotNull] DrawOperation op);
+        bool Begin( [NotNull] Player player, [NotNull] DrawOperation op );
 
         /// <summary> Provides the next Block type for the given DrawOperation. </summary>
         /// <returns> Block type to place, or Block.Undefined to skip. </returns>
-        Block NextBlock([NotNull] DrawOperation op);
+        Block NextBlock( [NotNull] DrawOperation op );
 
-        /// <summary>
-        ///     Called when the DrawOperation is done or cancelled.
-        ///     Resources used by the brush should be freed/disposed here.
-        /// </summary>
+        /// <summary> Called when the DrawOperation is done or cancelled.
+        /// Resources used by the brush should be freed/disposed here. </summary>
         void End();
     }
 }

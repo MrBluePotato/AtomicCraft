@@ -1,4 +1,22 @@
-﻿using System;
+﻿//Copyright (C) 2012 Lao Tszy (lao_tszy@yahoo.co.uk)﻿
+  	
+//fCraft Copyright (C) 2009, 2010, 2011, 2012 Matvei Stefarov <me@matvei.org>	
+//Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+//software and associated documentation files (the "Software"), 
+//to deal in the Software without restriction, including without limitation the rights to use, 
+//copy, modify, merge, publish, distribute, sublicense,
+//and/or sell copies of the Software, and to permit persons to whom the Software is 
+//furnished to do so, subject to the following conditions:
+//The above copyright notice and this permission notice shall be included in all copies 
+//or substantial portions of the Software.
+//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+//INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT 
+//HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER	  	
+//LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
+//WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,24 +24,24 @@ using System.Text;
 namespace fCraft
 {
     /// <summary>
-    ///     Base class for physic tasks
+    /// Base class for physic tasks
     /// </summary>
     public abstract class PhysicsTask : IHeapKey<Int64>
     {
         /// <summary>
-        ///     The flag indicating that task must not be performed when due.
-        ///     This flag is introduced because the heap doesnt allow deletion of elements.
-        ///     It is possible to implement but far too complicated than just marking elements like that.
-        /// </summary>
-        public bool Deleted = false;
-
-        /// <summary>
-        ///     the task due time in milliseconds since some start moment
+        /// the task due time in milliseconds since some start moment
         /// </summary>
         public Int64 DueTime;
 
-        protected Map _map;
+        /// <summary>
+        /// The flag indicating that task must not be performed when due.
+        /// This flag is introduced because the heap doesnt allow deletion of elements.
+        /// It is possible to implement but far too complicated than just marking elements like that.
+        /// </summary>
+        public bool Deleted = false;
+
         protected World _world;
+        protected Map _map;
 
         protected PhysicsTask(World world) //a task must be created under the map syn root
         {
@@ -39,28 +57,27 @@ namespace fCraft
             }
         }
 
-        public Int64 GetHeapKey()
+		public Int64 GetHeapKey()
         {
             return DueTime;
         }
 
         /// <summary>
-        ///     Performs the action. The returned value is used as the reschedule delay. If 0 - the task is completed and
-        ///     should not be rescheduled
+        /// Performs the action. The returned value is used as the reschedule delay. If 0 - the task is completed and
+        /// should not be rescheduled
         /// </summary>
         /// <returns></returns>
         public int Perform()
         {
-            lock (_world.SyncRoot)
+			lock (_world.SyncRoot)
             {
                 if (null == _map || !ReferenceEquals(_map, _world.Map))
                     return 0;
                 return PerformInternal();
             }
         }
-
         /// <summary>
-        ///     The real implementation of the action
+        /// The real implementation of the action
         /// </summary>
         /// <returns></returns>
         protected abstract int PerformInternal();
@@ -78,8 +95,8 @@ namespace fCraft
     }
 
     /// <summary>
-    ///     Min binary heap implementation.
-    ///     Note that the base array size is never decreased, i.e. Clear just moves the internal pointer to the first element.
+    /// Min binary heap implementation.
+    /// Note that the base array size is never decreased, i.e. Clear just moves the internal pointer to the first element.
     /// </summary>
     public class MinBinaryHeap<T, K>
         where T : IHeapKey<K>
@@ -89,15 +106,7 @@ namespace fCraft
         private int _free = 0;
 
         /// <summary>
-        ///     Heap size.
-        /// </summary>
-        public int Size
-        {
-            get { return _free; }
-        }
-
-        /// <summary>
-        ///     Adds an element.
+        /// Adds an element.
         /// </summary>
         /// <param name="t">The t.</param>
         public void Add(T t)
@@ -119,7 +128,7 @@ namespace fCraft
         }
 
         /// <summary>
-        ///     Head of this heap. This call assumes that size was checked before accessing the head element.
+        /// Head of this heap. This call assumes that size was checked before accessing the head element.
         /// </summary>
         /// <returns>Head element.</returns>
         public T Head()
@@ -128,7 +137,7 @@ namespace fCraft
         }
 
         /// <summary>
-        ///     Removes the head. This call assumes that size was checked before removing the head element.
+        /// Removes the head. This call assumes that size was checked before removing the head element.
         /// </summary>
         public void RemoveHead()
         {
@@ -139,7 +148,7 @@ namespace fCraft
             int me = 0;
             K myKey = _heap[0].GetHeapKey();
 
-            for (;;)
+            for (; ; )
             {
                 int kid1, kid2;
                 Kids(me, out kid1, out kid2);
@@ -177,6 +186,17 @@ namespace fCraft
             }
         }
 
+        /// <summary>
+        /// Heap size.
+        /// </summary>
+        public int Size
+        {
+            get
+            {
+                return _free;
+            }
+        }
+
         public void Clear()
         {
             for (int i = 0; i < _free; ++i)
@@ -186,12 +206,12 @@ namespace fCraft
 
         private static int ParentIdx(int idx)
         {
-            return (idx - 1)/2;
+            return (idx - 1) / 2;
         }
 
         private static void Kids(int idx, out int kid1, out int kid2)
         {
-            kid1 = 2*idx + 1;
+            kid1 = 2 * idx + 1;
             kid2 = kid1 + 1;
         }
 

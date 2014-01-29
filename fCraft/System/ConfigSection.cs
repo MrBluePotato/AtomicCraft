@@ -1,8 +1,9 @@
-﻿namespace fCraft
-{
+﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+
+namespace fCraft {
     /// <summary> ConfigKey section/category. </summary>
-    public enum ConfigSection
-    {
+    public enum ConfigSection {
+
         /// <summary> General server configuration (name, port, default rank, etc). </summary>
         General,
 

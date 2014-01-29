@@ -3,12 +3,10 @@ using System.IO.Compression;
 
 namespace fCraft.UpdateBuilder
 {
-    internal static class Program
+    static class Program
     {
-        private const string BinariesFileName = "../../UpdateInstaller/Resources/Payload.zip";
 
-        private static readonly string[] FileList =
-        {
+        static readonly string[] FileList = {
             "Server (Graphical).exe",
             "Server (Command Line).exe",
             "fCraft.dll",
@@ -20,8 +18,10 @@ namespace fCraft.UpdateBuilder
             "Readme.txt"
         };
 
+        const string BinariesFileName = "../../UpdateInstaller/Resources/Payload.zip";
 
-        private static void Main()
+
+        static void Main()
         {
             FileInfo binaries = new FileInfo(BinariesFileName);
             if (binaries.Exists)

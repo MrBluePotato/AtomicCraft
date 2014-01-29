@@ -1,11 +1,28 @@
-﻿using System;
+﻿//Copyright (C) <2011 - 2014>  <Jon Baker, Glenn Mariën and Lao Tszy>
+
+//This program is free software: you can redistribute it and/or modify
+//it under the terms of the GNU General Public License as published by
+//the Free Software Foundation, either version 3 of the License, or
+//(at your option) any later version.
+
+//This program is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU General Public License for more details.
+
+//You should have received a copy of the GNU General Public License
+//along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+//Copyright (C) <2011 - 2014> Glenn Mariën (http://project-vanilla.com)
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace fCraft.Utils
 {
-    internal class BroMode
+    class BroMode
     {
         private static BroMode instance;
         private static List<String> broNames;
@@ -48,11 +65,11 @@ namespace fCraft.Utils
                     "Haley Broel Osment",
                     "Brometheus",
                     "Fidel Castbro",
-                    "Broul Castbro",
-                    "Leonid Brozhnev",
-                    "Brotello Putin Brodimir Brodimirovich <tm>",
-                    "Brangela Merkel",
-                    "Brovio Brobrusconi",
+					"Broul Castbro",
+					"Leonid Brozhnev",
+					"Brotello Putin Brodimir Brodimirovich <tm>",
+					"Brangela Merkel",
+					"Brovio Brobrusconi",
                     "Brol Pot",
                     "Elvis Costellbro",
                     "Amy Broehler",
@@ -149,7 +166,7 @@ namespace fCraft.Utils
             return instance;
         }
 
-        private static void Player_Connected(object sender, Events.PlayerConnectedEventArgs e)
+        static void Player_Connected(object sender, Events.PlayerConnectedEventArgs e)
         {
             if (Active)
             {
@@ -157,7 +174,7 @@ namespace fCraft.Utils
             }
         }
 
-        private static void Player_Disconnected(object sender, Events.PlayerDisconnectedEventArgs e)
+        static void Player_Disconnected(object sender, Events.PlayerDisconnectedEventArgs e)
         {
             if (Active)
             {
@@ -216,9 +233,7 @@ namespace fCraft.Utils
                                 if (found)
                                 {
                                     player.Message("Giving you name: " + broNames[index]);
-                                    player.Info.DisplayedName =
-                                        Color.ReplacePercentCodes(player.Info.Rank.Color + player.Info.Rank.Prefix +
-                                                                  broNames[index]);
+                                    player.Info.DisplayedName = Color.ReplacePercentCodes(player.Info.Rank.Color + player.Info.Rank.Prefix + broNames[index]);
                                     namesRegistered++;
                                     registeredBroNames[index] = player;
                                 }
@@ -249,8 +264,7 @@ namespace fCraft.Utils
                 {
                     if (registeredBroNames.ContainsKey(i) && registeredBroNames[i].Name.Equals(p.Name))
                     {
-                        Logger.Log(LogType.SystemActivity,
-                            "Unregistering bro name '" + broNames[i] + "' for player '" + p.Name + "'");
+                        Logger.Log(LogType.SystemActivity, "Unregistering bro name '" + broNames[i] + "' for player '" + p.Name + "'");
                         registeredBroNames.Remove(i);
                         namesRegistered--;
                         if (!p.changedName)

@@ -1,4 +1,20 @@
-﻿using System;
+﻿//Copyright (C) <2011 - 2014>  <Jon Baker, Glenn Mariën and Lao Tszy>
+
+//This program is free software: you can redistribute it and/or modify
+//it under the terms of the GNU General Public License as published by
+//the Free Software Foundation, either version 3 of the License, or
+//(at your option) any later version.
+
+//This program is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU General Public License for more details.
+
+//You should have received a copy of the GNU General Public License
+//along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+//Copyright (C) <2011 - 2014> Glenn Mariën (http://project-vanilla.com)
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,8 +22,9 @@ using System.Collections;
 
 namespace fCraft.Portals
 {
-    internal class PortalHandler
+    class PortalHandler
     {
+
         private static PortalHandler instance;
 
         private PortalHandler()
@@ -28,15 +45,15 @@ namespace fCraft.Portals
             return instance;
         }
 
-        private static void Player_PlacingBlock(object sender, Events.PlayerPlacingBlockEventArgs e)
+        static void Player_PlacingBlock(object sender, Events.PlayerPlacingBlockEventArgs e)
         {
             try
             {
-                if (e.Player.World.Map.Portals != null && e.Player.World.Map.Portals.Count > 0 &&
-                    e.Context != BlockChangeContext.Portal)
+                if (e.Player.World.Map.Portals != null && e.Player.World.Map.Portals.Count > 0 && e.Context != BlockChangeContext.Portal)
                 {
                     lock (e.Player.World.Map.Portals.SyncRoot)
                     {
+
                         foreach (Portal portal in e.Player.World.Map.Portals)
                         {
                             if (portal.IsInRange(e.Coords))
@@ -58,25 +75,22 @@ namespace fCraft.Portals
                             if (e.Player.PortalCache.AffectedBlocks != null)
                             {
                                 if (e.Player.PortalCache.AffectedBlocks.Contains(e.Coords))
-                                {
-                                    //stop output being inside the unfinished portal
+                                { //stop output being inside the unfinished portal
                                     e.Result = CanPlaceResult.Revert;
                                     e.Player.Message("You can not place a block inside a portal");
                                     return;
                                 }
                                 e.Player.PortalCache.DesiredOutputX = e.Coords.ToPlayerCoords().X;
                                 e.Player.PortalCache.DesiredOutputY = e.Coords.ToPlayerCoords().Y;
-                                e.Player.PortalCache.DesiredOutputZ = (e.Coords.Z + 2)*32;
+                                e.Player.PortalCache.DesiredOutputZ = (e.Coords.Z + 2) * 32;
                                 e.Player.PortalCache.DesiredOutputR = e.Player.Position.R;
                                 e.Player.PortalCache.DesiredOutputL = e.Player.Position.L;
 
                                 e.Player.PortalCache.Name = Portal.GenerateName(e.Player.PortalCache.World, true);
                                 string oldWorld = e.Player.PortalCache.World;
                                 e.Player.PortalCache.World = e.Player.World.Name;
-                                PortalHandler.CreatePortal(e.Player.PortalCache, WorldManager.FindWorldExact(oldWorld),
-                                    true);
-                                e.Player.Message(" Portal finalized: Exit point at {0} on world {1}",
-                                    e.Coords.ToString(), e.Player.World.ClassyName);
+                                PortalHandler.CreatePortal(e.Player.PortalCache, WorldManager.FindWorldExact(oldWorld), true);
+                                e.Player.Message(" Portal finalized: Exit point at {0} on world {1}", e.Coords.ToString(), e.Player.World.ClassyName);
                                 e.Player.PortalCache = new Portal();
                                 e.Result = CanPlaceResult.Revert;
                             }
@@ -90,7 +104,7 @@ namespace fCraft.Portals
             }
         }
 
-        private static void Player_JoinedWorld(object sender, Events.PlayerJoinedWorldEventArgs e)
+        static void Player_JoinedWorld(object sender, Events.PlayerJoinedWorldEventArgs e)
         {
             try
             {
@@ -104,7 +118,7 @@ namespace fCraft.Portals
             }
         }
 
-        private static void Player_Moved(object sender, Events.PlayerMovedEventArgs e)
+        static void Player_Moved(object sender, Events.PlayerMovedEventArgs e)
         {
             try
             {
@@ -114,24 +128,19 @@ namespace fCraft.Portals
                     {
                         if (e.Player.CanUsePortal)
                         {
-                            if ((e.OldPosition.X != e.NewPosition.X) || (e.OldPosition.Y != e.NewPosition.Y) ||
-                                (e.OldPosition.Z != (e.NewPosition.Z)))
+                            if ((e.OldPosition.X != e.NewPosition.X) || (e.OldPosition.Y != e.NewPosition.Y) || (e.OldPosition.Z != (e.NewPosition.Z)))
                             {
                                 if (e.Player.Can(Permission.UsePortal))
                                 {
-                                    if (PortalHandler.GetInstance().GetPortal(e.Player) != null &&
-                                        !e.Player.StandingInPortal)
+                                    if (PortalHandler.GetInstance().GetPortal(e.Player) != null && !e.Player.StandingInPortal)
                                     {
-                                        if (e.Player.LastUsedPortal != null &&
-                                            (DateTime.UtcNow - e.Player.LastUsedPortal).TotalSeconds < 4)
+                                        if (e.Player.LastUsedPortal != null && (DateTime.UtcNow - e.Player.LastUsedPortal).TotalSeconds < 4)
                                         {
                                             // To prevent portal loops
-                                            if (e.Player.LastWarnedPortal == null ||
-                                                (DateTime.UtcNow - e.Player.LastWarnedPortal).TotalSeconds > 2)
+                                            if (e.Player.LastWarnedPortal == null || (DateTime.UtcNow - e.Player.LastWarnedPortal).TotalSeconds > 2)
                                             {
                                                 e.Player.LastWarnedPortal = DateTime.UtcNow;
-                                                e.Player.Message("You cannot use portals for another {0} seconds.",
-                                                    4 - (DateTime.UtcNow - e.Player.LastUsedPortal).Seconds);
+                                                e.Player.Message("You cannot use portals for another {0} seconds.", 4 - (DateTime.UtcNow - e.Player.LastUsedPortal).Seconds);
                                             }
                                             return;
                                         }
@@ -151,8 +160,7 @@ namespace fCraft.Portals
                                             case SecurityCheckResult.WhiteListed:
                                                 if (world.IsFull)
                                                 {
-                                                    e.Player.Message("Cannot join {0}&S: world is full.",
-                                                        world.ClassyName);
+                                                    e.Player.Message("Cannot join {0}&S: world is full.", world.ClassyName);
                                                     return;
                                                 }
                                                 e.Player.StopSpectating();
@@ -164,9 +172,7 @@ namespace fCraft.Portals
                                                     }
                                                     else
                                                     {
-                                                        e.Player.TeleportTo(new Position((short) portal.DesiredOutputX,
-                                                            (short) portal.DesiredOutputY, (short) portal.DesiredOutputZ,
-                                                            portal.DesiredOutputR, portal.DesiredOutputL));
+                                                        e.Player.TeleportTo(new Position((short)portal.DesiredOutputX, (short)portal.DesiredOutputY, (short)portal.DesiredOutputZ, portal.DesiredOutputR, portal.DesiredOutputL));
                                                     }
                                                     e.Player.LastWarnedPortal = DateTime.UtcNow;
                                                     e.Player.StandingInPortal = false;
@@ -177,17 +183,11 @@ namespace fCraft.Portals
                                                 {
                                                     if (!portal.HasDesiredOutput)
                                                     {
-                                                        e.Player.JoinWorld(WorldManager.FindWorldExact(portal.World),
-                                                            WorldChangeReason.Portal);
+                                                        e.Player.JoinWorld(WorldManager.FindWorldExact(portal.World), WorldChangeReason.Portal);
                                                     }
                                                     else
                                                     {
-                                                        e.Player.JoinWorld(WorldManager.FindWorldExact(portal.World),
-                                                            WorldChangeReason.Portal,
-                                                            new Position((short) portal.DesiredOutputX,
-                                                                (short) portal.DesiredOutputY,
-                                                                (short) portal.DesiredOutputZ, portal.DesiredOutputR,
-                                                                portal.DesiredOutputL));
+                                                        e.Player.JoinWorld(WorldManager.FindWorldExact(portal.World), WorldChangeReason.Portal, new Position((short)portal.DesiredOutputX, (short)portal.DesiredOutputY, (short)portal.DesiredOutputZ, portal.DesiredOutputR, portal.DesiredOutputL));
                                                     }
                                                 }
                                                 e.Player.Message("You used portal: " + portal.Name);
@@ -199,7 +199,7 @@ namespace fCraft.Portals
                                                 break;
                                             case SecurityCheckResult.RankTooLow:
                                                 e.Player.Message("Cannot join world {0}&S: must be {1}+",
-                                                    world.ClassyName, world.AccessSecurity.MinRank.ClassyName);
+                                                             world.ClassyName, world.AccessSecurity.MinRank.ClassyName);
                                                 break;
                                         }
                                     }
@@ -313,9 +313,9 @@ namespace fCraft.Portals
         {
             try
             {
-                int Xdistance = (world.Map.Spawn.X/32) - block.X;
-                int Ydistance = (world.Map.Spawn.Y/32) - block.Y;
-                int Zdistance = (world.Map.Spawn.Z/32) - block.Z;
+                int Xdistance = (world.Map.Spawn.X / 32) - block.X;
+                int Ydistance = (world.Map.Spawn.Y / 32) - block.Y;
+                int Zdistance = (world.Map.Spawn.Z / 32) - block.Z;
 
                 if (Xdistance <= 10 && Xdistance >= -10)
                 {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -9,7 +10,6 @@ using System.Reflection;
 using System.Text;
 using fCraft.Events;
 using JetBrains.Annotations;
-
 #if DEBUG_EVENTS
 using System.Reflection.Emit;
 #endif
@@ -19,21 +19,20 @@ namespace fCraft
     /// <summary> Central logging class. Logs to file, relays messages to the frontend, submits crash reports. </summary>
     public static class Logger
     {
-        private static readonly object LogLock = new object();
+        static readonly object LogLock = new object();
         public static bool Enabled { get; set; }
         public static readonly bool[] ConsoleOptions;
         public static readonly bool[] LogFileOptions;
 
-        private const string DefaultLogFileName = "AtomicCraft.log",
-            LongDateFormat = "yyyy'-'MM'-'dd'_'HH'-'mm'-'ss",
-            ShortDateFormat = "yyyy'-'MM'-'dd";
-
-        private static readonly Uri CrashReportUri = new Uri("http://error.atomiccraft.net/crashreport.php");
+        const string DefaultLogFileName = "AtomicCraft.log",
+                     LongDateFormat = "yyyy'-'MM'-'dd'_'HH'-'mm'-'ss",
+                     ShortDateFormat = "yyyy'-'MM'-'dd";
+        static readonly Uri CrashReportUri = new Uri("http://error.atomiccraft.net/crashreport.php");
         public static LogSplittingType SplittingType = LogSplittingType.OneFile;
 
-        private static readonly string SessionStart = DateTime.Now.ToString(LongDateFormat); // localized
-        private static readonly Queue<string> RecentMessages = new Queue<string>();
-        private const int MaxRecentMessages = 25;
+        static readonly string SessionStart = DateTime.Now.ToString(LongDateFormat); // localized
+        static readonly Queue<string> RecentMessages = new Queue<string>();
+        const int MaxRecentMessages = 25;
 
         public static string CurrentLogFileName
         {
@@ -55,7 +54,7 @@ namespace fCraft
         static Logger()
         {
             Enabled = true;
-            int typeCount = Enum.GetNames(typeof (LogType)).Length;
+            int typeCount = Enum.GetNames(typeof(LogType)).Length;
             ConsoleOptions = new bool[typeCount];
             LogFileOptions = new bool[typeCount];
             for (int i = 0; i < typeCount; i++)
@@ -70,7 +69,7 @@ namespace fCraft
         {
             // Mark start of logging
             Log(LogType.SystemActivity, "------ Log Starts {0} ({1}) ------",
-                DateTime.Now.ToLongDateString(), DateTime.Now.ToShortDateString()); // localized
+                 DateTime.Now.ToLongDateString(), DateTime.Now.ToShortDateString()); // localized
         }
 
         public static void LogToConsole([NotNull] string message)
@@ -121,7 +120,7 @@ namespace fCraft
                     RecentMessages.Dequeue();
                 }
 
-                if (LogFileOptions[(int) type])
+                if (LogFileOptions[(int)type])
                 {
                     try
                     {
@@ -131,9 +130,8 @@ namespace fCraft
                     {
                         string errorMessage = "Logger.Log: " + ex.Message;
                         RaiseLoggedEvent(errorMessage,
-                            DateTime.Now.ToLongTimeString() + " > " + GetPrefix(LogType.Error) + errorMessage,
-                            // localized
-                            LogType.Error);
+                                          DateTime.Now.ToLongTimeString() + " > " + GetPrefix(LogType.Error) + errorMessage, // localized
+                                          LogType.Error);
                     }
                 }
             }
@@ -157,17 +155,16 @@ namespace fCraft
             }
         }
 
+
         #region Crash Handling
 
-        private static readonly object CrashReportLock = new object();
-            // mutex to prevent simultaneous reports (messes up the timers/requests)
-
-        private static DateTime lastCrashReport = DateTime.MinValue;
-        private const int MinCrashReportInterval = 61; // minimum interval between submitting crash reports, in seconds
+        static readonly object CrashReportLock = new object(); // mutex to prevent simultaneous reports (messes up the timers/requests)
+        static DateTime lastCrashReport = DateTime.MinValue;
+        const int MinCrashReportInterval = 61; // minimum interval between submitting crash reports, in seconds
 
 
         public static void LogAndReportCrash([CanBeNull] string message, [CanBeNull] string assembly,
-            [CanBeNull] Exception exception, bool shutdownImminent)
+                                             [CanBeNull] Exception exception, bool shutdownImminent)
         {
             if (message == null) message = "(null)";
             if (assembly == null) assembly = "(null)";
@@ -182,17 +179,15 @@ namespace fCraft
             try
             {
                 var eventArgs = new CrashedEventArgs(message,
-                    assembly,
-                    exception,
-                    submitCrashReport && !isCommon,
-                    isCommon,
-                    shutdownImminent);
+                                                      assembly,
+                                                      exception,
+                                                      submitCrashReport && !isCommon,
+                                                      isCommon,
+                                                      shutdownImminent);
                 RaiseCrashedEvent(eventArgs);
                 isCommon = eventArgs.IsCommonProblem;
             }
-            catch
-            {
-            }
+            catch { }
             // ReSharper restore EmptyGeneralCatchClause
 
             if (!submitCrashReport || isCommon)
@@ -204,8 +199,7 @@ namespace fCraft
             {
                 if (DateTime.UtcNow.Subtract(lastCrashReport).TotalSeconds < MinCrashReportInterval)
                 {
-                    Log(LogType.Warning,
-                        "Logger.SubmitCrashReport: Could not submit crash report, reports too frequent.");
+                    Log(LogType.Warning, "Logger.SubmitCrashReport: Could not submit crash report, reports too frequent.");
                     return;
                 }
                 lastCrashReport = DateTime.UtcNow;
@@ -225,8 +219,7 @@ namespace fCraft
                     {
                         sb.Append(Uri.EscapeDataString("CLR " + Environment.Version));
                     }
-                    sb.Append("&os=")
-                        .Append(Environment.OSVersion.Platform + " / " + Environment.OSVersion.VersionString);
+                    sb.Append("&os=").Append(Environment.OSVersion.Platform + " / " + Environment.OSVersion.VersionString);
 
                     sb.Append("&exceptiontype=").Append(Uri.EscapeDataString(exception.GetType().ToString()));
                     sb.Append("&exceptionmessage=").Append(Uri.EscapeDataString(exception.Message));
@@ -247,8 +240,8 @@ namespace fCraft
                     }
 
                     string assemblies = AppDomain.CurrentDomain
-                        .GetAssemblies()
-                        .JoinToString(Environment.NewLine, asm => asm.FullName);
+                                                 .GetAssemblies()
+                                                 .JoinToString(Environment.NewLine, asm => asm.FullName);
                     sb.Append("&asm=").Append(Uri.EscapeDataString(assemblies));
 
                     string[] lastFewLines;
@@ -259,7 +252,7 @@ namespace fCraft
                     sb.Append("&log=").Append(Uri.EscapeDataString(String.Join(Environment.NewLine, lastFewLines)));
 
                     byte[] formData = Encoding.UTF8.GetBytes(sb.ToString());
-                    HttpWebRequest request = (HttpWebRequest) WebRequest.Create(CrashReportUri);
+                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(CrashReportUri);
                     request.Method = "POST";
                     request.Timeout = 15000; // 15s timeout
                     request.ContentType = "application/x-www-form-urlencoded";
@@ -274,7 +267,7 @@ namespace fCraft
                     }
 
                     string responseString;
-                    using (HttpWebResponse response = (HttpWebResponse) request.GetResponse())
+                    using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                     {
                         using (Stream responseStream = response.GetResponseStream())
                         {
@@ -321,8 +314,7 @@ namespace fCraft
             string message = null;
             try
             {
-                if ((ex is FileNotFoundException && ex.Message.Contains("Version=3.5")) ||
-                    (ex is FileNotFoundException && ex.Message.Contains("Version=3.5")))
+                if ((ex is FileNotFoundException && ex.Message.Contains("Version=3.5")) || (ex is FileNotFoundException && ex.Message.Contains("Version=3.5")))
                 {
                     message = "Your crash was likely caused by using a wrong version of .NET or Mono runtime. " +
                               "Please update to Microsoft .NET Framework 4 (Windows) OR Mono 2.8+ (Linux, Unix, Mac OS X).";
@@ -359,6 +351,7 @@ namespace fCraft
                 {
                     // Ignore Mono-specific bug in MonitorProcessorUsage()
                     return true;
+
                 }
                 else if (ex is InvalidOperationException && ex.StackTrace.Contains("MD5CryptoServiceProvider"))
                 {
@@ -368,9 +361,8 @@ namespace fCraft
                 }
                 else if (ex.StackTrace.Contains("__Error.WinIOError"))
                 {
-                    message =
-                        "A filesystem-related error has occured. Make sure that only one instance of AtomicCraft is running, " +
-                        "and that no other processes are using server's files or directories.";
+                    message = "A filesystem-related error has occured. Make sure that only one instance of AtomicCraft is running, " +
+                              "and that no other processes are using server's files or directories.";
                     return true;
                 }
                 else if (ex.Message.Contains("UNSTABLE"))
@@ -393,11 +385,11 @@ namespace fCraft
 
         #endregion
 
-        #region Event Tracing
 
+        #region Event Tracing
 #if DEBUG_EVENTS
 
-    // list of events in this assembly
+        // list of events in this assembly
         static readonly Dictionary<int, EventInfo> eventsMap = new Dictionary<int, EventInfo>();
 
 
@@ -520,8 +512,8 @@ namespace fCraft
         }
 
 #endif
-
         #endregion
+
 
         #region Events
 
@@ -529,30 +521,27 @@ namespace fCraft
         public static event EventHandler<LogEventArgs> Logged;
 
 
-        /// <summary>
-        ///     Occurs when the server "crashes" (has an unhandled exception).
-        ///     Note that such occurences will not always cause shutdowns - check ShutdownImminent property.
-        ///     Reporting of the crash may be suppressed.
-        /// </summary>
+        /// <summary> Occurs when the server "crashes" (has an unhandled exception).
+        /// Note that such occurences will not always cause shutdowns - check ShutdownImminent property.
+        /// Reporting of the crash may be suppressed. </summary>
         public static event EventHandler<CrashedEventArgs> Crashed;
 
 
         [DebuggerStepThrough]
-        private static void RaiseLoggedEvent([NotNull] string rawMessage, [NotNull] string line, LogType logType)
+        static void RaiseLoggedEvent([NotNull] string rawMessage, [NotNull] string line, LogType logType)
         {
             if (rawMessage == null) throw new ArgumentNullException("rawMessage");
             if (line == null) throw new ArgumentNullException("line");
             var h = Logged;
-            if (h != null)
-                h(null, new LogEventArgs(rawMessage,
-                    line,
-                    logType,
-                    LogFileOptions[(int) logType],
-                    ConsoleOptions[(int) logType]));
+            if (h != null) h(null, new LogEventArgs(rawMessage,
+                                                      line,
+                                                      logType,
+                                                      LogFileOptions[(int)logType],
+                                                      ConsoleOptions[(int)logType]));
         }
 
 
-        private static void RaiseCrashedEvent(CrashedEventArgs e)
+        static void RaiseCrashedEvent(CrashedEventArgs e)
         {
             var h = Crashed;
             if (h != null) h(null, e);
@@ -586,10 +575,7 @@ namespace fCraft
         /// <summary> Raw commands entered by the player. </summary>
         UserCommand,
 
-        /// <summary>
-        ///     Permission and hack related activity (name verification failures, banned players logging in, detected hacks,
-        ///     etc).
-        /// </summary>
+        /// <summary> Permission and hack related activity (name verification failures, banned players logging in, detected hacks, etc). </summary>
         SuspiciousActivity,
 
         /// <summary> Normal (white) chat written by the players. </summary>
@@ -607,10 +593,8 @@ namespace fCraft
         /// <summary> Messages printed to the console (typically as the result of commands called from console). </summary>
         ConsoleOutput,
 
-        /// <summary>
-        ///     Messages related to IRC activity.
-        ///     Does not include all messages relayed to/from IRC channels.
-        /// </summary>
+        /// <summary> Messages related to IRC activity.
+        /// Does not include all messages relayed to/from IRC channels. </summary>
         IRC,
 
         /// <summary> Information useful for debugging (error details, routine events, system information). </summary>
@@ -637,13 +621,13 @@ namespace fCraft
     #endregion
 }
 
+
 namespace fCraft.Events
 {
     public sealed class LogEventArgs : EventArgs
     {
         [DebuggerStepThrough]
-        internal LogEventArgs(string rawMessage, string message, LogType messageType, bool writeToFile,
-            bool writeToConsole)
+        internal LogEventArgs(string rawMessage, string message, LogType messageType, bool writeToFile, bool writeToConsole)
         {
             RawMessage = rawMessage;
             Message = message;
@@ -651,7 +635,6 @@ namespace fCraft.Events
             WriteToFile = writeToFile;
             WriteToConsole = writeToConsole;
         }
-
         public string RawMessage { get; private set; }
         public string Message { get; private set; }
         public LogType MessageType { get; private set; }
@@ -662,8 +645,7 @@ namespace fCraft.Events
 
     public sealed class CrashedEventArgs : EventArgs
     {
-        internal CrashedEventArgs(string message, string location, Exception exception, bool submitCrashReport,
-            bool isCommonProblem, bool shutdownImminent)
+        internal CrashedEventArgs(string message, string location, Exception exception, bool submitCrashReport, bool isCommonProblem, bool shutdownImminent)
         {
             Message = message;
             Location = location;
@@ -672,7 +654,6 @@ namespace fCraft.Events
             IsCommonProblem = isCommonProblem;
             ShutdownImminent = shutdownImminent;
         }
-
         public string Message { get; private set; }
         public string Location { get; private set; }
         public Exception Exception { get; private set; }

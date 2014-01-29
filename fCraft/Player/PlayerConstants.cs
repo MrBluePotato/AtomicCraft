@@ -1,12 +1,10 @@
-﻿using System;
+﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+using System;
 
 // This file condenses some of the player-related enumerations
-
-namespace fCraft
-{
+namespace fCraft {
     /// <summary> List of possible reasons for players leaving the server. </summary>
-    public enum LeaveReason : byte
-    {
+    public enum LeaveReason : byte {
         /// <summary> Unknown leave reason (default) </summary>
         Unknown = 0x00,
 
@@ -26,7 +24,8 @@ namespace fCraft
         InvalidMessageKick = 0x12,
 
         /// <summary> Attempted to place invalid blocktype </summary>
-        [Obsolete] InvalidSetTileKick = 0x13,
+        [Obsolete]
+        InvalidSetTileKick = 0x13,
 
         /// <summary> Unknown opcode or packet </summary>
         InvalidOpcodeKick = 0x14,
@@ -75,33 +74,25 @@ namespace fCraft
 
 
     /// <summary> Mode of player name verification. </summary>
-    public enum NameVerificationMode
-    {
-        /// <summary>
-        ///     Player names are not checked.
-        ///     Any connecting player can assume any identity.
-        /// </summary>
+    public enum NameVerificationMode {
+        /// <summary> Player names are not checked.
+        /// Any connecting player can assume any identity. </summary>
         Never,
 
-        /// <summary>
-        ///     Security balanced with usability.
-        ///     If normal verification fails, an additional check is done:
-        ///     If player has previously verified for his current IP and has connected at least twice before, he is allowed in.
-        /// </summary>
+        /// <summary> Security balanced with usability.
+        /// If normal verification fails, an additional check is done:
+        /// If player has previously verified for his current IP and has connected at least twice before, he is allowed in. </summary>
         Balanced,
 
-        /// <summary>
-        ///     Strict verification checks.
-        ///     If name cannot be verified, player is kicked and a failed login attempt is logged.
-        ///     Note that players connecting from localhost (127.0.0.1) are always allowed.
-        /// </summary>
+        /// <summary> Strict verification checks.
+        /// If name cannot be verified, player is kicked and a failed login attempt is logged.
+        /// Note that players connecting from localhost (127.0.0.1) are always allowed. </summary>
         Always
     }
 
 
     /// <summary> Describes the way player's rank was set. </summary>
-    public enum RankChangeType : byte
-    {
+    public enum RankChangeType : byte {
         /// <summary> Default rank (never been promoted or demoted). </summary>
         Default = 0,
 
@@ -119,12 +110,9 @@ namespace fCraft
     }
 
 
-    /// <summary>
-    ///     Bandwidth use mode.
-    ///     This setting affects the way player receive movement updates.
-    /// </summary>
-    public enum BandwidthUseMode : byte
-    {
+    /// <summary> Bandwidth use mode.
+    /// This setting affects the way player receive movement updates. </summary>
+    public enum BandwidthUseMode : byte {
         /// <summary> Use server default. </summary>
         Default = 0,
 
@@ -146,8 +134,8 @@ namespace fCraft
 
 
     /// <summary> A list of possible results of Player.CanPlace() permission test. </summary>
-    public enum CanPlaceResult
-    {
+    public enum CanPlaceResult {
+
         /// <summary> Block may be placed/changed. </summary>
         Allowed,
 
@@ -160,33 +148,26 @@ namespace fCraft
         /// <summary> Player was not allowed to build on this particular world. </summary>
         WorldDenied,
 
-        /// <summary>
-        ///     Player was not allowed to build in this particular zone.
-        ///     Use World.Map.FindDeniedZone() to find the specific zone.
-        /// </summary>
+        /// <summary> Player was not allowed to build in this particular zone.
+        /// Use World.Map.FindDeniedZone() to find the specific zone. </summary>
         ZoneDenied,
 
         /// <summary> Player's rank is not allowed to build or delete in general. </summary>
         RankDenied,
 
-        /// <summary>
-        ///     A plugin callback cancelled block placement/deletion.
-        ///     To keep player's copy of the map in sync, he will be resent the old blocktype at that location.
-        /// </summary>
+        /// <summary> A plugin callback cancelled block placement/deletion.
+        /// To keep player's copy of the map in sync, he will be resent the old blocktype at that location. </summary>
         PluginDenied,
 
-        /// <summary>
-        ///     A plugin callback cancelled block placement/deletion.
-        ///     A copy of the old block will not be sent to the player (he may go out of sync).
-        /// </summary>
+        /// <summary> A plugin callback cancelled block placement/deletion.
+        /// A copy of the old block will not be sent to the player (he may go out of sync). </summary>
         PluginDeniedNoUpdate,
-
+        
         Revert
     }
 
 
-    public enum WorldChangeReason
-    {
+    public enum WorldChangeReason {
         /// <summary> First world that the player joins upon entering the server (main). </summary>
         FirstWorld,
 
@@ -216,8 +197,7 @@ namespace fCraft
     }
 
 
-    public enum BanStatus : byte
-    {
+    public enum BanStatus : byte {
         /// <summary> Player is not banned. </summary>
         NotBanned,
 
@@ -229,8 +209,7 @@ namespace fCraft
     }
 
 
-    public enum ClickAction : byte
-    {
+    public enum ClickAction : byte {
         /// <summary> Deleting a block (left-click in Minecraft). </summary>
         Delete = 0,
 
@@ -239,8 +218,7 @@ namespace fCraft
     }
 
 
-    public enum SessionState
-    {
+    public enum SessionState {
         /// <summary> There is no session associated with this player (e.g. Console). </summary>
         Offline,
 

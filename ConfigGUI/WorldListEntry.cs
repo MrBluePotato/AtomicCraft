@@ -9,172 +9,17 @@ using JetBrains.Annotations;
 namespace fCraft.ConfigGUI
 {
     /// <summary>
-    ///     A wrapper for per-World metadata, designed to be usable with SortableBindingList.
-    ///     All these properties map directly to the UI controls.
+    /// A wrapper for per-World metadata, designed to be usable with SortableBindingList.
+    /// All these properties map directly to the UI controls.
     /// </summary>
-    internal sealed class WorldListEntry : ICloneable
+    sealed class WorldListEntry : ICloneable
     {
         public const string WorldInfoSignature = "(ConfigGUI)";
         public const string DefaultRankOption = "(everyone)";
-        private const string MapFileExtension = ".fcm";
-        private readonly bool blockDBIsPreloaded;
-        private readonly int blockDBLimit;
-        private readonly XElement environmentEl;
+        const string MapFileExtension = ".fcm";
 
-        public string LoadedBy;
-        public DateTime LoadedOn;
-        public string MapChangedBy;
-        public DateTime MapChangedOn;
-        private TimeSpan blockDBTimeLimit;
+        internal bool LoadingFailed { get; private set; }
 
-
-        private Map cachedMapHeader;
-
-        #region List Properties
-
-        private readonly SecurityController accessSecurity = new SecurityController();
-        private readonly SecurityController buildSecurity = new SecurityController();
-        private string accessRankString;
-        private string buildRankString;
-        private string name;
-
-        [SortableProperty(typeof (WorldListEntry), "Compare")]
-        public string Name
-        {
-            get { return name; }
-            set
-            {
-                if (name == value) return;
-                if (!World.IsValidName(value))
-                {
-                    throw new FormatException("Invalid world name");
-                }
-                else if (!value.Equals(name, StringComparison.OrdinalIgnoreCase) && MainForm.IsWorldNameTaken(value))
-                {
-                    throw new FormatException("Duplicate world names are not allowed.");
-                }
-                else
-                {
-                    string oldName = name;
-                    string oldFileName = Path.Combine(Paths.MapPath, oldName + ".fcm");
-                    string newFileName = Path.Combine(Paths.MapPath, value + ".fcm");
-                    if (File.Exists(oldFileName))
-                    {
-                        bool isSameFile;
-                        if (MonoCompat.IsCaseSensitive)
-                        {
-                            isSameFile = newFileName.Equals(oldFileName, StringComparison.Ordinal);
-                        }
-                        else
-                        {
-                            isSameFile = newFileName.Equals(oldFileName, StringComparison.OrdinalIgnoreCase);
-                        }
-                        if (File.Exists(newFileName) && !isSameFile)
-                        {
-                            string messageText = String.Format("Map file \"{0}\" already exists. Overwrite?",
-                                value + ".fcm");
-                            var result = MessageBox.Show(messageText, "", MessageBoxButtons.OKCancel);
-                            if (result == DialogResult.Cancel) return;
-                        }
-                        Paths.ForceRename(oldFileName, newFileName);
-                    }
-                    name = value;
-                    if (oldName != null)
-                    {
-                        MainForm.HandleWorldRename(oldName, name);
-                    }
-                }
-            }
-        }
-
-
-        [SortableProperty(typeof (WorldListEntry), "Compare")]
-        public string Description
-        {
-            get
-            {
-                Map mapHeader = MapHeader;
-                if (LoadingFailed)
-                {
-                    return "(cannot load file)";
-                }
-                else
-                {
-                    return String.Format("{0} × {1} × {2}",
-                        mapHeader.Width,
-                        mapHeader.Length,
-                        mapHeader.Height);
-                }
-            }
-        }
-
-
-        public bool Hidden { get; set; }
-
-
-        public string AccessPermission
-        {
-            get
-            {
-                if (accessSecurity.HasRankRestriction)
-                {
-                    return MainForm.ToComboBoxOption(accessSecurity.MinRank);
-                }
-                else
-                {
-                    return DefaultRankOption;
-                }
-            }
-            set
-            {
-                foreach (Rank rank in RankManager.Ranks)
-                {
-                    if (MainForm.ToComboBoxOption(rank) == value)
-                    {
-                        accessSecurity.MinRank = rank;
-                        accessRankString = rank.FullName;
-                        return;
-                    }
-                }
-                accessSecurity.ResetMinRank();
-                accessRankString = "";
-            }
-        }
-
-
-        public string BuildPermission
-        {
-            get
-            {
-                if (buildSecurity.HasRankRestriction)
-                {
-                    return MainForm.ToComboBoxOption(buildSecurity.MinRank);
-                }
-                else
-                {
-                    return DefaultRankOption;
-                }
-            }
-            set
-            {
-                foreach (Rank rank in RankManager.Ranks)
-                {
-                    if (MainForm.ToComboBoxOption(rank) == value)
-                    {
-                        buildSecurity.MinRank = rank;
-                        buildRankString = rank.FullName;
-                        return;
-                    }
-                }
-                buildSecurity.ResetMinRank();
-                buildRankString = null;
-            }
-        }
-
-
-        public string Backup { get; set; }
-
-        #endregion
 
         public WorldListEntry([NotNull] string newName)
         {
@@ -214,8 +59,7 @@ namespace fCraft.ConfigGUI
             }
             if (!World.IsValidName(temp.Value))
             {
-                throw new FormatException("WorldListEntity: Cannot parse XML: Invalid world name skipped \"" +
-                                          temp.Value + "\".");
+                throw new FormatException("WorldListEntity: Cannot parse XML: Invalid world name skipped \"" + temp.Value + "\".");
             }
             name = temp.Value;
 
@@ -228,8 +72,7 @@ namespace fCraft.ConfigGUI
                 }
                 else
                 {
-                    throw new FormatException(
-                        "WorldListEntity: Cannot parse XML: Invalid value for \"hidden\" attribute.");
+                    throw new FormatException("WorldListEntity: Cannot parse XML: Invalid value for \"hidden\" attribute.");
                 }
             }
             else
@@ -247,7 +90,7 @@ namespace fCraft.ConfigGUI
                 else
                 {
                     Logger.Log(LogType.Error,
-                        "WorldListEntity: Cannot parse backup settings for world \"{0}\". Assuming default.", name);
+                                "WorldListEntity: Cannot parse backup settings for world \"{0}\". Assuming default.", name);
                     Backup = BackupEnumNames[0];
                 }
             }
@@ -285,8 +128,8 @@ namespace fCraft.ConfigGUI
                     else
                     {
                         Logger.Log(LogType.Warning,
-                            "WorldListEntity: Could not parse BlockDB \"enabled\" attribute of world \"{0}\", assuming \"Auto\".",
-                            name);
+                                    "WorldListEntity: Could not parse BlockDB \"enabled\" attribute of world \"{0}\", assuming \"Auto\".",
+                                    name);
                         BlockDBEnabled = YesNoAuto.Auto;
                     }
                 }
@@ -301,8 +144,8 @@ namespace fCraft.ConfigGUI
                     else
                     {
                         Logger.Log(LogType.Warning,
-                            "WorldListEntity: Could not parse BlockDB \"preload\" attribute of world \"{0}\", assuming NOT preloaded.",
-                            name);
+                                    "WorldListEntity: Could not parse BlockDB \"preload\" attribute of world \"{0}\", assuming NOT preloaded.",
+                                    name);
                     }
                 }
                 if ((temp = blockEl.Attribute("limit")) != null)
@@ -315,8 +158,8 @@ namespace fCraft.ConfigGUI
                     else
                     {
                         Logger.Log(LogType.Warning,
-                            "WorldListEntity: Could not parse BlockDB \"limit\" attribute of world \"{0}\", assuming NO limit.",
-                            name);
+                                    "WorldListEntity: Could not parse BlockDB \"limit\" attribute of world \"{0}\", assuming NO limit.",
+                                    name);
                     }
                 }
                 if ((temp = blockEl.Attribute("timeLimit")) != null)
@@ -329,8 +172,8 @@ namespace fCraft.ConfigGUI
                     else
                     {
                         Logger.Log(LogType.Warning,
-                            "WorldListEntity: Could not parse BlockDB \"timeLimit\" attribute of world \"{0}\", assuming NO time limit.",
-                            name);
+                                    "WorldListEntity: Could not parse BlockDB \"timeLimit\" attribute of world \"{0}\", assuming NO time limit.",
+                                    name);
                     }
                 }
             }
@@ -361,96 +204,160 @@ namespace fCraft.ConfigGUI
             environmentEl = el.Element(WorldManager.EnvironmentXmlTagName);
         }
 
-        internal bool LoadingFailed { get; private set; }
+        public string LoadedBy, MapChangedBy;
+        public DateTime LoadedOn, MapChangedOn;
+        readonly XElement environmentEl;
 
-        internal Map MapHeader
+
+        #region List Properties
+
+        string name;
+        [SortableProperty(typeof(WorldListEntry), "Compare")]
+        public string Name
         {
             get
             {
-                if (cachedMapHeader == null && !LoadingFailed)
+                return name;
+            }
+            set
+            {
+                if (name == value) return;
+                if (!World.IsValidName(value))
                 {
-                    string fullFileName = Path.Combine(Paths.MapPath, name + ".fcm");
-                    LoadingFailed = !MapUtility.TryLoadHeader(fullFileName, out cachedMapHeader);
+                    throw new FormatException("Invalid world name");
+
                 }
-                return cachedMapHeader;
+                else if (!value.Equals(name, StringComparison.OrdinalIgnoreCase) && MainForm.IsWorldNameTaken(value))
+                {
+                    throw new FormatException("Duplicate world names are not allowed.");
+
+                }
+                else
+                {
+                    string oldName = name;
+                    string oldFileName = Path.Combine(Paths.MapPath, oldName + ".fcm");
+                    string newFileName = Path.Combine(Paths.MapPath, value + ".fcm");
+                    if (File.Exists(oldFileName))
+                    {
+                        bool isSameFile;
+                        if (MonoCompat.IsCaseSensitive)
+                        {
+                            isSameFile = newFileName.Equals(oldFileName, StringComparison.Ordinal);
+                        }
+                        else
+                        {
+                            isSameFile = newFileName.Equals(oldFileName, StringComparison.OrdinalIgnoreCase);
+                        }
+                        if (File.Exists(newFileName) && !isSameFile)
+                        {
+                            string messageText = String.Format("Map file \"{0}\" already exists. Overwrite?", value + ".fcm");
+                            var result = MessageBox.Show(messageText, "", MessageBoxButtons.OKCancel);
+                            if (result == DialogResult.Cancel) return;
+                        }
+                        Paths.ForceRename(oldFileName, newFileName);
+                    }
+                    name = value;
+                    if (oldName != null)
+                    {
+                        MainForm.HandleWorldRename(oldName, name);
+                    }
+                }
             }
         }
 
 
-        internal string FileName
+        [SortableProperty(typeof(WorldListEntry), "Compare")]
+        public string Description
         {
-            get { return Name + MapFileExtension; }
+            get
+            {
+                Map mapHeader = MapHeader;
+                if (LoadingFailed)
+                {
+                    return "(cannot load file)";
+                }
+                else
+                {
+                    return String.Format("{0} × {1} × {2}",
+                                          mapHeader.Width,
+                                          mapHeader.Length,
+                                          mapHeader.Height);
+                }
+            }
         }
 
 
-        internal string FullFileName
+        public bool Hidden { get; set; }
+
+
+        readonly SecurityController accessSecurity = new SecurityController();
+        string accessRankString;
+        public string AccessPermission
         {
-            get { return Path.Combine(Paths.MapPath, Name + MapFileExtension); }
+            get
+            {
+                if (accessSecurity.HasRankRestriction)
+                {
+                    return MainForm.ToComboBoxOption(accessSecurity.MinRank);
+                }
+                else
+                {
+                    return DefaultRankOption;
+                }
+            }
+            set
+            {
+                foreach (Rank rank in RankManager.Ranks)
+                {
+                    if (MainForm.ToComboBoxOption(rank) == value)
+                    {
+                        accessSecurity.MinRank = rank;
+                        accessRankString = rank.FullName;
+                        return;
+                    }
+                }
+                accessSecurity.ResetMinRank();
+                accessRankString = "";
+            }
         }
 
-        public YesNoAuto BlockDBEnabled { get; set; }
 
-        #region Backup
-
-        public static readonly string[] BackupEnumNames = new[]
+        readonly SecurityController buildSecurity = new SecurityController();
+        string buildRankString;
+        public string BuildPermission
         {
-            "(default)",
-            "Never",
-            "5 Minutes",
-            "10 Minutes",
-            "15 Minutes",
-            "20 Minutes",
-            "30 Minutes",
-            "45 Minutes",
-            "1 Hour",
-            "2 Hours",
-            "3 Hours",
-            "4 Hours",
-            "6 Hours",
-            "8 Hours",
-            "12 Hours",
-            "24 Hours",
-            "48 Hours"
-        };
-
-        private static readonly TimeSpan[] BackupEnumValues = new[]
-        {
-            TimeSpan.FromSeconds(-1), // default
-            TimeSpan.Zero,
-            TimeSpan.FromMinutes(5),
-            TimeSpan.FromMinutes(10),
-            TimeSpan.FromMinutes(15),
-            TimeSpan.FromMinutes(20),
-            TimeSpan.FromMinutes(30),
-            TimeSpan.FromMinutes(45),
-            TimeSpan.FromHours(1),
-            TimeSpan.FromHours(2),
-            TimeSpan.FromHours(3),
-            TimeSpan.FromHours(4),
-            TimeSpan.FromHours(6),
-            TimeSpan.FromHours(8),
-            TimeSpan.FromHours(12),
-            TimeSpan.FromHours(24),
-            TimeSpan.FromHours(48)
-        };
-
-        public static string BackupNameFromValue(TimeSpan value)
-        {
-            TimeSpan closestMatch = BackupEnumValues.OrderBy(t => Math.Abs(value.Subtract(t).Ticks)).First();
-            return BackupEnumNames[Array.IndexOf(BackupEnumValues, closestMatch)];
+            get
+            {
+                if (buildSecurity.HasRankRestriction)
+                {
+                    return MainForm.ToComboBoxOption(buildSecurity.MinRank);
+                }
+                else
+                {
+                    return DefaultRankOption;
+                }
+            }
+            set
+            {
+                foreach (Rank rank in RankManager.Ranks)
+                {
+                    if (MainForm.ToComboBoxOption(rank) == value)
+                    {
+                        buildSecurity.MinRank = rank;
+                        buildRankString = rank.FullName;
+                        return;
+                    }
+                }
+                buildSecurity.ResetMinRank();
+                buildRankString = null;
+            }
         }
 
-        public static TimeSpan BackupValueFromName(string name)
-        {
-            return BackupEnumValues[Array.IndexOf(BackupEnumNames, name)];
-        }
+
+        public string Backup { get; set; }
 
         #endregion
 
-        public object Clone()
-        {
-            return new WorldListEntry(this);
-        }
 
         internal XElement Serialize()
         {
@@ -467,7 +374,7 @@ namespace fCraft.ConfigGUI
             blockDB.Add(new XAttribute("enabled", BlockDBEnabled));
             blockDB.Add(new XAttribute("preload", blockDBIsPreloaded));
             blockDB.Add(new XAttribute("limit", blockDBLimit));
-            blockDB.Add(new XAttribute("timeLimit", (int) blockDBTimeLimit.TotalSeconds));
+            blockDB.Add(new XAttribute("timeLimit", (int)blockDBTimeLimit.TotalSeconds));
             element.Add(blockDB);
 
             if (environmentEl != null) element.Add(environmentEl);
@@ -504,12 +411,107 @@ namespace fCraft.ConfigGUI
         }
 
 
+        Map cachedMapHeader;
+        internal Map MapHeader
+        {
+            get
+            {
+                if (cachedMapHeader == null && !LoadingFailed)
+                {
+                    string fullFileName = Path.Combine(Paths.MapPath, name + ".fcm");
+                    LoadingFailed = !MapUtility.TryLoadHeader(fullFileName, out cachedMapHeader);
+                }
+                return cachedMapHeader;
+            }
+        }
+
+
+        internal string FileName
+        {
+            get { return Name + MapFileExtension; }
+        }
+
+
+        internal string FullFileName
+        {
+            get { return Path.Combine(Paths.MapPath, Name + MapFileExtension); }
+        }
+
+
+        #region Backup
+
+        public static string BackupNameFromValue(TimeSpan value)
+        {
+            TimeSpan closestMatch = BackupEnumValues.OrderBy(t => Math.Abs(value.Subtract(t).Ticks)).First();
+            return BackupEnumNames[Array.IndexOf(BackupEnumValues, closestMatch)];
+        }
+
+        public static TimeSpan BackupValueFromName(string name)
+        {
+            return BackupEnumValues[Array.IndexOf(BackupEnumNames, name)];
+        }
+
+        public static readonly string[] BackupEnumNames = new[] {
+            "(default)",
+            "Never",
+            "5 Minutes",
+            "10 Minutes",
+            "15 Minutes",
+            "20 Minutes",
+            "30 Minutes",
+            "45 Minutes",
+            "1 Hour",
+            "2 Hours",
+            "3 Hours",
+            "4 Hours",
+            "6 Hours",
+            "8 Hours",
+            "12 Hours",
+            "24 Hours",
+            "48 Hours"
+        };
+
+        static readonly TimeSpan[] BackupEnumValues = new[] {
+            TimeSpan.FromSeconds(-1), // default
+            TimeSpan.Zero,
+            TimeSpan.FromMinutes(5),
+            TimeSpan.FromMinutes(10),
+            TimeSpan.FromMinutes(15),
+            TimeSpan.FromMinutes(20),
+            TimeSpan.FromMinutes(30),
+            TimeSpan.FromMinutes(45),
+            TimeSpan.FromHours(1),
+            TimeSpan.FromHours(2),
+            TimeSpan.FromHours(3),
+            TimeSpan.FromHours(4),
+            TimeSpan.FromHours(6),
+            TimeSpan.FromHours(8),
+            TimeSpan.FromHours(12),
+            TimeSpan.FromHours(24),
+            TimeSpan.FromHours(48)
+        };
+
+        #endregion
+
+
+        public YesNoAuto BlockDBEnabled { get; set; }
+        readonly bool blockDBIsPreloaded;
+        readonly int blockDBLimit;
+        TimeSpan blockDBTimeLimit;
+
+
+        public object Clone()
+        {
+            return new WorldListEntry(this);
+        }
+
+
         // Comparison method used to customize sorting
         [UsedImplicitly]
         public static object Compare(string propertyName, object a, object b)
         {
-            WorldListEntry entry1 = (WorldListEntry) a;
-            WorldListEntry entry2 = (WorldListEntry) b;
+            WorldListEntry entry1 = (WorldListEntry)a;
+            WorldListEntry entry2 = (WorldListEntry)b;
             switch (propertyName)
             {
                 case "Description":

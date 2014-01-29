@@ -1,4 +1,19 @@
-﻿using System;
+﻿//Copyright (C) <2011 - 2014>  <Jon Baker, Glenn Mariën and Lao Tszy>
+
+//This program is free software: you can redistribute it and/or modify
+//it under the terms of the GNU General Public License as published by
+//the Free Software Foundation, either version 3 of the License, or
+//(at your option) any later version.
+
+//This program is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU General Public License for more details.
+
+//You should have received a copy of the GNU General Public License
+//along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,16 +38,16 @@ namespace fCraft
 
         #region Possess
 
-        private static readonly CommandDescriptor CdPossess = new CommandDescriptor
+        static readonly CommandDescriptor CdPossess = new CommandDescriptor
         {
             Name = "Possess",
             Category = CommandCategory.Fun,
-            Permissions = new[] {Permission.Possess},
+            Permissions = new[] { Permission.Possess },
             Usage = "/Possess PlayerName",
             Handler = PossessHandler
         };
 
-        private static void PossessHandler(Player player, Command cmd)
+        static void PossessHandler(Player player, Command cmd)
         {
             string targetName = cmd.Next();
             if (targetName == null)
@@ -56,9 +71,9 @@ namespace fCraft
             if (!player.Can(Permission.Possess, target.Info.Rank))
             {
                 player.Message("You may only possess players ranked {0}&S or lower.",
-                    player.Info.Rank.GetLimit(Permission.Possess).ClassyName);
+                player.Info.Rank.GetLimit(Permission.Possess).ClassyName);
                 player.Message("{0}&S is ranked {1}",
-                    target.ClassyName, target.Info.Rank.ClassyName);
+                                target.ClassyName, target.Info.Rank.ClassyName);
                 return;
             }
 
@@ -67,22 +82,21 @@ namespace fCraft
                 player.Message("Already possessing {0}", target.ClassyName);
             }
         }
-
         #endregion
 
-        #region Unpossess
 
-        private static readonly CommandDescriptor CdUnpossess = new CommandDescriptor
+        #region Unpossess
+        static readonly CommandDescriptor CdUnpossess = new CommandDescriptor
         {
             Name = "unpossess",
             Category = CommandCategory.Fun,
-            Permissions = new[] {Permission.Possess},
+            Permissions = new[] { Permission.Possess },
             NotRepeatable = true,
             Usage = "/Unpossess target",
             Handler = UnpossessHandler
         };
 
-        private static void UnpossessHandler(Player player, Command cmd)
+        static void UnpossessHandler(Player player, Command cmd)
         {
             string targetName = cmd.Next();
             if (targetName == null)
@@ -101,13 +115,13 @@ namespace fCraft
 
         #endregion
 
-        #region Life
 
-        private static readonly CommandDescriptor CdLife = new CommandDescriptor
+        #region Life
+        static readonly CommandDescriptor CdLife = new CommandDescriptor
         {
             Name = "Life",
             Category = CommandCategory.Fun,
-            Permissions = new[] {Permission.DrawAdvanced},
+            Permissions = new[] { Permission.DrawAdvanced },
             IsConsoleSafe = false,
             NotRepeatable = true,
             Usage = "/Life <command> [params]",
@@ -115,15 +129,13 @@ namespace fCraft
             UsableByFrozenPlayers = false,
             Handler = LifeHandlerFunc,
         };
-
-        private static void LifeHandlerFunc(Player p, Command cmd)
+        static void LifeHandlerFunc(Player p, Command cmd)
         {
             try
             {
                 if (!cmd.HasNext)
                 {
-                    p.Message(
-                        "&H/Life <command> <params>. Commands are Help, Create, Delete, Start, Stop, Set, List, Print");
+                    p.Message("&H/Life <command> <params>. Commands are Help, Create, Delete, Start, Stop, Set, List, Print");
                     p.Message("Type /Life help <command> for more information");
                     return;
                 }
@@ -134,27 +146,26 @@ namespace fCraft
                 p.Message("Error: " + e.Message);
             }
         }
-
         #endregion
 
-        #region Firework
 
-        private static readonly CommandDescriptor CdFirework = new CommandDescriptor
+        #region Firework
+        static readonly CommandDescriptor CdFirework = new CommandDescriptor
         {
             Name = "Firework",
             Category = CommandCategory.Fun,
-            Permissions = new[] {Permission.Fireworks},
+            Permissions = new[] { Permission.Fireworks },
             IsConsoleSafe = false,
             NotRepeatable = false,
             Usage = "/Firework",
             Help = "&HToggles Firework Mode on/off for yourself. " +
-                   "All Gold blocks will be replaced with fireworks if " +
-                   "firework physics are enabled for the current world.",
+            "All Gold blocks will be replaced with fireworks if " +
+            "firework physics are enabled for the current world.",
             UsableByFrozenPlayers = false,
             Handler = FireworkHandler
         };
 
-        private static void FireworkHandler(Player player, Command cmd)
+        static void FireworkHandler(Player player, Command cmd)
         {
             if (player.fireworkMode)
             {
@@ -166,20 +177,19 @@ namespace fCraft
             {
                 player.fireworkMode = true;
                 player.Message("Firework Mode has been turned on. " +
-                               "All Gold blocks are now being replaced with Fireworks.");
+                    "All Gold blocks are now being replaced with Fireworks.");
             }
         }
-
         #endregion
 
-        #region RandomMaze
 
-        private static readonly CommandDescriptor CdRandomMaze = new CommandDescriptor
+        #region RandomMaze
+        static readonly CommandDescriptor CdRandomMaze = new CommandDescriptor
         {
             Name = "RandomMaze",
-            Aliases = new string[] {"3dmaze"},
+            Aliases = new string[] { "3dmaze" },
             Category = CommandCategory.Fun,
-            Permissions = new Permission[] {Permission.DrawAdvanced},
+            Permissions = new Permission[] { Permission.DrawAdvanced },
             RepeatableSelection = true,
             Help =
                 "Choose the size (width, length and height) and it will draw a random maze at the chosen point. " +
@@ -187,8 +197,7 @@ namespace fCraft
             Usage = "/randommaze <width> <length> <height> [nolifts] [hints]",
             Handler = MazeHandler
         };
-
-        private static void MazeHandler(Player p, Command cmd)
+        static void MazeHandler(Player p, Command cmd)
         {
             try
             {
@@ -200,25 +209,23 @@ namespace fCraft
                 Logger.Log(LogType.Error, "Error: " + e.Message);
             }
         }
-
         #endregion
 
-        #region MazeCuboid
 
-        private static readonly CommandDescriptor CdMazeCuboid = new CommandDescriptor
+        #region MazeCuboid
+        static readonly CommandDescriptor CdMazeCuboid = new CommandDescriptor
         {
             Name = "MazeCuboid",
-            Aliases = new string[] {"Mc", "Mz", "Maze"},
+            Aliases = new string[] { "Mc", "Mz", "Maze" },
             Category = CommandCategory.Fun,
-            Permissions = new Permission[] {Permission.DrawAdvanced},
+            Permissions = new Permission[] { Permission.DrawAdvanced },
             RepeatableSelection = true,
             Help =
                 "Draws a cuboid with the current brush and with a random maze inside.(C) 2012 Lao Tszy",
             Usage = "/MazeCuboid [block type]",
             Handler = MazeCuboidHandler,
         };
-
-        private static void MazeCuboidHandler(Player p, Command cmd)
+        static void MazeCuboidHandler(Player p, Command cmd)
         {
             try
             {
@@ -230,24 +237,22 @@ namespace fCraft
                 Logger.Log(LogType.Error, "Error: " + e.Message);
             }
         }
-
         #endregion
 
-        #region ChangeModel
 
-        private static readonly CommandDescriptor CdChangeModel = new CommandDescriptor
+        #region ChangeModel
+        static readonly CommandDescriptor CdChangeModel = new CommandDescriptor
         {
             Name = "ChangeModel",
-            Aliases = new string[] {"model", "disguise"},
+            Aliases = new string[] { "model", "disguise" },
             Category = CommandCategory.Moderation,
-            Permissions = new[] {Permission.Bring},
+            Permissions = new[] { Permission.Bring },
             Usage = "/Model [Model] [Player]",
             Help = "Change the Model of [Player]!\n" +
-                   "Valid models: &echicken, creeper, croc, steve, pig, sheep, skeleton, spider, zombie.",
+            "Valid models: &echicken, creeper, croc, steve, pig, sheep, skeleton, spider, zombie.",
             Handler = ModelHandler
         };
-
-        private static void ModelHandler(Player player, Command cmd)
+        static void ModelHandler(Player player, Command cmd)
         {
             string modelName = cmd.Next();
             string targetName = cmd.Next();
@@ -270,15 +275,14 @@ namespace fCraft
             if (GetBlockName(modelName, false, out block))
             {
                 // block name is given, send its numeric ID in the ChangeModel packet
-                string newModel = ((int) block).ToString();
+                string newModel = ((int)block).ToString();
                 if (targetName == player.Name)
                 {
                     player.Message("Your model has changed from {0} &S to {1}", p.PlayerObject.Model, newModel);
                     p.PlayerObject.Model = newModel;
                     return;
                 }
-                player.Message(p.ClassyName + "&S's model has changed from {0} &S to {1}", p.PlayerObject.Model,
-                    newModel);
+                player.Message(p.ClassyName + "&S's model has changed from {0} &S to {1}", p.PlayerObject.Model, newModel);
                 p.PlayerObject.Model = newModel;
                 return;
             }
@@ -292,31 +296,17 @@ namespace fCraft
                     p.PlayerObject.Model = newModel;
                     return;
                 }
-                player.Message(p.ClassyName + "&S's model has changed from {0} &S to {1}", p.PlayerObject.Model,
-                    newModel);
+                player.Message(p.ClassyName + "&S's model has changed from {0} &S to {1}", p.PlayerObject.Model, newModel);
                 p.PlayerObject.Model = newModel;
                 return;
             }
             else
             {
                 CdChangeModel.PrintUsage(player);
+
             }
         }
-
-        private static bool GetBlockName(string blockName, bool allowNoneBlock, out Block block)
-        {
-            if (blockName == null) throw new ArgumentNullException("blockName");
-            if (Map.BlockNames.TryGetValue(blockName.ToLower(), out block))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        private enum acceptedModels
+        enum acceptedModels
         {
             chicken,
             creeper,
@@ -330,23 +320,35 @@ namespace fCraft
             zombie
         };
 
+        static bool GetBlockName(string blockName, bool allowNoneBlock, out Block block)
+        {
+            if (blockName == null) throw new ArgumentNullException("blockName");
+            if (Map.BlockNames.TryGetValue(blockName.ToLower(), out block))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         #endregion
 
-        #region ChangeWeather
 
-        private static readonly CommandDescriptor CdChangeWeather = new CommandDescriptor
+        #region ChangeWeather
+        static readonly CommandDescriptor CdChangeWeather = new CommandDescriptor
         {
             Name = "ChangeWeather",
-            Aliases = new string[] {"weather", "setweather"},
+            Aliases = new string[] { "weather", "setweather" },
             Category = CommandCategory.Moderation,
-            Permissions = new[] {Permission.Bring},
+            Permissions = new[] { Permission.Bring },
             Usage = "&1/Weather [Type] [World]",
             Help = "&1Change the weather of a world.\n" +
-                   "&1Valid weather: &esun, rain, snow",
+            "&1Valid weather: &esun, rain, snow",
             Handler = ChangeWeatherHandler
         };
-
-        private static void ChangeWeatherHandler(Player player, Command cmd)
+        static void ChangeWeatherHandler(Player player, Command cmd)
         {
             string worldName = cmd.Next();
             string weatherName = cmd.Next();
@@ -372,16 +374,18 @@ namespace fCraft
             if (world == null) return;
 
             player.Message("Changed weather of {0}&S to {1}", world.ClassyName, weather);
-            world.Players.Send(Packet.EnvWeatherType((int) weather));
+            world.Players.Send(Packet.EnvWeatherType((int)weather));
         }
 
-        private enum WeatherType
+        enum WeatherType
         {
             Sun = 0,
             Rain = 1,
             Snow = 2
         }
-
         #endregion
+
+
+
     }
 }

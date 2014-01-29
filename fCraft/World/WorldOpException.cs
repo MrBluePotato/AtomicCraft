@@ -1,41 +1,34 @@
-﻿using System;
+﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+using System;
 
-namespace fCraft
-{
-    public sealed class WorldOpException : Exception
-    {
-        public WorldOpException(string worldName, WorldOpExceptionCode errorCode)
-            : base(GetMessage(worldName, errorCode))
-        {
-            ErrorCode = errorCode;
-        }
-
-        public WorldOpException(WorldOpExceptionCode errorCode, string message)
-            : base(message)
-        {
-            ErrorCode = errorCode;
-        }
-
-        public WorldOpException(string worldName, WorldOpExceptionCode errorCode, Exception innerException)
-            : base(GetMessage(worldName, errorCode), innerException)
-        {
-            ErrorCode = errorCode;
-        }
-
-        public WorldOpException(WorldOpExceptionCode errorCode, string message, Exception innerException)
-            : base(message, innerException)
-        {
-            ErrorCode = errorCode;
-        }
+namespace fCraft {
+    public sealed class WorldOpException : Exception {
 
         public WorldOpExceptionCode ErrorCode { get; private set; }
 
-        public static string GetMessage(string worldName, WorldOpExceptionCode code)
-        {
-            if (worldName != null)
-            {
-                switch (code)
-                {
+        public WorldOpException( string worldName, WorldOpExceptionCode errorCode )
+            : base( GetMessage( worldName, errorCode ) ) {
+            ErrorCode = errorCode;
+        }
+
+        public WorldOpException( WorldOpExceptionCode errorCode, string message )
+            : base( message ) {
+            ErrorCode = errorCode;
+        }
+
+        public WorldOpException( string worldName, WorldOpExceptionCode errorCode, Exception innerException )
+            : base( GetMessage( worldName, errorCode ), innerException ) {
+            ErrorCode = errorCode;
+        }
+
+        public WorldOpException( WorldOpExceptionCode errorCode, string message, Exception innerException )
+            : base( message, innerException ) {
+            ErrorCode = errorCode;
+        }
+
+        public static string GetMessage( string worldName, WorldOpExceptionCode code ) {
+            if( worldName != null ) {
+                switch( code ) {
                     case WorldOpExceptionCode.CannotDoThatToMainWorld:
                         return "This operation cannot be done on the main world (" +
                                worldName + "). Assign a new main world and try again.";
@@ -80,11 +73,8 @@ namespace fCraft
                     default:
                         return "Unexpected error occured while working on world \"" + worldName + "\"";
                 }
-            }
-            else
-            {
-                switch (code)
-                {
+            } else {
+                switch( code ) {
                     case WorldOpExceptionCode.CannotDoThatToMainWorld:
                         return "This operation cannot be done on the main world. " +
                                "Assign a new main world and try again.";
@@ -135,8 +125,7 @@ namespace fCraft
 
 
     /// <summary> List of common world operation issues. Used by WorldOpException. </summary>
-    public enum WorldOpExceptionCode
-    {
+    public enum WorldOpExceptionCode {
         Unexpected,
 
         /// <summary> No changes were needed or made (e.g. renaming a world to the same name). </summary>

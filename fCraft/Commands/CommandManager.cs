@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using fCraft.Events;
@@ -9,12 +10,10 @@ namespace fCraft
     /// <summary> Static class that allows registration and parsing of all text commands. </summary>
     public static class CommandManager
     {
-        private static readonly SortedList<string, string> Aliases = new SortedList<string, string>();
+        static readonly SortedList<string, string> Aliases = new SortedList<string, string>();
+        static readonly SortedList<string, CommandDescriptor> Commands = new SortedList<string, CommandDescriptor>();
 
-        private static readonly SortedList<string, CommandDescriptor> Commands =
-            new SortedList<string, CommandDescriptor>();
-
-        public static readonly string[] ReservedCommandNames = new[] {"ok", "nvm", "dev"};
+        public static readonly string[] ReservedCommandNames = new[] { "ok", "nvm", "dev" };
 
         // Sets up all the command hooks
         public static void Init()
@@ -32,10 +31,10 @@ namespace fCraft
             GameHandlers.Init();
 
             Logger.Log(LogType.Debug,
-                "CommandManager: {0} commands registered ({1} hidden, {2} aliases)",
-                Commands.Count,
-                GetCommands(true).Length,
-                Aliases.Count);
+                        "CommandManager: {0} commands registered ({1} hidden, {2} aliases)",
+                        Commands.Count,
+                        GetCommands(true).Length,
+                        Aliases.Count);
         }
 
 
@@ -50,8 +49,8 @@ namespace fCraft
         public static CommandDescriptor[] GetCommands(bool hidden)
         {
             return Commands.Values
-                .Where(cmd => (cmd.IsHidden == hidden))
-                .ToArray();
+                           .Where(cmd => (cmd.IsHidden == hidden))
+                           .ToArray();
         }
 
 
@@ -60,29 +59,25 @@ namespace fCraft
         {
             if (rank == null) throw new ArgumentNullException("rank");
             return Commands.Values
-                .Where(cmd => (!cmd.IsHidden || includeHidden) &&
-                              cmd.CanBeCalledBy(rank))
-                .ToArray();
+                           .Where(cmd => (!cmd.IsHidden || includeHidden) &&
+                                          cmd.CanBeCalledBy(rank))
+                           .ToArray();
         }
 
 
-        /// <summary>
-        ///     Gets a list of commands in a specified category.
-        ///     Note that commands may belong to more than one category.
-        /// </summary>
+        /// <summary> Gets a list of commands in a specified category.
+        /// Note that commands may belong to more than one category. </summary>
         public static CommandDescriptor[] GetCommands(CommandCategory category, bool includeHidden)
         {
             return Commands.Values
-                .Where(cmd => (includeHidden || !cmd.IsHidden) &&
-                              (cmd.Category & category) == category)
-                .ToArray();
+                           .Where(cmd => (includeHidden || !cmd.IsHidden) &&
+                                          (cmd.Category & category) == category)
+                           .ToArray();
         }
 
 
-        /// <summary>
-        ///     Registers a custom command with fCraft.
-        ///     CommandRegistrationException may be thrown if the given descriptor does not meet all the requirements.
-        /// </summary>
+        /// <summary> Registers a custom command with fCraft.
+        /// CommandRegistrationException may be thrown if the given descriptor does not meet all the requirements. </summary>
         public static void RegisterCustomCommand([NotNull] CommandDescriptor descriptor)
         {
             if (descriptor == null) throw new ArgumentNullException("descriptor");
@@ -96,24 +91,21 @@ namespace fCraft
             if (descriptor == null) throw new ArgumentNullException("descriptor");
 
 #if DEBUG
-            if (descriptor.Category == CommandCategory.None && !descriptor.IsCustom)
-            {
-                throw new CommandRegistrationException("Standard commands must have a category set.");
+            if( descriptor.Category == CommandCategory.None && !descriptor.IsCustom ) {
+                throw new CommandRegistrationException( "Standard commands must have a category set." );
             }
 #endif
 
             if (!IsValidCommandName(descriptor.Name))
             {
-                throw new CommandRegistrationException(
-                    "All commands need a name, between 1 and 16 alphanumeric characters long.");
+                throw new CommandRegistrationException("All commands need a name, between 1 and 16 alphanumeric characters long.");
             }
 
             string normalizedName = descriptor.Name.ToLower();
 
             if (Commands.ContainsKey(normalizedName))
             {
-                throw new CommandRegistrationException("A command with the name \"{0}\" is already registered.",
-                    descriptor.Name);
+                throw new CommandRegistrationException("A command with the name \"{0}\" is already registered.", descriptor.Name);
             }
 
             if (ReservedCommandNames.Contains(normalizedName))
@@ -123,16 +115,14 @@ namespace fCraft
 
             if (descriptor.Handler == null)
             {
-                throw new CommandRegistrationException(
-                    "All command descriptors are required to provide a handler callback.");
+                throw new CommandRegistrationException("All command descriptors are required to provide a handler callback.");
             }
 
             if (descriptor.Aliases != null)
             {
                 if (descriptor.Aliases.Any(alias => Commands.ContainsKey(alias)))
                 {
-                    throw new CommandRegistrationException(
-                        "One of the aliases for \"{0}\" is using the name of an already-defined command.");
+                    throw new CommandRegistrationException("One of the aliases for \"{0}\" is using the name of an already-defined command.");
                 }
             }
 
@@ -151,9 +141,9 @@ namespace fCraft
             if (Aliases.ContainsKey(normalizedName))
             {
                 Logger.Log(LogType.Warning,
-                    "CommandManager.RegisterCommand: \"{0}\" was defined as an alias for \"{1}\", " +
-                    "but has now been replaced by a different command of the same name.",
-                    descriptor.Name, Aliases[descriptor.Name]);
+                            "CommandManager.RegisterCommand: \"{0}\" was defined as an alias for \"{1}\", " +
+                            "but has now been replaced by a different command of the same name.",
+                            descriptor.Name, Aliases[descriptor.Name]);
                 Aliases.Remove(normalizedName);
             }
 
@@ -165,15 +155,15 @@ namespace fCraft
                     if (ReservedCommandNames.Contains(normalizedAlias))
                     {
                         Logger.Log(LogType.Warning,
-                            "CommandManager.RegisterCommand: Alias \"{0}\" for \"{1}\" ignored (reserved name).",
-                            alias, descriptor.Name);
+                                    "CommandManager.RegisterCommand: Alias \"{0}\" for \"{1}\" ignored (reserved name).",
+                                    alias, descriptor.Name);
                     }
                     else if (Aliases.ContainsKey(normalizedAlias))
                     {
                         Logger.Log(LogType.Warning,
-                            "CommandManager.RegisterCommand: \"{0}\" was defined as an alias for \"{1}\", " +
-                            "but has been overridden to resolve to \"{2}\" instead.",
-                            alias, Aliases[normalizedAlias], descriptor.Name);
+                                    "CommandManager.RegisterCommand: \"{0}\" was defined as an alias for \"{1}\", " +
+                                    "but has been overridden to resolve to \"{2}\" instead.",
+                                    alias, Aliases[normalizedAlias], descriptor.Name);
                     }
                     else
                     {
@@ -188,10 +178,8 @@ namespace fCraft
         }
 
 
-        /// <summary>
-        ///     Finds an instance of CommandDescriptor for a given command.
-        ///     Case-insensitive, but no autocompletion.
-        /// </summary>
+        /// <summary> Finds an instance of CommandDescriptor for a given command.
+        /// Case-insensitive, but no autocompletion. </summary>
         /// <param name="commandName"> Command to find. </param>
         /// <param name="alsoCheckAliases"> Whether to check command aliases. </param>
         /// <returns> CommandDesriptor object if found, null if not found. </returns>
@@ -269,10 +257,8 @@ namespace fCraft
         }
 
 
-        /// <summary>
-        ///     Checks whether a command name is acceptible.
-        ///     Constraints are similar to Player.IsValidName, except for minimum length.
-        /// </summary>
+        /// <summary> Checks whether a command name is acceptible.
+        /// Constraints are similar to Player.IsValidName, except for minimum length. </summary>
         /// <param name="name"> Command name to check. </param>
         /// <returns> True if the name is valid. </returns>
         public static bool IsValidCommandName([NotNull] string name)
@@ -293,6 +279,7 @@ namespace fCraft
             return true;
         }
 
+
         #region Events
 
         /// <summary> Occurs when a command is being registered (cancellable). </summary>
@@ -308,7 +295,7 @@ namespace fCraft
         public static event EventHandler<CommandCalledEventArgs> CommandCalled;
 
 
-        private static bool RaiseCommandRegisteringEvent(CommandDescriptor descriptor)
+        static bool RaiseCommandRegisteringEvent(CommandDescriptor descriptor)
         {
             var h = CommandRegistering;
             if (h == null) return false;
@@ -318,7 +305,7 @@ namespace fCraft
         }
 
 
-        private static void RaiseCommandRegisteredEvent(CommandDescriptor descriptor)
+        static void RaiseCommandRegisteredEvent(CommandDescriptor descriptor)
         {
             var h = CommandRegistered;
             if (h != null) h(null, new CommandRegisteredEventArgs(descriptor));
@@ -346,17 +333,13 @@ namespace fCraft
 
     public sealed class CommandRegistrationException : Exception
     {
-        public CommandRegistrationException(string message) : base(message)
-        {
-        }
-
+        public CommandRegistrationException(string message) : base(message) { }
         [StringFormatMethod("message")]
         public CommandRegistrationException(string message, params object[] args) :
-            base(String.Format(message, args))
-        {
-        }
+            base(String.Format(message, args)) { }
     }
 }
+
 
 namespace fCraft.Events
 {

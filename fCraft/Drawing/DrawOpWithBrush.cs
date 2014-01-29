@@ -1,105 +1,90 @@
-﻿using System;
+﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+using System;
 
-namespace fCraft.Drawing
-{
-    /// <summary>
-    ///     A self-contained DrawOperation that prodivides its own brush.
-    ///     Purpose of this class is mostly to take care of the boilerplate code.
-    /// </summary>
-    public abstract class DrawOpWithBrush : DrawOperation, IBrushFactory, IBrush, IBrushInstance
-    {
-        protected DrawOpWithBrush(Player player)
-            : base(player)
-        {
+namespace fCraft.Drawing {
+    /// <summary> A self-contained DrawOperation that prodivides its own brush.
+    /// Purpose of this class is mostly to take care of the boilerplate code. </summary>
+    public abstract class DrawOpWithBrush : DrawOperation, IBrushFactory, IBrush, IBrushInstance {
+
+        public override abstract string Description {
+            get;
         }
 
-        public abstract override string Description { get; }
+        protected DrawOpWithBrush( Player player )
+            : base( player ) {
+        }
 
-        public abstract bool ReadParams(Command cmd);
+        public abstract bool ReadParams( Command cmd );
 
 
         protected abstract Block NextBlock();
 
+
         #region IBrushFactory Members
 
-        string IBrushFactory.Name
-        {
+        string IBrushFactory.Name {
             get { return Name; }
         }
 
-        string IBrushFactory.Help
-        {
+        string IBrushFactory.Help {
             get { throw new NotImplementedException(); }
         }
 
-        string[] IBrushFactory.Aliases
-        {
+        string[] IBrushFactory.Aliases {
             get { return null; }
         }
 
-        IBrush IBrushFactory.MakeBrush(Player player, Command cmd)
-        {
+        IBrush IBrushFactory.MakeBrush( Player player, Command cmd ) {
             return this;
         }
 
         #endregion
 
+
         #region IBrush Members
 
-        IBrushFactory IBrush.Factory
-        {
+        IBrushFactory IBrush.Factory {
             get { return this; }
         }
 
-        string IBrush.Description
-        {
+        string IBrush.Description {
             get { throw new NotImplementedException(); }
         }
 
-        IBrushInstance IBrush.MakeInstance(Player player, Command cmd, DrawOperation op)
-        {
-            if (ReadParams(cmd))
-            {
+        IBrushInstance IBrush.MakeInstance( Player player, Command cmd, DrawOperation op ) {
+            if( ReadParams( cmd ) ) {
                 return this;
-            }
-            else
-            {
+            } else {
                 return null;
             }
         }
 
         #endregion
 
+
         #region IBrushInstance Members
 
-        IBrush IBrushInstance.Brush
-        {
+        IBrush IBrushInstance.Brush {
             get { return this; }
         }
 
-        string IBrushInstance.InstanceDescription
-        {
+        string IBrushInstance.InstanceDescription {
             get { return Description; }
         }
 
-        bool IBrushInstance.HasAlternateBlock
-        {
+        bool IBrushInstance.HasAlternateBlock {
             get { return false; }
         }
 
-        bool IBrushInstance.Begin(Player player, DrawOperation op)
-        {
+        bool IBrushInstance.Begin( Player player, DrawOperation op ) {
             return true;
         }
 
-        Block IBrushInstance.NextBlock(DrawOperation op)
-        {
+        Block IBrushInstance.NextBlock( DrawOperation op ) {
             return NextBlock();
         }
 
-        void IBrushInstance.End()
-        {
-        }
+        void IBrushInstance.End() { }
 
         #endregion
     }

@@ -1,90 +1,86 @@
-﻿using System;
+﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+using System;
 using System.Xml.Linq;
 using JetBrains.Annotations;
 
 namespace fCraft
 {
+
     public sealed class MapGeneratorArgs
     {
-        private const int FormatVersion = 2;
-        private const string RootTagName = "fCraftMapGeneratorArgs";
-        public float AboveFuncExponent = 1;
-        public bool AddBeaches; // false
-        public bool AddCaveLava; // false
-        public bool AddCaveWater; // false
-        public bool AddCaves; // false
-        public bool AddCliffs = true;
-        public bool AddGiantTrees; // false
-
-        public bool // false
-            AddOre; // false
-
-        public bool AddSnow; // false
-        public bool AddTrees = true; // false
-
-        public bool AddWater = true; // false
-
-        public int BeachExtent = 6,
-            BeachHeight = 2;
-
-        public float BelowFuncExponent = 1;
-        public float Bias; // 0
-
-        public float CaveDensity = 2,
-            CaveSize = 1;
-
-        public bool CliffSmoothing = true;
-
-        public float CliffThreshold = 1;
-
-        public bool CustomWaterLevel; // false
-
-        public bool // false
-            DelayBias; // false
-
-        public int DetailScale = 7,
-            FeatureScale = 1;
-
-        public bool InvertHeightmap; // false
-
-        public bool LayeredHeightmap; // false
-
-        public int // 0
-            LoweredCorners; // 0
-
-        public int // 0
-            MapHeight = 96; // 0
-
-        public int // 0
-            MapLength = 256; // 0
-
-        public int // 0
-            MapWidth = 256; // 0
-
-        public bool // false
-            MarbledHeightmap; // false
-
-        public bool MatchWaterCoverage; // false
-        public int MaxDepth = 12; // 0
-        public int MaxDepthVariation; // 0
-        public int MaxHeight = 20; // 0
-        public int MaxHeightVariation = 4; // 0
-        public int MidPoint; // 0
-        public int RaisedCorners; // 0
-        public float Roughness = .5f;
-        public int Seed; // 0
-
-        public int SnowAltitude = 70,
-            SnowTransition = 7;
+        const int FormatVersion = 2;
 
         public MapGenTheme Theme = MapGenTheme.Forest;
-        public int TreeHeightMax = 7;
-        public int TreeHeightMin = 5;
-        public int TreeSpacingMax = 11;
-        public int TreeSpacingMin = 7;
-        public bool UseBias; // false
-        public float WaterCoverage = .5f;
+        public int Seed, // 0
+                     MapWidth = 256,
+                     MapLength = 256,
+                     MapHeight = 96,
+                     MaxHeight = 20,
+                     MaxDepth = 12,
+                     MaxHeightVariation = 4,
+                     MaxDepthVariation; // 0
+
+        public bool AddWater = true,
+                     CustomWaterLevel,   // false
+                     MatchWaterCoverage; // false
         public int WaterLevel = 48;
+        public float WaterCoverage = .5f;
+
+        public bool UseBias,        // false
+                     DelayBias;      // false
+        public float Bias;           // 0
+        public int RaisedCorners,  // 0
+                     LoweredCorners, // 0
+                     MidPoint;       // 0
+
+        public int DetailScale = 7,
+                     FeatureScale = 1;
+        public float Roughness = .5f;
+        public bool LayeredHeightmap, // false
+                     MarbledHeightmap, // false
+                     InvertHeightmap;  // false
+        public float AboveFuncExponent = 1,
+                     BelowFuncExponent = 1;
+
+        public bool AddTrees = true,
+                     AddGiantTrees; // false
+        public int TreeSpacingMin = 7,
+                     TreeSpacingMax = 11,
+                     TreeHeightMin = 5,
+                     TreeHeightMax = 7;
+
+        public bool AddCaves,     // false
+                     AddOre,       // false
+                     AddCaveWater, // false
+                     AddCaveLava;  // false
+        public float CaveDensity = 2,
+                     CaveSize = 1;
+
+        public bool AddSnow; // false
+        public int SnowAltitude = 70,
+                     SnowTransition = 7;
+
+        public bool AddCliffs = true,
+                     CliffSmoothing = true;
+        public float CliffThreshold = 1;
+
+        public bool AddBeaches; // false
+        public int BeachExtent = 6,
+                     BeachHeight = 2;
+
+        public void Validate()
+        {
+            if (RaisedCorners < 0 || RaisedCorners > 4 || LoweredCorners < 0 || RaisedCorners > 4 || RaisedCorners + LoweredCorners > 4)
+            {
+                throw new ArgumentException("The sum of raisedCorners and loweredCorners must be between 0 and 4.");
+            }
+
+            if (CaveDensity <= 0 || CaveSize <= 0)
+            {
+                throw new ArgumentException("caveDensity and caveSize must be > 0");
+            }
+            // TODO: additional validation
+        }
 
         public MapGeneratorArgs()
         {
@@ -105,7 +101,7 @@ namespace fCraft
                 version = Int32.Parse(versionTag.Value);
             }
 
-            Theme = (MapGenTheme) Enum.Parse(typeof (MapGenTheme), root.Element("theme").Value, true);
+            Theme = (MapGenTheme)Enum.Parse(typeof(MapGenTheme), root.Element("theme").Value, true);
             Seed = Int32.Parse(root.Element("seed").Value);
             MapWidth = Int32.Parse(root.Element("dimX").Value);
             MapLength = Int32.Parse(root.Element("dimY").Value);
@@ -114,8 +110,7 @@ namespace fCraft
             MaxDepth = Int32.Parse(root.Element("maxDepth").Value);
 
             AddWater = Boolean.Parse(root.Element("addWater").Value);
-            if (root.Element("customWaterLevel") != null)
-                CustomWaterLevel = Boolean.Parse(root.Element("customWaterLevel").Value);
+            if (root.Element("customWaterLevel") != null) CustomWaterLevel = Boolean.Parse(root.Element("customWaterLevel").Value);
             MatchWaterCoverage = Boolean.Parse(root.Element("matchWaterCoverage").Value);
             WaterLevel = Int32.Parse(root.Element("waterLevel").Value);
             WaterCoverage = float.Parse(root.Element("waterCoverage").Value);
@@ -141,10 +136,8 @@ namespace fCraft
             LayeredHeightmap = Boolean.Parse(root.Element("layeredHeightmap").Value);
             MarbledHeightmap = Boolean.Parse(root.Element("marbledHeightmap").Value);
             InvertHeightmap = Boolean.Parse(root.Element("invertHeightmap").Value);
-            if (root.Element("aboveFuncExponent") != null)
-                AboveFuncExponent = float.Parse(root.Element("aboveFuncExponent").Value);
-            if (root.Element("belowFuncExponent") != null)
-                BelowFuncExponent = float.Parse(root.Element("belowFuncExponent").Value);
+            if (root.Element("aboveFuncExponent") != null) AboveFuncExponent = float.Parse(root.Element("aboveFuncExponent").Value);
+            if (root.Element("belowFuncExponent") != null) BelowFuncExponent = float.Parse(root.Element("belowFuncExponent").Value);
 
             AddTrees = Boolean.Parse(root.Element("addTrees").Value);
             TreeSpacingMin = Int32.Parse(root.Element("treeSpacingMin").Value);
@@ -164,47 +157,27 @@ namespace fCraft
 
             if (root.Element("addSnow") != null) AddSnow = Boolean.Parse(root.Element("addSnow").Value);
             if (root.Element("snowAltitude") != null) SnowAltitude = Int32.Parse(root.Element("snowAltitude").Value);
-            if (root.Element("snowTransition") != null)
-                SnowTransition = Int32.Parse(root.Element("snowTransition").Value);
+            if (root.Element("snowTransition") != null) SnowTransition = Int32.Parse(root.Element("snowTransition").Value);
 
             if (root.Element("addCliffs") != null) AddCliffs = Boolean.Parse(root.Element("addCliffs").Value);
-            if (root.Element("cliffSmoothing") != null)
-                CliffSmoothing = Boolean.Parse(root.Element("cliffSmoothing").Value);
-            if (root.Element("cliffThreshold") != null)
-                CliffThreshold = float.Parse(root.Element("cliffThreshold").Value);
+            if (root.Element("cliffSmoothing") != null) CliffSmoothing = Boolean.Parse(root.Element("cliffSmoothing").Value);
+            if (root.Element("cliffThreshold") != null) CliffThreshold = float.Parse(root.Element("cliffThreshold").Value);
 
             if (root.Element("addBeaches") != null) AddBeaches = Boolean.Parse(root.Element("addBeaches").Value);
             if (root.Element("beachExtent") != null) BeachExtent = Int32.Parse(root.Element("beachExtent").Value);
             if (root.Element("beachHeight") != null) BeachHeight = Int32.Parse(root.Element("beachHeight").Value);
 
-            if (root.Element("maxHeightVariation") != null)
-                MaxHeightVariation = Int32.Parse(root.Element("maxHeightVariation").Value);
-            if (root.Element("maxDepthVariation") != null)
-                MaxDepthVariation = Int32.Parse(root.Element("maxDepthVariation").Value);
+            if (root.Element("maxHeightVariation") != null) MaxHeightVariation = Int32.Parse(root.Element("maxHeightVariation").Value);
+            if (root.Element("maxDepthVariation") != null) MaxDepthVariation = Int32.Parse(root.Element("maxDepthVariation").Value);
 
-            if (root.Element("addGiantTrees") != null)
-                AddGiantTrees = Boolean.Parse(root.Element("addGiantTrees").Value);
+            if (root.Element("addGiantTrees") != null) AddGiantTrees = Boolean.Parse(root.Element("addGiantTrees").Value);
             // ReSharper restore PossibleNullReferenceException
 
             Validate();
         }
 
-        public void Validate()
-        {
-            if (RaisedCorners < 0 || RaisedCorners > 4 || LoweredCorners < 0 || RaisedCorners > 4 ||
-                RaisedCorners + LoweredCorners > 4)
-            {
-                throw new ArgumentException("The sum of raisedCorners and loweredCorners must be between 0 and 4.");
-            }
 
-            if (CaveDensity <= 0 || CaveSize <= 0)
-            {
-                throw new ArgumentException("caveDensity and caveSize must be > 0");
-            }
-            // TODO: additional validation
-        }
-
-
+        const string RootTagName = "fCraftMapGeneratorArgs";
         public void Save(string fileName)
         {
             XDocument document = new XDocument();

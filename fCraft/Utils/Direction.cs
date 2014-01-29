@@ -13,9 +13,9 @@ namespace fCraft
         three,
         four
     }
-
     public class DirectionFinder
     {
+        
         public static Direction GetDirection(Vector3I[] marks)
         {
             if (Math.Abs(marks[1].X - marks[0].X) > Math.Abs(marks[1].Y - marks[0].Y))
