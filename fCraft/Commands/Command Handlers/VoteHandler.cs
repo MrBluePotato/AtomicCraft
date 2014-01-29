@@ -205,7 +205,7 @@ namespace fCraft
                     break;
 
                 case "1":
-                    if (PropHunt.isOn)
+                    if (PropHunt.IsOn)
                     {
                         if (!PropHunt.VoteIsOn)
                         {
@@ -221,12 +221,12 @@ namespace fCraft
                         PropHunt.Voted.Add(player);
                         PropHunt.Voted1++;
                         player.HasVoted = true;
-                        player.Message("&8You have voted for {0}.", PropHunt.world1.ClassyName);
+                        player.Message("&8You have voted for {0}.", PropHunt.World1.ClassyName);
                     }
                     break;
 
                 case "2":
-                    if (PropHunt.isOn)
+                    if (PropHunt.IsOn)
                     {
                         if (!PropHunt.VoteIsOn)
                         {
@@ -242,12 +242,12 @@ namespace fCraft
                         PropHunt.Voted.Add(player);
                         PropHunt.Voted2++;
                         player.HasVoted = true;
-                        player.Message("&8You have voted for {0}.", PropHunt.world2.ClassyName);
+                        player.Message("&8You have voted for {0}.", PropHunt.World2.ClassyName);
                     }
                     break;
 
                 case "3":
-                    if (PropHunt.isOn)
+                    if (PropHunt.IsOn)
                     {
                         if (!PropHunt.VoteIsOn)
                         {
@@ -263,7 +263,7 @@ namespace fCraft
                         PropHunt.Voted.Add(player);
                         PropHunt.Voted3++;
                         player.HasVoted = true;
-                        player.Message("&8You have voted for {0}.", PropHunt.world3.ClassyName);
+                        player.Message("&8You have voted for {0}.", PropHunt.World3.ClassyName);
                     }
                     break;
 

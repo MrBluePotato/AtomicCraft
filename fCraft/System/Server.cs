@@ -530,7 +530,7 @@ namespace fCraft
                 GlobalChat.Start();
             }
 
-            if (PropHunt.startMode == Game.StartMode.PropHunt)
+            if (PropHunt.StartMode == Game.StartMode.PropHunt)
             {
                 PropHunt game = new PropHunt();
                 game.Start();
@@ -608,10 +608,10 @@ namespace fCraft
                 }
             }
 
-            if (PropHunt.isOn)
+            if (PropHunt.IsOn)
             {
                 Logger.Log(LogType.SystemActivity, "Shutdown: Reverting PropHunt");
-                PropHunt.revertGame();
+                PropHunt.RevertGame();
             }
 
             Scheduler.EndShutdown();

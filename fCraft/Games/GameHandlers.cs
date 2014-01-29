@@ -63,7 +63,7 @@ namespace fCraft
             string Option = cmd.Next();
             World world = player.World;
 
-            if (PropHunt.startMode != Game.StartMode.None)
+            if (PropHunt.StartMode != Game.StartMode.None)
             {
                 player.Message("&cThere is already a game running!");
                 return;
