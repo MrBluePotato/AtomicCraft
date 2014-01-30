@@ -774,6 +774,27 @@ namespace fCraft
             }
         }
 
+        public static bool GetBlockByName([NotNull] string blockName, bool allowNoneBlock, out Block block)
+        {
+            if (blockName == null) throw new ArgumentNullException("blockName");
+            if (BlockNames.TryGetValue(blockName.ToLower(), out block))
+            {
+                if (block == Block.Undefined)
+                {
+                    return allowNoneBlock;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                block = Block.Undefined;
+                return false;
+            }
+        }
+
         /// <summary> Tries to find WoM file hashes for edge textures. </summary>
         /// <param name="block"> Blocktype to find edge texture hash for. </param>
         /// <returns> Hash string if found, or null if not found. </returns>

@@ -1376,9 +1376,11 @@ namespace fCraft
             // MakeInstance returns null if there were problems with syntax, abort
             if (brush == null) return;
             op.Brush = brush;
+            player.DrawOpBlock = player.HeldBlock;
+            string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
             player.SelectionStart(op.ExpectedMarks, DrawOperationCallback, op, Permission.Draw);
-            player.Message("{0}: Click {1} blocks or use &H/Mark&S to make a selection.",
-                op.Description, op.ExpectedMarks);
+            player.Message("{0}: Click {1} blocks while holding &H{2}&S or use &H/Mark&S to make a selection.",
+                op.Description, op.ExpectedMarks, drawOpBlockName);
         }
 
 

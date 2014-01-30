@@ -51,6 +51,10 @@ namespace fCraft
         public bool IsAway;
         public bool KillWait = false;
 
+        //Draw operation variables
+        public Block HeldBlock;
+        public Block DrawOpBlock;
+
         //Team death match
         public DateTime LastUsedHug;
         public DateTime LastUsedInsult;
@@ -58,30 +62,30 @@ namespace fCraft
         public DateTime LastUsedLottery;
         public DateTime LastUsedMessageBlock;
         public DateTime LastUsedSlap;
-        public bool changedName = false;
+        public bool ChangedName = false;
 
         //Zombie survival
-        public bool isInfected = false;
-        public bool isOnTDMTeam = false;
-        public bool isPlayingPropHunt = false;
-        public bool isPlayingZombieSurvival = false;
-        public bool isPropHuntSeeker = false;
-        public bool isPropHuntTagged = false;
-        public bool isSolidBlock = false;
-        public string oldname;
+        public bool IsInfected = false;
+        public bool IsOnTdmTeam = false;
+        public bool IsPlayingPropHunt = false;
+        public bool IsPlayingZombieSurvival = false;
+        public bool IsPropHuntSeeker = false;
+        public bool IsPropHuntTagged = false;
+        public bool IsSolidBlock = false;
+        public string Oldname;
 
-        [CanBeNull] private Player possessionPlayer;
+        [CanBeNull] private Player _possessionPlayer;
 
         #region Spectating
 
-        private readonly object spectateLock = new object();
-        [CanBeNull] private Player spectatedPlayer;
+        private readonly object _spectateLock = new object();
+        [CanBeNull] private Player _spectatedPlayer;
 
         /// <summary> Player currently being spectated. Use Spectate/StopSpectate methods to set. </summary>
         [CanBeNull]
         public Player SpectatedPlayer
         {
-            get { return spectatedPlayer; }
+            get { return _spectatedPlayer; }
         }
 
         [CanBeNull]
@@ -89,14 +93,14 @@ namespace fCraft
 
         public bool IsSpectating
         {
-            get { return (spectatedPlayer != null); }
+            get { return (_spectatedPlayer != null); }
         }
 
 
         public bool Spectate([NotNull] Player target)
         {
             if (target == null) throw new ArgumentNullException("target");
-            lock (spectateLock)
+            lock (_spectateLock)
             {
                 if (target == this)
                 {
@@ -108,9 +112,9 @@ namespace fCraft
                     PlayerOpException.ThrowPermissionLimit(this, target.Info, "spectate", Permission.Spectate);
                 }
 
-                if (spectatedPlayer == target) return false;
+                if (_spectatedPlayer == target) return false;
 
-                spectatedPlayer = target;
+                _spectatedPlayer = target;
                 LastSpectatedPlayer = target.Info;
                 Message("Now spectating {0}&S. Type &H/unspec&S to stop.", target.ClassyName);
                 return true;
@@ -119,11 +123,11 @@ namespace fCraft
 
         public bool StopSpectating()
         {
-            lock (spectateLock)
+            lock (_spectateLock)
             {
-                if (spectatedPlayer == null) return false;
-                Message("Stopped spectating {0}", spectatedPlayer.ClassyName);
-                spectatedPlayer = null;
+                if (_spectatedPlayer == null) return false;
+                Message("Stopped spectating {0}", _spectatedPlayer.ClassyName);
+                _spectatedPlayer = null;
                 return true;
             }
         }
@@ -131,7 +135,7 @@ namespace fCraft
         public bool Possess([NotNull] Player target)
         {
             if (target == null) throw new ArgumentNullException("target");
-            lock (spectateLock)
+            lock (_spectateLock)
             {
                 if (target == this)
                 {
@@ -143,9 +147,9 @@ namespace fCraft
                     PlayerOpException.ThrowPermissionLimit(this, target.Info, "possess", Permission.Possess);
                 }
 
-                if (target.possessionPlayer == this) return false;
+                if (target._possessionPlayer == this) return false;
 
-                target.possessionPlayer = this;
+                target._possessionPlayer = this;
                 Message("Now Possessing {0}&S. Type &H/unpossess&S to stop.", target.ClassyName);
                 return true;
             }
@@ -153,11 +157,11 @@ namespace fCraft
 
         public bool StopPossessing([NotNull] Player target)
         {
-            lock (spectateLock)
+            lock (_spectateLock)
             {
-                if (target.possessionPlayer == null) return false;
+                if (target._possessionPlayer == null) return false;
                 Message("Stopped possessing {0}", target.ClassyName);
-                target.possessionPlayer = null;
+                target._possessionPlayer = null;
                 return true;
             }
         }
@@ -563,7 +567,7 @@ namespace fCraft
         /// <summary> Resets the IdleTimer to 0. </summary>
         public void ResetIdleTimer()
         {
-            if (this.isSolidBlock && !this.isPropHuntTagged)
+            if (this.IsSolidBlock && !this.IsPropHuntTagged)
             {
                 //Remove the players block
                 Block airBlock = Block.Air;
@@ -572,7 +576,7 @@ namespace fCraft
 
                 //Do the other stuff
                 this.Message("You are no longer a solid block!");
-                this.isSolidBlock = false;
+                this.IsSolidBlock = false;
                 this.Info.IsHidden = false;
                 RaisePlayerHideChangedEvent(this);
             }
@@ -963,7 +967,7 @@ namespace fCraft
                     string messageText = rawMessage.Substring(rawMessage.IndexOf(' ') + 1);
 
                     Player[] spectators = Server.Players.NotRanked(Info.Rank)
-                        .Where(p => p.spectatedPlayer == this)
+                        .Where(p => p._spectatedPlayer == this)
                         .ToArray();
                     if (spectators.Length > 0)
                     {
@@ -1020,7 +1024,7 @@ namespace fCraft
         {
             if (message == null) throw new ArgumentNullException("message");
             if (args == null) throw new ArgumentNullException("args");
-            Player[] spectators = Server.Players.Where(p => p.spectatedPlayer == this).ToArray();
+            Player[] spectators = Server.Players.Where(p => p._spectatedPlayer == this).ToArray();
             if (spectators.Length > 0)
             {
                 spectators.Message("[Spectate]: &F" + message, args);
@@ -1520,7 +1524,7 @@ namespace fCraft
             type = bindings[(byte) type];
 
             // selection handling
-            if (SelectionMarksExpected > 0)
+            if (SelectionMarksExpected > 0 && HeldBlock == DrawOpBlock)
             {
                 RevertBlockNow(coord);
                 SelectionAddMark(coord, true);
@@ -1884,8 +1888,8 @@ namespace fCraft
             if (other == null) throw new ArgumentNullException("other");
             return other == this ||
                    IsSuper ||
-                   other.spectatedPlayer == null && !other.Info.IsHidden ||
-                   (other.spectatedPlayer != this && Info.Rank.CanSee(other.Info.Rank));
+                   other._spectatedPlayer == null && !other.Info.IsHidden ||
+                   (other._spectatedPlayer != this && Info.Rank.CanSee(other.Info.Rank));
         }
 
 
@@ -2009,8 +2013,12 @@ namespace fCraft
 
         public void SelectionAddMark(Vector3I pos, bool executeCallbackIfNeeded)
         {
+            string drawOpBlockName = Map.GetBlockByName(DrawOpBlock.ToString()).ToString();
             if (!IsMakingSelection) throw new InvalidOperationException("No selection in progress.");
-            selectionMarks.Enqueue(pos);
+            if (HeldBlock == DrawOpBlock)
+            {
+                selectionMarks.Enqueue(pos);
+            }
             if (SelectionMarkCount >= SelectionMarksExpected)
             {
                 if (executeCallbackIfNeeded)
@@ -2019,13 +2027,16 @@ namespace fCraft
                 }
                 else
                 {
-                    Message("Last block marked at {0}. Type &H/Mark&S or click any block to continue.", pos);
+                    Message("Last block marked at {0}. Type &H/Mark&S or click any block while holding &H{1}&S to continue.", pos, drawOpBlockName);
                 }
             }
             else
             {
-                Message("Block #{0} marked at {1}. Place mark #{2}.",
-                    SelectionMarkCount, pos, SelectionMarkCount + 1);
+                if (HeldBlock == DrawOpBlock)
+                {
+                    Message("Block #{0} marked at {1}. Place mark #{2}.",
+                        SelectionMarkCount, pos, SelectionMarkCount + 1);
+                }
             }
         }
 
