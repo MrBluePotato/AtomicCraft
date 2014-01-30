@@ -3,15 +3,17 @@ The website is currently experiencing technical difficulties. A link will be pos
 
 ## To-Do List (In order of importance)
 
-1) PropHunt game (75% complete)
+1) PropHunt game (95% complete)
 
-2) Factions (0% complete)
+2) Full Classic Protocol Extension support (Classicube) (30% complete)
 
-3) Full Classic Protocol Extension support (Classicube) (30% complete)
+3) UPnP Port Forwarding (0% complete)
 
-4) Web Administration Panel (0% complete)
+4) Factions (0% complete)
 
-5) Improved Global Chat (10% complete)
+5) Web Administration Panel (0% complete)
+
+6) Improved Global Chat (50% complete)
 
 
 ## About AtomicCraft
