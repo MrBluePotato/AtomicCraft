@@ -172,8 +172,8 @@ namespace fCraft
                     {
                         BeginGame(p);
                         ChooseSeeker();
-                        p.isPlayingPropHunt = true;
-                        if (p.isPropHuntSeeker) continue;
+                        p.IsPlayingPropHunt = true;
+                        if (p.IsPropHuntSeeker) continue;
                         p.Model = BlockId[randBlock.Next(0, BlockId.Length)];
                         string blockName = Map.GetBlockByName(p.Model).ToString();
                         p.Message("You are disgused as {0}", blockName);
@@ -228,8 +228,8 @@ namespace fCraft
             if (LastChecked != null && (DateTime.Now - LastChecked).TotalSeconds > 30 && TimeLeft <= TimeLimit)
             {
                 _world.Players.Message("There are currently {0} block(s) and {1} seeker(s) left on {2}",
-                    _world.Players.Count() - _world.Players.Count(player => !player.isPropHuntSeeker),
-                    _world.Players.Count(player => player.isPropHuntSeeker), _world.ClassyName);
+                    _world.Players.Count() - _world.Players.Count(player => !player.IsPropHuntSeeker),
+                    _world.Players.Count(player => player.IsPropHuntSeeker), _world.ClassyName);
                 _world.Players.Message("There are {0} seconds left!", TimeLeft);
                 LastChecked = DateTime.Now;
             }
@@ -238,7 +238,7 @@ namespace fCraft
 
         public static void BeginGame(Player player)
         {
-            player.isPlayingPropHunt = true;
+            player.IsPlayingPropHunt = true;
             PropHuntPlayers.Add(player);
             Server.Message("&WPropHunt is starting!");
             RoundStarted = true;
@@ -254,18 +254,18 @@ namespace fCraft
             int randSeeker = randNumber.Next(0, _world.Players.Length);
             Player seeker = _world.Players[randSeeker];
 
-            if (_world.Players.Count(player => player.isPropHuntSeeker) != 0) return;
+            if (_world.Players.Count(player => player.IsPropHuntSeeker) != 0) return;
             seeker.Message("&cYou were chosen as the seeker!");
-            seeker.isPropHuntSeeker = true;
+            seeker.IsPropHuntSeeker = true;
         }
 
         //Called when the seeker tags a player (turns player into seeker)
         public static void MakeSeeker(Player p)
         {
-            p.isPropHuntTagged = false;
+            p.IsPropHuntTagged = false;
             p.Message("&cYou were tagged! You are now a seeker!");
             p.Model = "steve";
-            p.isPropHuntSeeker = true;
+            p.IsPropHuntSeeker = true;
         }
 
         //Resets player and map settings from the game
@@ -275,17 +275,17 @@ namespace fCraft
             {
                 foreach (Player p in _world.Players)
                 {
-                    p.isPlayingPropHunt = false;
-                    if (!p.isPropHuntSeeker)
+                    p.IsPlayingPropHunt = false;
+                    if (!p.IsPropHuntSeeker)
                     {
-                        p.isSolidBlock = false;
+                        p.IsSolidBlock = false;
                         p.Model = "steve";
                     }
-                    if (p.isPropHuntTagged)
+                    if (p.IsPropHuntTagged)
                     {
-                        p.isPropHuntTagged = false;
+                        p.IsPropHuntTagged = false;
                     }
-                    p.isPropHuntSeeker = false;
+                    p.IsPropHuntSeeker = false;
                 }
             }
             IsOn = false;
@@ -360,7 +360,7 @@ namespace fCraft
             {
                 p.HasVoted = false;
             }
-            foreach (Player p in _world.Players.Where(p => p.isPlayingPropHunt))
+            foreach (Player p in _world.Players.Where(p => p.IsPlayingPropHunt))
             {
 #if DEBUG
                 Server.Message("Rejoin world");
@@ -381,7 +381,7 @@ namespace fCraft
             Block currentBlock = e.Player.WorldMap.GetBlock(e.Coords); // Gets the blocks coords
             // Check if currentBlock is on the list
             if (!ClickableBlocks.Contains(currentBlock)) return;
-            foreach (Player p in _world.Players.Where(p => p.prophuntSolidPos == e.Coords && p.isSolidBlock))
+            foreach (Player p in _world.Players.Where(p => p.prophuntSolidPos == e.Coords && p.IsSolidBlock))
             {
                 //Remove the players block
                 const Block airBlock = Block.Air;
@@ -390,9 +390,9 @@ namespace fCraft
 
                 //Do the other stuff
                 p.Message("&cA seeker has found you! Run away!");
-                p.isPropHuntTagged = true;
+                p.IsPropHuntTagged = true;
                 p.ResetIdleTimer();
-                p.isSolidBlock = false;
+                p.IsSolidBlock = false;
                 p.Info.IsHidden = false;
                 Player.RaisePlayerHideChangedEvent(p);
             }
@@ -402,7 +402,7 @@ namespace fCraft
         // Checks if the seeker tagged a player, after they broke the block form
         public static void PlayerMovingHandler(object sender, Events.PlayerMovingEventArgs e)
         {
-            if (e.Player.isPropHuntSeeker)
+            if (e.Player.IsPropHuntSeeker)
             {
                 var oldPos = new Vector3I(e.OldPosition.X/32, e.OldPosition.Y/32, e.OldPosition.Z/32);
                     // Get the position of the player
@@ -415,7 +415,7 @@ namespace fCraft
                     {
                         var pos = p.Position.ToBlockCoords(); // Converts to block coords
                         if (e.NewPosition.DistanceSquaredTo(pos.ToPlayerCoords()) > 48*48) continue;
-                        if (!p.isPropHuntSeeker && !p.isSolidBlock)
+                        if (!p.IsPropHuntSeeker && !p.IsSolidBlock)
                         {
                             MakeSeeker(p);
                         }
@@ -428,10 +428,10 @@ namespace fCraft
         public static void PlayerConnectedHandler(object sender, Events.PlayerConnectedEventArgs e)
         {
             e.StartingWorld = _world;
-            if (StartMode != Game.StartMode.PropHunt || e.Player.isPlayingPropHunt || TimeDelay != 0) return;
+            if (StartMode != Game.StartMode.PropHunt || e.Player.IsPlayingPropHunt || TimeDelay != 0) return;
             BeginGame(e.Player);
             e.Player.Model = BlockId[randBlock.Next(0, BlockId.Length)];
-            if (Server.Players.TakeWhile(p => !p.isPropHuntSeeker).Any())
+            if (Server.Players.TakeWhile(p => !p.IsPropHuntSeeker).Any())
             {
                 if (Server.Players.Count() < 2)
                 {
@@ -445,7 +445,7 @@ namespace fCraft
             if (RoundStarted && TimeDelay != 0)
             {
                 e.Player.Message("You connected while a round was in progress. You have been made a seeker.");
-                e.Player.isPropHuntSeeker = true;
+                e.Player.IsPropHuntSeeker = true;
             }
         }
 
@@ -460,14 +460,14 @@ namespace fCraft
 
                 if (player.IdleTime.TotalSeconds >= 7)
                 {
-                    if (!player.isSolidBlock && !player.isPropHuntSeeker)
+                    if (!player.IsSolidBlock && !player.IsPropHuntSeeker)
                     {
                         //Debug message to easily alert when player is idle
 #if DEBUG
                         Server.Message("{0} is idle!", player.ClassyName);
 #endif
                         player.Info.IsHidden = true;
-                        player.isSolidBlock = true;
+                        player.IsSolidBlock = true;
 
                         //Gets the coords of the player
                         var x = (short) (player.Position.X/32*32 + 16);

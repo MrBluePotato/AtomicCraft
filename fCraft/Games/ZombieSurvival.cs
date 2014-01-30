@@ -119,15 +119,15 @@ namespace fCraft
 
         public static void PlayerMoved(Player p, fCraft.Events.PlayerMovingEventArgs e)
         {
-            if (p.isInfected)
+            if (p.IsInfected)
             {
                 foreach (Player target in ZombiePlayers)
                 {
-                    if (p.Position == target.Position && !target.isInfected)
+                    if (p.Position == target.Position && !target.IsInfected)
                     {
                         _world.Players.Message("&c{0} infected {1}!", p.Name, target.Name);
                         target.Message("&cYou were infected by {0}", p.Name);
-                        target.isInfected = true;
+                        target.IsInfected = true;
                     }
                 }
             }
@@ -184,12 +184,12 @@ namespace fCraft
             if (isOn && (DateTime.UtcNow - lastChecked).TotalSeconds > 10)
                 //check if players left the world, forfeits if no players of that team left
             {
-                if (_world.Players.Count(player => player.isInfected) == _world.Players.Count())
+                if (_world.Players.Count(player => player.IsInfected) == _world.Players.Count())
                 {
                     ZombiesWin();
                     return;
                 }
-                if (_world.Players.Count(player => player.isInfected) == 0 && _world.Players.Count() > 0)
+                if (_world.Players.Count(player => player.IsInfected) == 0 && _world.Players.Count() > 0)
                 {
                     HumansWin();
                     return;
@@ -200,14 +200,14 @@ namespace fCraft
             if (lastChecked != null && (DateTime.UtcNow - lastChecked).TotalSeconds > 29.9 && timeLeft <= timeLimit)
             {
                 _world.Players.Message("There are currently {0} human(s) and {1} zombie(s) left on {2}",
-                    _world.Players.Count() - _world.Players.Count(player => player.isInfected),
-                    _world.Players.Count(player => player.isInfected), _world.ClassyName);
+                    _world.Players.Count() - _world.Players.Count(player => player.IsInfected),
+                    _world.Players.Count(player => player.IsInfected), _world.ClassyName);
             }
         }
 
         public static void beginGame(Player player)
         {
-            player.isPlayingZombieSurvival = true;
+            player.IsPlayingZombieSurvival = true;
             ZombiePlayers.Add(player);
         }
 
@@ -280,9 +280,9 @@ namespace fCraft
             {
                 p.iName = p.Name;
                 p.Model = "steve";
-                p.isInfected = false;
-                p.Info.DisplayedName = p.oldname;
-                p.isPlayingZombieSurvival = false;
+                p.IsInfected = false;
+                p.Info.DisplayedName = p.Oldname;
+                p.IsPlayingZombieSurvival = false;
                 p.Message("You are no longer playing zombie survival.");
             }
         }
