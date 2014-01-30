@@ -352,7 +352,9 @@ namespace fCraft
                 if (this.HeldBlock != failsafe)
                 {
                     this.HeldBlock = failsafe;
+#if DEBUG
                     this.Message("&eBlock:&f" + failsafe.ToString() + " &eID:&f" + failsafe.GetHashCode());
+#endif
                 }
             }
             else
