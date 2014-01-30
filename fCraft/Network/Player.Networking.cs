@@ -345,8 +345,22 @@ namespace fCraft
         private void ProcessMovementPacket()
         {
             BytesReceived += 10;
-            reader.ReadByte();
-            Position newPos = new Position
+            byte id = reader.ReadByte();
+            Block failsafe;
+            if (Map.GetBlockByName(id.ToString(), false, out failsafe))
+            {
+                if (this.HeldBlock != failsafe)
+                {
+                    this.HeldBlock = failsafe;
+                    this.Message("&eBlock:&f" + failsafe.ToString() + " &eID:&f" + failsafe.GetHashCode());
+                }
+            }
+            else
+            {
+                this.HeldBlock = Block.Stone;
+            }
+
+            var newPos = new Position
             {
                 X = IPAddress.NetworkToHostOrder(reader.ReadInt16()),
                 Z = IPAddress.NetworkToHostOrder(reader.ReadInt16()),
@@ -376,10 +390,10 @@ namespace fCraft
             // only reset the timer if player rotated
             // if player is just pushed around, rotation does not change (and timer should not reset)
             //If the player is playing prophunt, rotating will not reset the timer
-            if (rotChanged && !this.isPlayingPropHunt) ResetIdleTimer();
+            if (rotChanged && !this.IsPlayingPropHunt) ResetIdleTimer();
 
             //If the player is a solid block and they moved, the timer will reset
-            if (posChanged && this.isSolidBlock) ResetIdleTimer();
+            if (posChanged && this.IsSolidBlock) ResetIdleTimer();
 
             if (Info.IsFrozen)
             {
@@ -1200,17 +1214,17 @@ namespace fCraft
         private void UpdateVisibleEntities()
         {
             if (World == null) PlayerOpException.ThrowNoWorld(this);
-            if (possessionPlayer != null)
+            if (_possessionPlayer != null)
             {
-                if (!possessionPlayer.IsOnline || possessionPlayer.IsSpectating)
+                if (!_possessionPlayer.IsOnline || _possessionPlayer.IsSpectating)
                 {
                     Message("You have been released from possession");
-                    possessionPlayer = null;
+                    _possessionPlayer = null;
                 }
                 else
                 {
-                    Position sendTo = possessionPlayer.Position;
-                    World possessedWorld = possessionPlayer.World;
+                    Position sendTo = _possessionPlayer.Position;
+                    World possessedWorld = _possessionPlayer.World;
                     if (possessedWorld == null)
                     {
                         throw new InvalidOperationException("Possess: Something weird just happened (error 404).");
@@ -1226,10 +1240,10 @@ namespace fCraft
                         }
                         else
                         {
-                            possessionPlayer.Message("Stopped possessing {0}&S (they cannot join {1}&S)",
+                            _possessionPlayer.Message("Stopped possessing {0}&S (they cannot join {1}&S)",
                                 ClassyName,
                                 possessedWorld.ClassyName);
-                            possessionPlayer = null;
+                            _possessionPlayer = null;
                         }
                     }
                     else if (sendTo != Position)
@@ -1238,17 +1252,17 @@ namespace fCraft
                     }
                 }
             }
-            if (spectatedPlayer != null)
+            if (_spectatedPlayer != null)
             {
-                if (!spectatedPlayer.IsOnline || !CanSee(spectatedPlayer))
+                if (!_spectatedPlayer.IsOnline || !CanSee(_spectatedPlayer))
                 {
-                    Message("Stopped spectating {0}&S (disconnected)", spectatedPlayer.ClassyName);
-                    spectatedPlayer = null;
+                    Message("Stopped spectating {0}&S (disconnected)", _spectatedPlayer.ClassyName);
+                    _spectatedPlayer = null;
                 }
                 else
                 {
-                    Position spectatePos = spectatedPlayer.Position;
-                    World spectateWorld = spectatedPlayer.World;
+                    Position spectatePos = _spectatedPlayer.Position;
+                    World spectateWorld = _spectatedPlayer.World;
                     if (spectateWorld == null)
                     {
                         throw new InvalidOperationException("Trying to spectate player without a world.");
@@ -1260,15 +1274,15 @@ namespace fCraft
                             postJoinPosition = spectatePos;
                             Message("Joined {0}&S to continue spectating {1}",
                                 spectateWorld.ClassyName,
-                                spectatedPlayer.ClassyName);
+                                _spectatedPlayer.ClassyName);
                             JoinWorldNow(spectateWorld, false, WorldChangeReason.SpectateTargetJoined);
                         }
                         else
                         {
                             Message("Stopped spectating {0}&S (cannot join {1}&S)",
-                                spectatedPlayer.ClassyName,
+                                _spectatedPlayer.ClassyName,
                                 spectateWorld.ClassyName);
-                            spectatedPlayer = null;
+                            _spectatedPlayer = null;
                         }
                     }
                     else if (spectatePos != Position)
@@ -1286,7 +1300,7 @@ namespace fCraft
                 Player otherPlayer = worldPlayerList[i];
                 if (otherPlayer == this ||
                     !CanSeeMoving(otherPlayer) ||
-                    spectatedPlayer == otherPlayer || possessionPlayer != null) continue;
+                    _spectatedPlayer == otherPlayer || _possessionPlayer != null) continue;
 
                 Position otherPos = otherPlayer.Position;
                 int distance = pos.DistanceSquaredTo(otherPos);
@@ -1878,7 +1892,7 @@ namespace fCraft
                     World.VisitCount++;
                 }
             }
-            if (!World.IsRealm && oldWorld == newWorld && !isPlayingPropHunt)
+            if (!World.IsRealm && oldWorld == newWorld && !IsPlayingPropHunt)
             {
                 Message("Rejoined world {0}", newWorld.ClassyName);
             }

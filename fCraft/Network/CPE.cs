@@ -45,11 +45,15 @@ namespace fCraft
         private const byte CustomBlocksLevel = 1;
         private const string SelectionBoxExtName = "SelectionBoxExt";
         private const int SelectionBoxExtVersion = 1;
+        const string HeldBlockExtName = "HeldBlock";
+        const int HeldBlockExtVersion = 1;
+
 
         // Note: if more levels are added, change UsesCustomBlocks from bool to int
         public bool UsesCustomBlocks { get; set; }
         public bool SupportsBlockPermissions { get; set; }
         public bool SelectionBoxExt { get; set; }
+        public bool SupportsHeldBlock { get; set; }
         private string ClientName { get; set; }
 
         private bool NegotiateProtocolExtension()
@@ -59,6 +63,7 @@ namespace fCraft
             writer.Write(Packet.MakeExtInfo(2).Data);
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Data);
             writer.Write(Packet.MakeExtEntry(BlockPermissionsExtName, BlockPermissionsExtVersion).Data);
+            writer.Write(Packet.MakeExtEntry(HeldBlockExtName, HeldBlockExtVersion).Data);
 
             Logger.Log(LogType.SystemActivity, "Sent ExtInfo and entry packets");
 
