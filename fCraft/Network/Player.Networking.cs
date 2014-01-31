@@ -989,12 +989,10 @@ namespace fCraft
             State = SessionState.Online;
             Server.UpdatePlayerList();
             RaisePlayerReadyEvent(this);
-            Server.Players.Send(Packet.MakeExtAddPlayerName((Int16)Info.ID, Name, ClassyName, Info.Rank.ClassyName, 0));
             foreach (Player p in Server.Players)
             {
-                Send(Packet.MakeExtAddPlayerName((Int16)p.Info.ID, p.Name, p.ClassyName, p.Info.Rank.ClassyName, 0));
+                Send(Packet.MakeExtAddPlayerName((Int16) p.Info.ID, p.Name, p.ClassyName, p.Info.Rank.ClassyName, 0));
             }
-
 
 
             return true;
@@ -1201,6 +1199,9 @@ namespace fCraft
         public void RefreshEntity()
         {
             Interlocked.Increment(ref entityVersion);
+            //Update player list when a players rank changes, etc
+            Send(Packet.MakeExtRemovePlayerName((Int16) Info.ID));
+            Send(Packet.MakeExtAddPlayerName((Int16) Info.ID, Name, ClassyName, Info.Rank.ClassyName, 0));
         }
 
         private void ResetVisibleEntities()
@@ -1385,18 +1386,6 @@ namespace fCraft
             }
         }
 
-
-        /*void AddEntity([NotNull] Player player, Position newPos)
-        {
-            if (player == null) throw new ArgumentNullException("player");
-            if (freePlayerIDs.Count > 0)
-            {
-                var newEntity = new VisibleEntity(VisibleEntity.HiddenPosition, freePlayerIDs.Pop(), player.entityVersion);
-                entities.Add(player, newEntity);
-                SendNow(PacketWriter.MakeAddEntity(newEntity.Id, player.ListName, newPos));
-            }
-        }*/
-
         [NotNull]
         private VisibleEntity AddEntity([NotNull] Player player)
         {
@@ -1410,6 +1399,8 @@ namespace fCraft
                 Logger.Log( LogType.Debug, "AddEntity: {0} added {1} ({2})", Name, newEntity.Id, player.Name );
 #endif
                 SendNow(PacketWriter.MakeAddEntity(newEntity.Id, player.ListName, newEntity.LastKnownPosition));
+                Server.Players.Send(Packet.MakeExtAddPlayerName((Int16) player.Info.ID, player.Name, player.ClassyName,
+                    player.Info.Rank.ClassyName, 0));
                 return newEntity;
             }
 
@@ -1443,6 +1434,9 @@ namespace fCraft
             if (player == null) throw new ArgumentNullException("player");
             SendNow(PacketWriter.MakeRemoveEntity(entity.Id));
             SendNow(PacketWriter.MakeAddEntity(entity.Id, player.ListName, newPos));
+            Server.Players.Send(Packet.MakeExtRemovePlayerName((Int16) player.Info.ID));
+            Server.Players.Send(Packet.MakeExtAddPlayerName((Int16) player.Info.ID, player.Name, player.ClassyName,
+                player.Info.Rank.ClassyName, 0));
             entity.LastKnownPosition = newPos;
         }
 
@@ -1451,6 +1445,7 @@ namespace fCraft
         {
             if (player == null) throw new ArgumentNullException("player");
             SendNow(PacketWriter.MakeRemoveEntity(entities[player].Id));
+            Server.Players.Send(Packet.MakeExtRemovePlayerName((Int16) player.Info.ID));
             freePlayerIDs.Push(entities[player].Id);
             entities.Remove(player);
         }
