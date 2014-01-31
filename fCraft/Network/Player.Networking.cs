@@ -989,10 +989,16 @@ namespace fCraft
             State = SessionState.Online;
             Server.UpdatePlayerList();
             RaisePlayerReadyEvent(this);
+            Server.Players.Send(Packet.MakeExtAddPlayerName((Int16)Info.ID, Name, ClassyName, Info.Rank.ClassyName, 0));
+            foreach (Player p in Server.Players)
+            {
+                Send(Packet.MakeExtAddPlayerName((Int16)p.Info.ID, p.Name, p.ClassyName, p.Info.Rank.ClassyName, 0));
+            }
+
+
 
             return true;
         }
-
 
         private void GentlyKickBetaClients()
         {

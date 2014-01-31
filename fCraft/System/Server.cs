@@ -1279,6 +1279,7 @@ namespace fCraft
                 }
                 PlayerIndex.Remove(player.Name);
                 UpdatePlayerList();
+                Server.Players.Send(Packet.MakeExtRemovePlayerName((Int16)player.Info.ID));
             }
         }
 

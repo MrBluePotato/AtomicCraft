@@ -47,6 +47,8 @@ namespace fCraft
         private const int SelectionBoxExtVersion = 1;
         const string HeldBlockExtName = "HeldBlock";
         const int HeldBlockExtVersion = 1;
+        const string ExtPlayerListName = "ExtPlayerList";
+        const int ExtPlayerListVersion = 1;
 
 
         // Note: if more levels are added, change UsesCustomBlocks from bool to int
@@ -55,6 +57,7 @@ namespace fCraft
         public bool SelectionBoxExt { get; set; }
         public bool SupportsHeldBlock { get; set; }
         private string ClientName { get; set; }
+        public bool SupportsExtPlayerList { get; set; }
 
         private bool NegotiateProtocolExtension()
         {
@@ -188,24 +191,31 @@ namespace fCraft
             return packet;
         }
 
-        public static Packet MakeAddSelectionBox(byte ID, string Label, short StartX, short StartY, short StartZ,
-            short EndX, short EndY, short EndZ, short R, short G, short B, short A)
+        public static Packet MakeAddSelectionBox(byte id, string label, short startX, short startY, short startZ,
+            short endX, short endY, short endZ, short r, short g, short b, short a)
         {
             Logger.Log(LogType.Debug, "Send: MakeAddSelectionBox({0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11})",
-                ID, Label, StartX, StartY, StartZ, EndX, EndY, EndZ, R, G, B, A);
+                id, label, startX, startY, startZ, endX, endY, endZ, r, g, b, a);
             Packet packet = new Packet(OpCode.MakeSelection);
-            packet.Data[1] = ID;
-            Encoding.ASCII.GetBytes(Label.PadRight(64), 0, 64, packet.Data, 2);
-            ToNetOrder(StartX, packet.Data, 66);
-            ToNetOrder(StartY, packet.Data, 68);
-            ToNetOrder(StartZ, packet.Data, 70);
-            ToNetOrder(EndX, packet.Data, 72);
-            ToNetOrder(EndY, packet.Data, 74);
-            ToNetOrder(EndZ, packet.Data, 76);
-            ToNetOrder(R, packet.Data, 78);
-            ToNetOrder(G, packet.Data, 80);
-            ToNetOrder(B, packet.Data, 82);
-            ToNetOrder(A, packet.Data, 84);
+            packet.Data[1] = id;
+            Encoding.ASCII.GetBytes(label.PadRight(64), 0, 64, packet.Data, 2);
+            ToNetOrder(startX, packet.Data, 66);
+            ToNetOrder(startY, packet.Data, 68);
+            ToNetOrder(startZ, packet.Data, 70);
+            ToNetOrder(endX, packet.Data, 72);
+            ToNetOrder(endY, packet.Data, 74);
+            ToNetOrder(endZ, packet.Data, 76);
+            ToNetOrder(r, packet.Data, 78);
+            ToNetOrder(g, packet.Data, 80);
+            ToNetOrder(b, packet.Data, 82);
+            ToNetOrder(a, packet.Data, 84);
+            return packet;
+        }
+
+        public static Packet MakeRemoveSelectionBox(byte selectionId)
+        {
+            Packet packet = new Packet(OpCode.RemoveSelection);
+            packet.Data[1] = selectionId;
             return packet;
         }
 
@@ -240,6 +250,36 @@ namespace fCraft
         {
             Packet packet = new Packet(OpCode.EnvWeatherType);
             packet.Data[1] = (byte) weatherType;
+            return packet;
+        }
+
+        public static Packet MakeHoldThis(byte blockToHold, byte preventChange)
+        {
+            Packet packet = new Packet(OpCode.HoldThis);
+            packet.Data[1] = blockToHold;
+            packet.Data[2] = preventChange;
+            return packet;
+        }
+
+        public static Packet MakeExtAddPlayerName(short nameId, string playerName, string listName, string groupName,
+                                                   byte groupRank)
+        {
+            if (playerName == null) throw new ArgumentNullException("playerName");
+            if (listName == null) throw new ArgumentNullException("listName");
+            if (groupName == null) throw new ArgumentNullException("groupName");
+            Packet packet = new Packet(OpCode.ExtAddPlayerName);
+            ToNetOrder(nameId, packet.Data, 1);
+            Encoding.ASCII.GetBytes(playerName.PadRight(64), 0, 64, packet.Data, 3);
+            Encoding.ASCII.GetBytes(listName.PadRight(64), 0, 64, packet.Data, 67);
+            Encoding.ASCII.GetBytes(groupName.PadRight(64), 0, 64, packet.Data, 131);
+            packet.Data[195] = groupRank;
+            return packet;
+        }
+
+        public static Packet MakeExtRemovePlayerName(short nameId)
+        {
+            Packet packet = new Packet(OpCode.ExtRemovePlayerName);
+            ToNetOrder(nameId, packet.Data, 1);
             return packet;
         }
 

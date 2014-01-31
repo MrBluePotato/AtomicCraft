@@ -32,13 +32,13 @@ namespace fCraft
 
             3, // SetClickDistance
             2, // CustomBlockSupportLevel
-            2, // HoldThis
+            3, // HoldThis
             134, // SetTextHotKey
             196, // ExtAddPlayerName
             130, // ExtAddEntity
             3, // ExtRemovePlayerName
             8, // EnvSetColor
-            82, // MakeSelection
+            86, // MakeSelection
             2, // RemoveSelection
             4, // SetBlockPermission
             66, // ChangeModel
