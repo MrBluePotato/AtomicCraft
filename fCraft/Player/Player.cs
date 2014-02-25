@@ -2019,6 +2019,7 @@ namespace fCraft
             {
                 selectionMarks.Enqueue(pos);
             }
+            if (isUsingMark) selectionMarks.Enqueue(pos);
             if (SelectionMarkCount >= SelectionMarksExpected)
             {
                 if (executeCallbackIfNeeded)
@@ -2037,6 +2038,8 @@ namespace fCraft
                     Message("Block #{0} marked at {1}. Place mark #{2}.",
                         SelectionMarkCount, pos, SelectionMarkCount + 1);
                 }
+                if (isUsingMark) Message("Block #{0} marked at {1}. Place mark #{2}.",
+                        SelectionMarkCount, pos, SelectionMarkCount + 1);
             }
         }
 
@@ -2104,6 +2107,7 @@ namespace fCraft
         private CopyState[] copyInformation;
 
         private int copySlot;
+        public bool isUsingMark = false;
 
         public CopyState[] CopyInformation
         {

@@ -163,7 +163,10 @@ namespace fCraft
             {
                 Door door = new Door();
                 player.SelectionStart(2, DoorAdd, door, CdDoor.Permissions);
-                player.Message("Door: Click a block or type /mark to use your location.");
+                player.DrawOpBlock = player.HeldBlock;
+                string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
+                player.Message("Door: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to make a selection.",
+                    drawOpBlockName);
                 return;
             }
             else if (option.ToLower().Equals("remove") || option.ToLower().Equals("rd"))
@@ -273,7 +276,10 @@ namespace fCraft
             else if (option.ToLower() == "check")
             {
                 player.SelectionStart(1, DoorCheckCallback, null, CdDoor.Permissions);
-                player.Message("DoorCheck: Click a block or type /mark to use your location.");
+                player.DrawOpBlock = player.HeldBlock;
+                string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
+                player.Message("DoorCheck: Click 1 block while holding &H{0}&S or use &H/Mark&S to make a selection.",
+                    drawOpBlockName);
             }
             else
             {
@@ -393,8 +399,11 @@ namespace fCraft
             }
             else
             {
-                player.Message("DrawImage: Click 2 blocks or use &H/Mark&S to set direction.");
                 player.SelectionStart(2, DrawImgCallback, Url, Permission.DrawAdvanced);
+                player.DrawOpBlock = player.HeldBlock;
+                string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
+                player.Message("DrawImage: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to make set the direction.",
+                    drawOpBlockName);
             }
         }
 
@@ -610,8 +619,11 @@ namespace fCraft
                 }
             }
             Draw2DData tag = new Draw2DData() {Shape = Shape, Points = Points, Radius = radius, Fill = fill};
-            player.Message("Draw2D({0}): Click 2 blocks or use &H/Mark&S to set direction.", Shape);
             player.SelectionStart(2, Draw2DCallback, tag, Permission.DrawAdvanced);
+            player.DrawOpBlock = player.HeldBlock;
+            string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
+            player.Message("Draw2D({0}): Click 2 blocks while holding &H{1}&S or use &H/Mark&S to set the direction.",
+                Shape,  drawOpBlockName);
         }
 
         private static void Draw2DCallback(Player player, Vector3I[] marks, object tag)
@@ -707,8 +719,11 @@ namespace fCraft
             }
             else
             {
-                player.Message("Write: Click 2 blocks or use &H/Mark&S to set direction.");
                 player.SelectionStart(2, WriteCallback, sentence, Permission.DrawAdvanced);
+                player.DrawOpBlock = player.HeldBlock;
+                string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
+                player.Message("Write: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to set the direction.",
+                    drawOpBlockName);
             }
         }
 
@@ -830,6 +845,11 @@ namespace fCraft
             };
             player.SelectionStart(1, TreeCallback, args, CdTree.Permissions);
             player.MessageNow("Tree: Place a block or type /Mark to use your location.");
+            player.DrawOpBlock = player.HeldBlock;
+            string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
+            player.SelectionStart(op.ExpectedMarks, DrawOperationCallback, op, Permission.Draw);
+            player.Message("Tree: Click 1 block while holding &H{0}&S or use &H/Mark&S to select a location.",
+                drawOpBlockName);
         }
 
         private static void TreeCallback(Player player, Vector3I[] marks, object tag)
@@ -930,7 +950,10 @@ namespace fCraft
         private static void CenterHandler(Player player, Command cmd)
         {
             player.SelectionStart(2, CenterCallback, null, CdCenter.Permissions);
-            player.MessageNow("Center: Place a block or type /Mark to use your location.");
+            player.DrawOpBlock = player.HeldBlock;
+            string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
+            player.Message("Center: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to make a selection.",
+                drawOpBlockName);
         }
 
         private static void CenterCallback(Player player, Vector3I[] marks, object tag)
@@ -1425,7 +1448,10 @@ namespace fCraft
             Fill2DDrawOperation op = new Fill2DDrawOperation(player);
             op.ReadParams(cmd);
             player.SelectionStart(1, Fill2DCallback, op, Permission.Draw);
-            player.Message("{0}: Click a block to start filling.", op.Description);
+            player.DrawOpBlock = player.HeldBlock;
+            string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
+            player.Message("{0}: Click a block while holding &H{1}&S or use &H/Mark&S to being filling.",
+                op.Description, drawOpBlockName);
         }
 
 
@@ -1705,8 +1731,10 @@ namespace fCraft
             op.Brush = brush;
 
             player.SelectionStart(2, DrawOperationCallback, op, Permission.Draw);
-            player.MessageNow("{0}: Click 2 blocks or use &H/Mark&S to make a selection.",
-                op.Brush.InstanceDescription);
+            player.DrawOpBlock = player.HeldBlock;
+            string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
+            player.Message("{0}: Click 2 blocks while holding &H{1}&S or use &H/Mark&S to make a selection.",
+                op.Description, drawOpBlockName);
         }
 
         private static void ReplaceHandler(Player player, Command cmd)
@@ -2028,8 +2056,11 @@ namespace fCraft
                 CdCopy.PrintUsage(player);
                 return;
             }
+            player.DrawOpBlock = player.HeldBlock;
+            string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
             player.SelectionStart(2, CopyCallback, null, CdCopy.Permissions);
-            player.MessageNow("Copy: Place a block or type /Mark to use your location.");
+            player.Message("Copy: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to make a selection.",
+                drawOpBlockName);
         }
 
 
@@ -2109,14 +2140,18 @@ namespace fCraft
             };
 
             player.SelectionStart(2, DrawOperationCallback, op, Permission.Draw);
+            player.DrawOpBlock = player.HeldBlock;
+            string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
             if (fillBlock != Block.Air)
             {
-                player.Message("Cut/{0}: Click 2 blocks or use &H/Mark&S to make a selection.",
-                    fillBlock);
+                player.Message("Cut/{0}: Click 2 blocks while holding &H{1}&S or use &H/Mark&S to make a selection.",
+                    fillBlock, drawOpBlockName);
+                player.SelectionStart(2, CopyCallback, null, CdCopy.Permissions);
             }
             else
             {
-                player.Message("Cut: Click 2 blocks or use &H/Mark&S to make a selection.");
+                player.Message("Cut: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to make a selection.",
+                    drawOpBlockName);
             }
         }
 
@@ -2402,8 +2437,10 @@ namespace fCraft
             PasteDrawOperation op = new PasteDrawOperation(player, false);
             if (!op.ReadParams(cmd)) return;
             player.SelectionStart(2, DrawOperationCallback, op, Permission.Draw, Permission.CopyAndPaste);
-            player.MessageNow("{0}: Click 2 blocks or use &H/Mark&S to make a selection.",
-                op.Description);
+            player.DrawOpBlock = player.HeldBlock;
+            string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
+            player.Message("{0}: Click 2 blocks while holding &H{1}&S or use &H/Mark&S to make a selection.",
+                op.Description, drawOpBlockName);
         }
 
 
@@ -2412,8 +2449,10 @@ namespace fCraft
             PasteDrawOperation op = new PasteDrawOperation(player, true);
             if (!op.ReadParams(cmd)) return;
             player.SelectionStart(2, DrawOperationCallback, op, Permission.Draw, Permission.CopyAndPaste);
-            player.MessageNow("{0}: Click 2 blocks or use &H/Mark&S to make a selection.",
-                op.Description);
+            player.DrawOpBlock = player.HeldBlock;
+            string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
+            player.Message("{0}: Click 2 blocks while holding &H{1}&S or use &H/Mark&S to make a selection.",
+                op.Description, drawOpBlockName);
         }
 
 
@@ -2422,8 +2461,10 @@ namespace fCraft
             QuickPasteDrawOperation op = new QuickPasteDrawOperation(player, false);
             if (!op.ReadParams(cmd)) return;
             player.SelectionStart(1, DrawOperationCallback, op, Permission.Draw, Permission.CopyAndPaste);
-            player.MessageNow("{0}: Click a block or use &H/Mark&S to begin pasting.",
-                op.Description);
+            player.DrawOpBlock = player.HeldBlock;
+            string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
+            player.Message("{0}: Click 2 blocks while holding &H{1}&S or use &H/Mark&S to make a selection.",
+                op.Description, drawOpBlockName);
         }
 
 
@@ -2432,8 +2473,10 @@ namespace fCraft
             QuickPasteDrawOperation op = new QuickPasteDrawOperation(player, true);
             if (!op.ReadParams(cmd)) return;
             player.SelectionStart(1, DrawOperationCallback, op, Permission.Draw, Permission.CopyAndPaste);
-            player.MessageNow("{0}: Click a block or use &H/Mark&S to begin pasting.",
-                op.Description);
+            player.DrawOpBlock = player.HeldBlock;
+            string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
+            player.Message("{0}: Click 2 blocks while holding &H{1}&S or use &H/Mark&S to make a selection.",
+                op.Description, drawOpBlockName);
         }
 
         #endregion
@@ -2497,8 +2540,10 @@ namespace fCraft
 
             map.Metadata["fCraft.Temp", "FileName"] = fullFileName;
             player.SelectionStart(2, RestoreCallback, map, CdRestore.Permissions);
-            player.MessageNow(
-                "Restore: Select the area to restore. To mark a corner, place/click a block or type &H/Mark");
+            player.DrawOpBlock = player.HeldBlock;
+            string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
+            player.Message("Restore: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to make a selection.",
+                drawOpBlockName);
         }
 
 
@@ -2600,6 +2645,8 @@ namespace fCraft
             if (player.SelectionMarksExpected > 0)
             {
                 player.SelectionAddMark(coords, true);
+                player.isUsingMark = true;
+                
             }
             else
             {
@@ -2893,7 +2940,10 @@ namespace fCraft
                 permission = Permission.UndoOthersActions;
             }
             player.SelectionStart(2, UndoAreaSelectionCallback, args, permission);
-            player.MessageNow("UndoArea: Click or &H/Mark&S 2 blocks.");
+            player.DrawOpBlock = player.HeldBlock;
+            string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
+            player.Message("UndoArea: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to make a selection.",
+                drawOpBlockName);
         }
 
         private static void UndoAreaNotHandler(Player player, Command cmd)
@@ -2907,7 +2957,10 @@ namespace fCraft
             if (args == null) return;
 
             player.SelectionStart(2, UndoAreaSelectionCallback, args, CdUndoAreaNot.Permissions);
-            player.MessageNow("UndoAreaNot: Click or &H/Mark&S 2 blocks.");
+            player.DrawOpBlock = player.HeldBlock;
+            string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
+            player.Message("UndoAreaNot: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to make a selection.",
+                drawOpBlockName);
         }
 
 
