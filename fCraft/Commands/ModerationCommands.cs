@@ -3309,7 +3309,7 @@ namespace fCraft
 
         #region Report
 
-        public static List<String> Reports = new List<String>();
+        public static List<Player> Reports = new List<Player>();
 
         private static readonly CommandDescriptor CdReport = new CommandDescriptor
         {
@@ -3337,37 +3337,17 @@ namespace fCraft
         {
             try
             {
-                DateTime dt = DateTime.Now;
                 string targetName = cmd.Next();
-                //string reason = cmd.Next();
+                if (targetName == null) return;
                 Player target = Server.FindPlayerOrPrintMatches(player, targetName, false, true);
-                if (target == null)
-                {
-                    return;
-                }
-                /*if (reason == null)
-                {
-                    player.Message("&eYou must include a reason!");
-                    return;
-                }*/
-
-                if (targetName == null)
-                {
-                    player.Message("&eYou must enter a playername!");
-                    return;
-                }
-                if (Reports.Contains(target.Name))
+                if (target == null) return;
+                if (Reports.Contains(target))
                 {
                     player.Message("&eThat player has already been reported.");
                     return;
                 }
-                else
-                {
-                    Reports.Add(target.Name);
-                    //Reports.Add("# " + reason + " (" + dt + ")");
-                    player.Message("&ePlayer sucesfully reported.");
-                    return;
-                }
+                Reports.Add(target);
+                player.Message("&ePlayer sucesfully reported.");
             }
             catch (ArgumentNullException)
             {
@@ -3383,47 +3363,35 @@ namespace fCraft
                 string playerReport = cmd.Next();
                 if (option == null)
                 {
-                    if (Reports.Count() == 0)
+                    if (!Reports.Any())
                     {
                         player.Message("&eThere are no reports.");
                     }
                     else
                     {
                         player.Message("&c----&7Reports&c----");
-                        for (int i = 0; i < Reports.Count; i++)
+                        foreach (Player p in Reports)
                         {
-                            player.Message(Reports[i]);
+                            player.Message(p.Name);
                         }
                     }
                 }
-                else if (option == "remove")
+                else if (option == "remove" && playerReport != null)
                 {
                     Player target = Server.FindPlayerOrPrintMatches(player, playerReport, false, true);
-                    if (playerReport == null)
+                    if (target == null) return;
+                    if (!Reports.Contains(target))
                     {
-                        player.Message("&eYou must enter a name to remove");
+                        player.Message(target.Name + "&e could not be found.");
                         return;
                     }
-                    if (target == null)
+                    if (Reports.Contains(target))
                     {
+                        Reports.Remove(target);
+                        player.Message(target.ClassyName + "&e was removed from the reports list.");
                         return;
                     }
-                    else if (!Reports.Contains(target.Name))
-                    {
-                        player.Message(target.Name + "&ecould not be found");
-                        return;
-                    }
-                    else if (Reports.Contains(target.Name))
-                    {
-                        Reports.Remove(target.Name);
-                        player.Message(target.Name + "&e was removed from the reports list");
-                        return;
-                    }
-                    else
-                    {
-                        CdReports.PrintUsage(player);
-                        return;
-                    }
+                    CdReports.PrintUsage(player);
                 }
             }
             catch (ArgumentNullException)
