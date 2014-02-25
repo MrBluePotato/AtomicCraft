@@ -93,12 +93,14 @@ namespace fCraft
                 player.Message("Title: Title for {0} set to \"{1}&S\"",
                     info.Name,
                     titleName);
+                player.RefreshEntity();
             }
             else if (titleName == null)
             {
                 player.Message("Title: Title for {0} was reset (was \"{1}&S\")",
                     info.Name,
                     oldTitle);
+                player.RefreshEntity();
             }
             else
             {
@@ -106,6 +108,7 @@ namespace fCraft
                     info.Name,
                     oldTitle,
                     titleName);
+                player.RefreshEntity();
             }
         }
 

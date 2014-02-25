@@ -231,12 +231,14 @@ namespace fCraft
                 player.Message("Nick: DisplayedName for {0} set to \"{1}&S\"",
                     info.Name,
                     valName);
+                player.RefreshEntity();
             }
             else if (valName == null)
             {
                 player.Message("Nick: DisplayedName for {0} was reset (was \"{1}&S\")",
                     info.Name,
                     oldDisplayedName);
+                player.RefreshEntity();
             }
             else
             {
@@ -244,6 +246,7 @@ namespace fCraft
                     info.Name,
                     oldDisplayedName,
                     valName);
+                player.RefreshEntity();
             }
         }
 
