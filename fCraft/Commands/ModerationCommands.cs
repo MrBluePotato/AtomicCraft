@@ -1007,16 +1007,17 @@ namespace fCraft
                 return;
             }
             PlayerInfo target = PlayerDB.FindPlayerInfoOrPrintMatches(player, targetName);
+            Player reportTarget = Server.FindPlayerOrPrintMatches(player, targetName, false, true);
             if (target == null) return;
             string reason = cmd.NextAll();
             try
             {
-                if (Reports.Contains(target))
+                if (Reports.Contains(reportTarget))
                 {
                     Player targetPlayer = target.PlayerObject;
                     target.Ban(player, reason, true, true);
                     WarnIfOtherPlayersOnIp(player, target, targetPlayer);
-                    Reports.Remove(target);
+                    Reports.Remove(reportTarget);
                 }
                 else
                 {

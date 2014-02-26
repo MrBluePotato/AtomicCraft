@@ -1,5 +1,45 @@
 ﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
 
+//Copyright (C) <2011 - 2014>  <Jon Baker, Glenn Mariën and Lao Tszy>
+
+//This program is free software: you can redistribute it and/or modify
+//it under the terms of the GNU General Public License as published by
+//the Free Software Foundation, either version 3 of the License, or
+//(at your option) any later version.
+
+//This program is distributed in the hope that it will be useful,
+//but WITHOUT ANY WARRANTY; without even the implied warranty of
+//MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//GNU General Public License for more details.
+
+//You should have received a copy of the GNU General Public License
+//along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+// Copyright (c) 2013 Michael Cummings <michael.cummings.97@outlook.com>
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//    * Neither the name of AtomicCraft or the names of its
+//      contributors may be used to endorse or promote products derived from this
+//      software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -26,26 +66,17 @@ namespace fCraft
             CommandManager.RegisterCommand(CdBanInfo);
             CommandManager.RegisterCommand(CdRankInfo);
             CommandManager.RegisterCommand(CdServerInfo);
-
             CommandManager.RegisterCommand(CdRanks);
-
             CommandManager.RegisterCommand(CdRules);
-
             CommandManager.RegisterCommand(CdMeasure);
-
             CommandManager.RegisterCommand(CdPlayers);
-
             CommandManager.RegisterCommand(CdWhere);
-
             CommandManager.RegisterCommand(CdHelp);
             CommandManager.RegisterCommand(CdCommands);
-
             CommandManager.RegisterCommand(CdColors);
-
             CommandManager.RegisterCommand(CdReqs);
             CommandManager.RegisterCommand(CdList);
             CommandManager.RegisterCommand(CdWhoIs);
-
             CommandManager.RegisterCommand(CdDevs);
 
 #if DEBUG_SCHEDULER
@@ -53,22 +84,7 @@ namespace fCraft
 #endif
         }
 
-        #region 800craft
-
-        //Copyright (C) <2011 - 2014>  <Jon Baker, Glenn Mariën and Lao Tszy>
-
-        //This program is free software: you can redistribute it and/or modify
-        //it under the terms of the GNU General Public License as published by
-        //the Free Software Foundation, either version 3 of the License, or
-        //(at your option) any later version.
-
-        //This program is distributed in the hope that it will be useful,
-        //but WITHOUT ANY WARRANTY; without even the implied warranty of
-        //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-        //GNU General Public License for more details.
-
-        //You should have received a copy of the GNU General Public License
-        //along with this program.  If not, see <http://www.gnu.org/licenses/>.
+        #region WhoIs
 
         private static readonly CommandDescriptor CdWhoIs = new CommandDescriptor
         {
@@ -138,6 +154,10 @@ namespace fCraft
             player.Message("More than one player matched with that DisplayedName: {0}",
                 nameList);
         }
+
+        #endregion
+
+        #region List
 
         private static readonly CommandDescriptor CdList = new CommandDescriptor
         {
@@ -359,6 +379,10 @@ namespace fCraft
                     break;
             }
         }
+
+        #endregion
+
+        #region Requirements
 
         private static readonly CommandDescriptor CdReqs = new CommandDescriptor
         {
@@ -790,7 +814,7 @@ namespace fCraft
                 float blocks = ((info.BlocksBuilt + info.BlocksDrawn) - info.BlocksDeleted);
                 if (blocks < 0)
                     player.Message("  &CWARNING! {0}&S has deleted more than built!", info.ClassyName);
-                        //<---- GlennMR on Au70 Galaxy
+                //<---- GlennMR on Au70 Galaxy
             }
 
             // Show ban information
@@ -2029,31 +2053,6 @@ namespace fCraft
 
         #region Devs
 
-        // Copyright (c) 2013 Michael Cummings <michael.cummings.97@outlook.com>
-        // All rights reserved.
-        //
-        // Redistribution and use in source and binary forms, with or without
-        // modification, are permitted provided that the following conditions are met:
-        //    * Redistributions of source code must retain the above copyright
-        //      notice, this list of conditions and the following disclaimer.
-        //    * Redistributions in binary form must reproduce the above copyright
-        //      notice, this list of conditions and the following disclaimer in the
-        //      documentation and/or other materials provided with the distribution.
-        //    * Neither the name of AtomicCraft or the names of its
-        //      contributors may be used to endorse or promote products derived from this
-        //      software without specific prior written permission.
-        //
-        // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-        // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-        // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-        // DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-        // DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-        // (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-        // LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-        // ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-        // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-        // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
         private static readonly CommandDescriptor CdDevs = new CommandDescriptor
         {
             Name = "Devs",
@@ -2070,7 +2069,6 @@ namespace fCraft
         {
             player.Message("&cAtomicCraft&e is developed by &eMrBluePotato&e.");
             player.Message("&eVisit &1www.AtomicCraft.net&e for more information.");
-            return;
         }
 
         #endregion

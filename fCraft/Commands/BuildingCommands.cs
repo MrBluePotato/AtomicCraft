@@ -847,7 +847,6 @@ namespace fCraft
             player.MessageNow("Tree: Place a block or type /Mark to use your location.");
             player.DrawOpBlock = player.HeldBlock;
             string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
-            player.SelectionStart(op.ExpectedMarks, DrawOperationCallback, op, Permission.Draw);
             player.Message("Tree: Click 1 block while holding &H{0}&S or use &H/Mark&S to select a location.",
                 drawOpBlockName);
         }
@@ -1029,11 +1028,11 @@ namespace fCraft
                 }
             }
             PlayerInfo target = PlayerDB.FindPlayerInfoOrPrintMatches(player, ban);
+            Player reportTarget = Server.FindPlayerOrPrintMatches(player, ban, false, true);
             if (target == null) return;
             if (!Player.IsValidName(ban))
             {
                 CdBanx.PrintUsage(player);
-                return;
             }
             else
             {
@@ -1043,11 +1042,11 @@ namespace fCraft
                     reason = "Reason Undefined: BanX";
                 try
                 {
-                    if (ModerationCommands.Reports.Contains(ban))
+                    if (ModerationCommands.Reports.Contains(reportTarget))
                     {
                         Player targetPlayer = target.PlayerObject;
                         target.Ban(player, reason, false, true);
-                        ModerationCommands.Reports.Remove(ban);
+                        ModerationCommands.Reports.Remove(reportTarget);
                     }
                     else
                     {
