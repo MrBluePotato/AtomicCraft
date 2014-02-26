@@ -402,7 +402,6 @@ namespace fCraft
 
         #endregion
 
-
         #region CheckBlock (Debug Only)
 #if DEBUG
         private static readonly CommandDescriptor CdCheckBlock = new CommandDescriptor
@@ -418,7 +417,11 @@ namespace fCraft
 
         private static void CheckBlockHandler(Player player, Command cmd)
         {
-            player.Message(player.HeldBlock.ToString());
+            //player.Message(player.HeldBlock.ToString());
+            //player.Send(Packet.MakeHoldThis(49, 0));
+            string label = "label";
+            player.Send(Packet.MakeAddSelectionBox(0, label, 67, 55, 32, 75, 54, 32, 50, 100, 0, 75));
+            player.Send(Packet.PlaySound("random.explode", 71, 33, 56, 2));
         }
 #endif
 

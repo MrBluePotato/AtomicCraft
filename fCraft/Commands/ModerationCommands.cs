@@ -15,6 +15,31 @@
 //You should have received a copy of the GNU General Public License
 //along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+// Modifications Copyright (c) 2013 Michael Cummings <michael.cummings.97@outlook.com>
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//    * Neither the name of 800Craft or the names of its
+//      contributors may be used to endorse or promote products derived from this
+//      software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +54,71 @@ namespace fCraft
     /// </summary>
     internal static class ModerationCommands
     {
+        internal static void Init()
+        {
+            CdBan.Help += BanCommonHelp;
+            CdBanIp.Help += BanCommonHelp;
+            CdBanAll.Help += BanCommonHelp;
+            CdUnban.Help += BanCommonHelp;
+            CdUnbanIp.Help += BanCommonHelp;
+            CdUnbanAll.Help += BanCommonHelp;
+
+            CommandManager.RegisterCommand(CdBan);
+            CommandManager.RegisterCommand(CdBanIp);
+            CommandManager.RegisterCommand(CdBanAll);
+            CommandManager.RegisterCommand(CdUnban);
+            CommandManager.RegisterCommand(CdUnbanIp);
+            CommandManager.RegisterCommand(CdUnbanAll);
+
+            CommandManager.RegisterCommand(CdBanEx);
+
+            CommandManager.RegisterCommand(CdKick);
+
+            CommandManager.RegisterCommand(CdRank);
+
+            CommandManager.RegisterCommand(CdHide);
+            CommandManager.RegisterCommand(CdUnhide);
+
+            CommandManager.RegisterCommand(CdSetSpawn);
+
+            CommandManager.RegisterCommand(CdFreeze);
+            CommandManager.RegisterCommand(CdUnfreeze);
+
+            CommandManager.RegisterCommand(CdTp);
+            CommandManager.RegisterCommand(CdBring);
+            CommandManager.RegisterCommand(CdWorldBring);
+            CommandManager.RegisterCommand(CdBringAll);
+
+            CommandManager.RegisterCommand(CdPatrol);
+            CommandManager.RegisterCommand(CdSpecPatrol);
+
+            CommandManager.RegisterCommand(CdMute);
+            CommandManager.RegisterCommand(CdUnmute);
+
+            CommandManager.RegisterCommand(CdSpectate);
+            CommandManager.RegisterCommand(CdUnspectate);
+
+            CommandManager.RegisterCommand(CdSlap);
+            CommandManager.RegisterCommand(CdTpZone);
+            CommandManager.RegisterCommand(CdBasscannon);
+            CommandManager.RegisterCommand(CdKill);
+            CommandManager.RegisterCommand(CdTempBan);
+            CommandManager.RegisterCommand(CdWarn);
+            CommandManager.RegisterCommand(CdUnWarn);
+            CommandManager.RegisterCommand(CdDisconnect);
+            CommandManager.RegisterCommand(CdModerate);
+            CommandManager.RegisterCommand(CdImpersonate);
+            CommandManager.RegisterCommand(CdImmortal);
+            CommandManager.RegisterCommand(CdTitle);
+
+            CommandManager.RegisterCommand(CdPay);
+            CommandManager.RegisterCommand(CdEconomy);
+            CommandManager.RegisterCommand(CdStore);
+            CommandManager.RegisterCommand(CdBalance);
+            CommandManager.RegisterCommand(CdReport);
+            CommandManager.RegisterCommand(CdReports);
+        }
+
         private const string BanCommonHelp = "Ban information can be viewed with &H/BanInfo";
 
         public static List<string> BassText = new List<string>();
@@ -79,8 +169,8 @@ namespace fCraft
             //check the title, is it a title?
             if (titleName != null)
             {
-                string StripT = Color.StripColors(titleName);
-                if (!StripT.StartsWith("[") && !StripT.EndsWith("]"))
+                string stripT = Color.StripColors(titleName);
+                if (!stripT.StartsWith("[") && !stripT.EndsWith("]"))
                 {
                     //notify player, confirm with /ok TODO
                     //titleName = info.Rank.Color + "[" + titleName + info.Rank.Color + "]";
@@ -160,8 +250,8 @@ namespace fCraft
 
         internal static void ModerateHandler(Player player, Command cmd)
         {
-            string Option = cmd.Next();
-            if (Option == null)
+            string option = cmd.Next();
+            if (option == null)
             {
                 if (Server.Moderation)
                 {
@@ -185,7 +275,7 @@ namespace fCraft
             else
             {
                 string name = cmd.Next();
-                if (Option.ToLower() == "voice" && Server.Moderation)
+                if (option.ToLower() == "voice" && Server.Moderation)
                 {
                     if (name == null)
                     {
@@ -201,9 +291,8 @@ namespace fCraft
                     }
                     Server.VoicedPlayers.Add(target);
                     Server.Message("{0}&S was given Voiced status by {1}", target.ClassyName, player.ClassyName);
-                    return;
                 }
-                else if (Option.ToLower() == "devoice" && Server.Moderation)
+                else if (option.ToLower() == "devoice" && Server.Moderation)
                 {
                     if (name == null)
                     {
@@ -220,7 +309,6 @@ namespace fCraft
                     Server.VoicedPlayers.Remove(target);
                     player.Message("{0}&S is no longer voiced", target.ClassyName);
                     target.Message("You are no longer voiced");
-                    return;
                 }
                 else
                 {
@@ -249,7 +337,7 @@ namespace fCraft
         internal static void KillHandler(Player player, Command cmd)
         {
             string name = cmd.Next();
-            string OReason = cmd.NextAll();
+            string oReason = cmd.NextAll();
             if (name == null)
             {
                 player.Message("Please enter a name");
@@ -275,37 +363,28 @@ namespace fCraft
                 player.Message("&WYou can use /Kill again in " + Math.Round(10 - time) + " seconds.");
                 return;
             }
-            if (target == null)
+            if (player.Can(Permission.Kill, target.Info.Rank))
             {
-                player.Message("You need to enter a player name to Kill");
-                return;
-            }
-            else
-            {
-                if (player.Can(Permission.Kill, target.Info.Rank))
+                if (player.World != null) if (player.World.Map != null) target.TeleportTo(player.World.Map.Spawn);
+                player.LastUsedKill = DateTime.UtcNow;
+                if (!string.IsNullOrWhiteSpace(oReason))
                 {
-                    target.TeleportTo(player.World.Map.Spawn);
-                    player.LastUsedKill = DateTime.UtcNow;
-                    if (!string.IsNullOrWhiteSpace(OReason))
-                    {
-                        Server.Players.CanSee(target)
-                            .Union(target)
-                            .Message("{0}&C was &4Killed&C by {1}&W: {2}", target.ClassyName, player.ClassyName, OReason);
-                    }
-                    else
-                    {
-                        Server.Players.CanSee(target)
-                            .Union(target)
-                            .Message("{0}&C was &4Killed&C by {1}", target.ClassyName, player.ClassyName);
-                    }
-                    return;
+                    Server.Players.CanSee(target)
+                        .Union(target)
+                        .Message("{0}&C was &4Killed&C by {1}&W: {2}", target.ClassyName, player.ClassyName, oReason);
                 }
                 else
                 {
-                    player.Message("You can only Kill players ranked {0}&S or lower",
-                        player.Info.Rank.GetLimit(Permission.Kill).ClassyName);
-                    player.Message("{0}&S is ranked {1}", target.ClassyName, target.Info.Rank.ClassyName);
+                    Server.Players.CanSee(target)
+                        .Union(target)
+                        .Message("{0}&C was &4Killed&C by {1}", target.ClassyName, player.ClassyName);
                 }
+            }
+            else
+            {
+                player.Message("You can only Kill players ranked {0}&S or lower",
+                    player.Info.Rank.GetLimit(Permission.Kill).ClassyName);
+                player.Message("{0}&S is ranked {1}", target.ClassyName, target.Info.Rank.ClassyName);
             }
         }
 
@@ -354,7 +433,6 @@ namespace fCraft
                 player.Message("&WYou can use /Slap again in " + Math.Round(10 - time) + " seconds.");
                 return;
             }
-            string aMessage;
             if (player.Can(Permission.Slap, target.Info.Rank))
             {
                 Position slap = new Position(target.Position.X, target.Position.Y, (target.World.Map.Bounds.ZMax)*32);
@@ -368,30 +446,35 @@ namespace fCraft
                     player.LastUsedSlap = DateTime.UtcNow;
                     return;
                 }
-                else if (item.ToLower() == "bakingtray")
-                    aMessage = String.Format("{0} &Swas slapped by {1}&S with a Baking Tray", target.ClassyName,
-                        player.ClassyName);
-                else if (item.ToLower() == "fish")
-                    aMessage = String.Format("{0} &Swas slapped by {1}&S with a Giant Fish", target.ClassyName,
-                        player.ClassyName);
-                else if (item.ToLower() == "bitchslap")
-                    aMessage = String.Format("{0} &Swas bitch-slapped by {1}", target.ClassyName, player.ClassyName);
-                else if (item.ToLower() == "shoe")
-                    aMessage = String.Format("{0} &Swas slapped by {1}&S with a Shoe", target.ClassyName,
-                        player.ClassyName);
-                else
+                string aMessage;
+                switch (item.ToLower())
                 {
-                    Server.Players.CanSee(target)
-                        .Union(target)
-                        .Message("{0} &Swas slapped sky high by {1}", target.ClassyName, player.ClassyName);
-                    IRC.PlayerSomethingMessage(player, "slapped", target, null);
-                    player.LastUsedSlap = DateTime.UtcNow;
-                    return;
+                    case "bakingtray":
+                        aMessage = String.Format("{0} &Swas slapped by {1}&S with a Baking Tray", target.ClassyName,
+                            player.ClassyName);
+                        break;
+                    case "fish":
+                        aMessage = String.Format("{0} &Swas slapped by {1}&S with a Giant Fish", target.ClassyName,
+                            player.ClassyName);
+                        break;
+                    case "bitchslap":
+                        aMessage = String.Format("{0} &Swas bitch-slapped by {1}", target.ClassyName, player.ClassyName);
+                        break;
+                    case "shoe":
+                        aMessage = String.Format("{0} &Swas slapped by {1}&S with a Shoe", target.ClassyName,
+                            player.ClassyName);
+                        break;
+                    default:
+                        Server.Players.CanSee(target)
+                            .Union(target)
+                            .Message("{0} &Swas slapped sky high by {1}", target.ClassyName, player.ClassyName);
+                        IRC.PlayerSomethingMessage(player, "slapped", target, null);
+                        player.LastUsedSlap = DateTime.UtcNow;
+                        return;
                 }
                 Server.Players.CanSee(target).Union(target).Message(aMessage);
                 IRC.PlayerSomethingMessage(player, "slapped", target, null);
                 player.LastUsedSlap = DateTime.UtcNow;
-                return;
             }
             else
             {
@@ -405,7 +488,7 @@ namespace fCraft
 
         #region TPZone
 
-        private static readonly CommandDescriptor CdTPZone = new CommandDescriptor
+        private static readonly CommandDescriptor CdTpZone = new CommandDescriptor
         {
             Name = "Tpzone",
             IsConsoleSafe = false,
@@ -414,20 +497,19 @@ namespace fCraft
             Permissions = new[] {Permission.Teleport},
             Help = "Teleports you to the centre of a Zone listed in /Zones.",
             Usage = "/tpzone ZoneName",
-            Handler = TPZone
+            Handler = TpZone
         };
 
-        private static void TPZone(Player player, Command cmd)
+        private static void TpZone(Player player, Command cmd)
         {
             string zoneName = cmd.Next();
             if (zoneName == null)
             {
                 player.Message("No zone name specified. See &W/Help tpzone");
-                return;
             }
             else
             {
-                Zone zone = player.World.Map.Zones.Find(zoneName);
+                if (player.World == null) return; if (player.World.Map == null) return; Zone zone = player.World.Map.Zones.Find(zoneName);
                 if (zone == null)
                 {
                     player.MessageNoZone(zoneName);
@@ -556,9 +638,9 @@ namespace fCraft
                 try
                 {
                     target.Ban(player, "You were Banned for " + timeString, false, true);
-                    DateTime UnbanTime = DateTime.UtcNow;
-                    UnbanTime = UnbanTime.AddSeconds(duration.ToSeconds());
-                    target.BannedUntil = UnbanTime;
+                    DateTime unbanTime = DateTime.UtcNow;
+                    unbanTime = unbanTime.AddSeconds(duration.ToSeconds());
+                    target.BannedUntil = unbanTime;
                     target.IsTempbanned = true;
 
                     Server.Message("&SPlayer {0}&S was Banned by {1}&S for {2}",
@@ -625,7 +707,6 @@ namespace fCraft
                 target.Info.IsHidden = false;
                 try
                 {
-                    Player targetPlayer = target;
                     target.BassKick(player, reason, LeaveReason.Kick, true, true, true);
                     if (BassText.Count < 1)
                     {
@@ -698,14 +779,13 @@ namespace fCraft
                 {
                     try
                     {
-                        Player targetPlayer = target;
                         target.Kick(player, "Auto Kick (2 warnings or more)", LeaveReason.Kick, true, true, true);
                     }
                     catch (PlayerOpException ex)
                     {
                         player.Message(ex.MessageColored);
                         if (ex.ErrorCode == PlayerOpExceptionCode.ReasonRequired)
-                            return;
+                        return;
                     }
                 }
             }
@@ -779,10 +859,10 @@ namespace fCraft
             Permissions = new[] {Permission.Gtfo},
             Usage = "/disconnect playername",
             Help = "Get rid of those annoying people without saving to PlayerDB",
-            Handler = dc
+            Handler = DisconnectHandler
         };
 
-        internal static void dc(Player player, Command cmd)
+        internal static void DisconnectHandler(Player player, Command cmd)
         {
             string name = cmd.Next();
             if (name == null)
@@ -798,7 +878,6 @@ namespace fCraft
             {
                 try
                 {
-                    Player targetPlayer = target;
                     target.Kick(player, "Manually disconnected by " + player.Name, LeaveReason.Kick, false, true, false);
                     Server.Players.Message("{0} &Swas manually disconnected by {1}", target.ClassyName,
                         player.ClassyName);
@@ -807,7 +886,7 @@ namespace fCraft
                 {
                     player.Message(ex.MessageColored);
                     if (ex.ErrorCode == PlayerOpExceptionCode.ReasonRequired)
-                        return;
+                    return;
                 }
             }
             else
@@ -835,7 +914,7 @@ namespace fCraft
         };
 
 
-        private static readonly CommandDescriptor CdBanIP = new CommandDescriptor
+        private static readonly CommandDescriptor CdBanIp = new CommandDescriptor
         {
             Name = "BanIP",
             Category = CommandCategory.Moderation,
@@ -878,7 +957,7 @@ namespace fCraft
         };
 
 
-        private static readonly CommandDescriptor CdUnbanIP = new CommandDescriptor
+        private static readonly CommandDescriptor CdUnbanIp = new CommandDescriptor
         {
             Name = "UnbanIP",
             Category = CommandCategory.Moderation,
@@ -932,18 +1011,18 @@ namespace fCraft
             string reason = cmd.NextAll();
             try
             {
-                if (Reports.Contains(target.Name))
+                if (Reports.Contains(target))
                 {
                     Player targetPlayer = target.PlayerObject;
                     target.Ban(player, reason, true, true);
-                    WarnIfOtherPlayersOnIP(player, target, targetPlayer);
-                    Reports.Remove(target.Name);
+                    WarnIfOtherPlayersOnIp(player, target, targetPlayer);
+                    Reports.Remove(target);
                 }
                 else
                 {
                     Player targetPlayer = target.PlayerObject;
                     target.Ban(player, reason, true, true);
-                    WarnIfOtherPlayersOnIP(player, target, targetPlayer);
+                    WarnIfOtherPlayersOnIp(player, target, targetPlayer);
                 }
             }
             catch (PlayerOpException ex)
@@ -958,16 +1037,16 @@ namespace fCraft
 
         private static void BanIPHandler(Player player, Command cmd)
         {
-            string targetNameOrIP = cmd.Next();
-            if (targetNameOrIP == null)
+            string targetNameOrIp = cmd.Next();
+            if (targetNameOrIp == null)
             {
-                CdBanIP.PrintUsage(player);
+                CdBanIp.PrintUsage(player);
                 return;
             }
             string reason = cmd.NextAll();
 
             IPAddress targetAddress;
-            if (Server.IsIP(targetNameOrIP) && IPAddress.TryParse(targetNameOrIP, out targetAddress))
+            if (Server.IsIP(targetNameOrIp) && IPAddress.TryParse(targetNameOrIp, out targetAddress))
             {
                 try
                 {
@@ -980,7 +1059,7 @@ namespace fCraft
             }
             else
             {
-                PlayerInfo target = PlayerDB.FindPlayerInfoOrPrintMatches(player, targetNameOrIP);
+                PlayerInfo target = PlayerDB.FindPlayerInfoOrPrintMatches(player, targetNameOrIp);
                 if (target == null) return;
                 try
                 {
@@ -1006,8 +1085,8 @@ namespace fCraft
 
         private static void BanAllHandler(Player player, Command cmd)
         {
-            string targetNameOrIP = cmd.Next();
-            if (targetNameOrIP == null)
+            string targetNameOrIp = cmd.Next();
+            if (targetNameOrIp == null)
             {
                 CdBanAll.PrintUsage(player);
                 return;
@@ -1015,7 +1094,7 @@ namespace fCraft
             string reason = cmd.NextAll();
 
             IPAddress targetAddress;
-            if (Server.IsIP(targetNameOrIP) && IPAddress.TryParse(targetNameOrIP, out targetAddress))
+            if (Server.IsIP(targetNameOrIp) && IPAddress.TryParse(targetNameOrIp, out targetAddress))
             {
                 try
                 {
@@ -1028,7 +1107,7 @@ namespace fCraft
             }
             else
             {
-                PlayerInfo target = PlayerDB.FindPlayerInfoOrPrintMatches(player, targetNameOrIP);
+                PlayerInfo target = PlayerDB.FindPlayerInfoOrPrintMatches(player, targetNameOrIp);
                 if (target == null) return;
                 try
                 {
@@ -1075,10 +1154,10 @@ namespace fCraft
 
         private static void UnbanIPHandler(Player player, Command cmd)
         {
-            string targetNameOrIP = cmd.Next();
-            if (targetNameOrIP == null)
+            string targetNameOrIp = cmd.Next();
+            if (targetNameOrIp == null)
             {
-                CdUnbanIP.PrintUsage(player);
+                CdUnbanIp.PrintUsage(player);
                 return;
             }
             string reason = cmd.NextAll();
@@ -1086,13 +1165,13 @@ namespace fCraft
             try
             {
                 IPAddress targetAddress;
-                if (Server.IsIP(targetNameOrIP) && IPAddress.TryParse(targetNameOrIP, out targetAddress))
+                if (Server.IsIP(targetNameOrIp) && IPAddress.TryParse(targetNameOrIp, out targetAddress))
                 {
                     targetAddress.UnbanIP(player, reason, true, true);
                 }
                 else
                 {
-                    PlayerInfo target = PlayerDB.FindPlayerInfoOrPrintMatches(player, targetNameOrIP);
+                    PlayerInfo target = PlayerDB.FindPlayerInfoOrPrintMatches(player, targetNameOrIp);
                     if (target == null) return;
                     if (target.LastIP.Equals(IPAddress.Any) || target.LastIP.Equals(IPAddress.None))
                     {
@@ -1112,8 +1191,8 @@ namespace fCraft
 
         private static void UnbanAllHandler(Player player, Command cmd)
         {
-            string targetNameOrIP = cmd.Next();
-            if (targetNameOrIP == null)
+            string targetNameOrIp = cmd.Next();
+            if (targetNameOrIp == null)
             {
                 CdUnbanAll.PrintUsage(player);
                 return;
@@ -1123,13 +1202,13 @@ namespace fCraft
             try
             {
                 IPAddress targetAddress;
-                if (Server.IsIP(targetNameOrIP) && IPAddress.TryParse(targetNameOrIP, out targetAddress))
+                if (Server.IsIP(targetNameOrIp) && IPAddress.TryParse(targetNameOrIp, out targetAddress))
                 {
                     targetAddress.UnbanAll(player, reason, true, true);
                 }
                 else
                 {
-                    PlayerInfo target = PlayerDB.FindPlayerInfoOrPrintMatches(player, targetNameOrIP);
+                    PlayerInfo target = PlayerDB.FindPlayerInfoOrPrintMatches(player, targetNameOrIp);
                     if (target == null) return;
                     if (target.LastIP.Equals(IPAddress.Any) || target.LastIP.Equals(IPAddress.None))
                     {
@@ -1163,16 +1242,11 @@ namespace fCraft
             switch (target.BanStatus)
             {
                 case BanStatus.Banned:
-                    if (addExemption)
-                    {
-                        player.Message("Player {0}&S is currently banned. Unban before adding an exemption.",
-                            target.ClassyName);
-                    }
-                    else
-                    {
-                        player.Message("Player {0}&S is already banned. There is no exemption to remove.",
-                            target.ClassyName);
-                    }
+                    player.Message(
+                        addExemption
+                            ? "Player {0}&S is currently banned. Unban before adding an exemption."
+                            : "Player {0}&S is already banned. There is no exemption to remove.",
+                        target.ClassyName);
                     break;
                 case BanStatus.IPBanExempt:
                     if (addExemption)
@@ -1242,7 +1316,7 @@ namespace fCraft
             {
                 Player targetPlayer = target;
                 target.Kick(player, reason, LeaveReason.Kick, true, true, true);
-                WarnIfOtherPlayersOnIP(player, target.Info, targetPlayer);
+                WarnIfOtherPlayersOnIp(player, target.Info, targetPlayer);
             }
             catch (PlayerOpException ex)
             {
@@ -1342,14 +1416,7 @@ namespace fCraft
                 }
                 if (cmd.IsConfirmed)
                 {
-                    if (newRank > RankManager.DefaultRank)
-                    {
-                        targetInfo = PlayerDB.AddFakeEntry(name, RankChangeType.Promoted);
-                    }
-                    else
-                    {
-                        targetInfo = PlayerDB.AddFakeEntry(name, RankChangeType.Demoted);
-                    }
+                    targetInfo = PlayerDB.AddFakeEntry(name, newRank > RankManager.DefaultRank ? RankChangeType.Promoted : RankChangeType.Demoted);
                 }
                 else
                 {
@@ -1510,6 +1577,7 @@ namespace fCraft
             }
             else if (player.Can(Permission.Bring))
             {
+                if (playerWorld == null) return;
                 Player[] infos = playerWorld.FindPlayers(player, playerName);
                 if (infos.Length == 1)
                 {
@@ -1628,7 +1696,7 @@ namespace fCraft
 
         #region TP
 
-        private static readonly CommandDescriptor CdTP = new CommandDescriptor
+        private static readonly CommandDescriptor CdTp = new CommandDescriptor
         {
             Name = "TP",
             Category = CommandCategory.Moderation,
@@ -1644,7 +1712,7 @@ namespace fCraft
             string name = cmd.Next();
             if (name == null)
             {
-                CdTP.PrintUsage(player);
+                CdTp.PrintUsage(player);
                 return;
             }
 
@@ -1672,7 +1740,7 @@ namespace fCraft
                 }
                 else
                 {
-                    CdTP.PrintUsage(player);
+                    CdTp.PrintUsage(player);
                 }
             }
             else
@@ -1702,6 +1770,7 @@ namespace fCraft
                     }
                     else
                     {
+                        if (targetWorld == null) return;
                         switch (targetWorld.AccessSecurity.CheckDetailed(player.Info))
                         {
                             case SecurityCheckResult.Allowed:
@@ -1850,6 +1919,7 @@ namespace fCraft
             else
             {
                 // teleport to a different world
+                if (world == null) return;
                 SecurityCheckResult check = world.AccessSecurity.CheckDetailed(target.Info);
                 if (check == SecurityCheckResult.RankTooHigh || check == SecurityCheckResult.RankTooLow)
                 {
@@ -1969,19 +2039,16 @@ namespace fCraft
                         player.Message("Unknown rank: {0}", arg.Substring(1));
                         return;
                     }
+                    if (player.Can(Permission.Bring, rank))
+                    {
+                        targetRanks.Add(rank);
+                    }
                     else
                     {
-                        if (player.Can(Permission.Bring, rank))
-                        {
-                            targetRanks.Add(rank);
-                        }
-                        else
-                        {
-                            player.Message("&WYou are not allowed to bring players of rank {0}",
-                                rank.ClassyName);
-                        }
-                        allRanks = false;
+                        player.Message("&WYou are not allowed to bring players of rank {0}",
+                            rank.ClassyName);
                     }
+                    allRanks = false;
                 }
                 else if (arg == "*")
                 {
@@ -2069,7 +2136,7 @@ namespace fCraft
                 else
                 {
                     // teleport to a different world
-                    BringPlayerToWorld(player, targetPlayer, player.World, false, true);
+                    if (player.World != null) BringPlayerToWorld(player, targetPlayer, player.World, false, true);
                 }
                 count++;
             }
@@ -2174,7 +2241,6 @@ namespace fCraft
         {
             World playerWorld = player.World;
             if (playerWorld == null) PlayerOpException.ThrowNoWorld(player);
-
             Player target = playerWorld.GetNextPatrolTarget(player);
             if (target == null)
             {
@@ -2190,7 +2256,6 @@ namespace fCraft
         {
             World playerWorld = player.World;
             if (playerWorld == null) PlayerOpException.ThrowNoWorld(player);
-
             Player target = playerWorld.GetNextPatrolTarget(player,
                 p => player.Can(Permission.Spectate, p.Info.Rank),
                 true);
@@ -2394,7 +2459,6 @@ namespace fCraft
         {
             string targetName = cmd.Next();
             string money = cmd.Next();
-            int amount;
 
             if (money == null)
             {
@@ -2402,20 +2466,24 @@ namespace fCraft
                 return;
             }
 
-            Player target = Server.FindPlayerOrPrintMatches(player, targetName, false, true);
-            if (target == null)
+            if (targetName != null)
             {
-                player.Message("&ePlease select a player to pay bits towards.");
-                return;
-            }
+                Player target = Server.FindPlayerOrPrintMatches(player, targetName, false, true);
+                if (target == null)
+                {
+                    player.Message("&ePlease select a player to pay bits towards.");
+                    return;
+                }
 
-            if (!int.TryParse(money, out amount))
-            {
-                player.Message("&ePlease select from a whole number.");
-                return;
-            }
+                int amount;
+                if (!int.TryParse(money, out amount))
+                {
+                    player.Message("&ePlease select from a whole number.");
+                    return;
+                }
 
-            PayHandler(player, new Command("/economy pay " + target + " " + money));
+                PayHandler(player, new Command("/economy pay " + target + " " + money));
+            }
         }
 
         #endregion
@@ -2449,13 +2517,11 @@ namespace fCraft
                 Player target = Server.FindPlayerOrPrintMatches(player, targetName, false, true);
                 if (target == null)
                 {
-                    return;
                 }
                 else
                 {
                     player.Message("&e{0}&e has &C{1} &e" + ConfigKey.CurrencyKeyPl.GetString() + ".", target.ClassyName,
                         target.Info.Money);
-                    return;
                 }
             }
             catch (ArgumentNullException)
@@ -2467,33 +2533,6 @@ namespace fCraft
         #endregion
 
         #region Economy
-
-//Economy (c)2012-2014 LeChosenOne
-
-// Modifications Copyright (c) 2013 Michael Cummings <michael.cummings.97@outlook.com>
-// All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-//    * Redistributions of source code must retain the above copyright
-//      notice, this list of conditions and the following disclaimer.
-//    * Redistributions in binary form must reproduce the above copyright
-//      notice, this list of conditions and the following disclaimer in the
-//      documentation and/or other materials provided with the distribution.
-//    * Neither the name of 800Craft or the names of its
-//      contributors may be used to endorse or promote products derived from this
-//      software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
         private static readonly CommandDescriptor CdEconomy = new CommandDescriptor
         {
@@ -2516,36 +2555,87 @@ namespace fCraft
                 string option = cmd.Next();
                 string targetName = cmd.Next();
                 string amount = cmd.Next();
-                int amountnum;
                 if (option == null)
                 {
                     CdEconomy.PrintUsage(player);
                 }
-                if (option == "give")
+                if (option == null || amount == null || targetName == null) CdEconomy.PrintUsage(player);
+                if (targetName != null)
                 {
                     Player target = Server.FindPlayerOrPrintMatches(player, targetName, false, true);
-                    if (!player.Can(Permission.ManageEconomy))
+                    if (target == null) return;
+                    int amountnum;
+                    switch (option)
                     {
-                        player.Message("&cYou do not have permission to use that command!");
-                        return;
-                    }
+                        case "give":
+                            if (!player.Can(Permission.ManageEconomy))
+                            {
+                                player.Message("&cYou do not have permission to use that command!");
+                                return;
+                            }
+                            if ((player.Can(Permission.GiveSelf)) && (target == player)) //Giving yourself da monai
+                            {
+                                if (!int.TryParse(amount, out amountnum))
+                                {
+                                    player.Message("&eThe amount must be a number without any decimals!");
+                                    return;
+                                }
+                                if (cmd.IsConfirmed)
+                                {
+                                    //actually give the player the money
+                                    int tNewMoney = target.Info.Money + amountnum;
 
-                    if (targetName == null)
-                    {
-                        player.Message("&ePlease type in a player's name to give " + ConfigKey.CurrencyKeyPl.GetString() +
-                                       " to.");
-                        return;
-                    }
+                                    if (amountnum == 1)
+                                    {
+                                        player.Message(
+                                            "&eYou have given {0} &C" + ConfigKey.CurrencyKeySl.GetString() + " &ecoin.",
+                                            target.ClassyName, amountnum);
+                                        target.Message(
+                                            "&e{0} &ehas given you {1} &e" + ConfigKey.CurrencyKeySl.GetString(),
+                                            player.ClassyName, amountnum);
+                                        Server.Players.Except(target)
+                                            .Except(player)
+                                            .Message(
+                                                "&e{0} &ewas given {1} &e" + ConfigKey.CurrencyKeySl.GetString() +
+                                                " by {2}&e.", target.ClassyName, amountnum, player.ClassyName);
+                                    }
+                                    else
+                                    {
+                                        player.Message(
+                                            "&eYou have given {0} &C{1} &e" + ConfigKey.CurrencyKeyPl.GetString(),
+                                            target.ClassyName, amountnum);
+                                        target.Message(
+                                            "&e{0} &ehas given you {1} &e" + ConfigKey.CurrencyKeyPl.GetString(),
+                                            player.ClassyName, amountnum);
+                                        Server.Players.Except(target)
+                                            .Except(player)
+                                            .Message(
+                                                "&e{0} &ewas given {1} &e" + ConfigKey.CurrencyKeyPl.GetString() +
+                                                " by {2}&e.", target.ClassyName, amountnum, player.ClassyName);
+                                    }
 
+                                    target.Info.Money = tNewMoney;
+                                    return;
+                                }
+                                if (amountnum == 1)
+                                {
+                                    player.Confirm(cmd,
+                                        "&eAre you sure you want to give {0} &C{1} &e " +
+                                        ConfigKey.CurrencyKeySl.GetString() + "?", target.ClassyName, amountnum);
+                                    return;
+                                }
+                                player.Confirm(cmd,
+                                    "&eAre you sure you want to give {0} &C{1} &e " +
+                                    ConfigKey.CurrencyKeyPl.GetString() + "?", target.ClassyName, amountnum);
+                                return;
+                            } //der
+                            if ((!player.Can(Permission.GiveSelf)) && (target == player))
+                                //Not letting dat scum give himslef da monai
+                            {
+                                player.Message("&eYou cannot give yourself " + ConfigKey.CurrencyKeyPl.GetString());
+                                return;
+                            }
 
-                    if (target == null)
-                    {
-                        return;
-                    }
-                    else
-                    {
-                        if ((player.Can(Permission.GiveSelf)) && (target == player)) //Giving yourself da monai
-                        {
                             if (!int.TryParse(amount, out amountnum))
                             {
                                 player.Message("&eThe amount must be a number without any decimals!");
@@ -2561,32 +2651,31 @@ namespace fCraft
                                     player.Message(
                                         "&eYou have given {0} &C" + ConfigKey.CurrencyKeySl.GetString() + " &ecoin.",
                                         target.ClassyName, amountnum);
-                                    target.Message(
-                                        "&e{0} &ehas given you {1} &e" + ConfigKey.CurrencyKeySl.GetString(),
+                                    target.Message("&e{0} &ehas given you {1} &e" + ConfigKey.CurrencyKeySl.GetString(),
                                         player.ClassyName, amountnum);
                                     Server.Players.Except(target)
                                         .Except(player)
                                         .Message(
                                             "&e{0} &ewas given {1} &e" + ConfigKey.CurrencyKeySl.GetString() +
-                                            " by {2}&e.", target.ClassyName, amountnum, player.ClassyName);
+                                            " by {2}&e.",
+                                            target.ClassyName, amountnum, player.ClassyName);
                                 }
                                 else
                                 {
                                     player.Message(
                                         "&eYou have given {0} &C{1} &e" + ConfigKey.CurrencyKeyPl.GetString(),
                                         target.ClassyName, amountnum);
-                                    target.Message(
-                                        "&e{0} &ehas given you {1} &e" + ConfigKey.CurrencyKeyPl.GetString(),
+                                    target.Message("&e{0} &ehas given you {1} &e" + ConfigKey.CurrencyKeyPl.GetString(),
                                         player.ClassyName, amountnum);
                                     Server.Players.Except(target)
                                         .Except(player)
                                         .Message(
                                             "&e{0} &ewas given {1} &e" + ConfigKey.CurrencyKeyPl.GetString() +
-                                            " by {2}&e.", target.ClassyName, amountnum, player.ClassyName);
+                                            " by {2}&e.",
+                                            target.ClassyName, amountnum, player.ClassyName);
                                 }
 
                                 target.Info.Money = tNewMoney;
-                                return;
                             }
                             else
                             {
@@ -2595,282 +2684,154 @@ namespace fCraft
                                     player.Confirm(cmd,
                                         "&eAre you sure you want to give {0} &C{1} &e " +
                                         ConfigKey.CurrencyKeySl.GetString() + "?", target.ClassyName, amountnum);
-                                    return;
                                 }
                                 else
                                 {
                                     player.Confirm(cmd,
                                         "&eAre you sure you want to give {0} &C{1} &e " +
                                         ConfigKey.CurrencyKeyPl.GetString() + "?", target.ClassyName, amountnum);
-                                    return;
                                 }
                             }
-                        } //der
-                        else if ((!player.Can(Permission.GiveSelf)) && (target == player))
-                            //Not letting dat scum give himslef da monai
-                        {
-                            player.Message("&eYou cannot give yourself " + ConfigKey.CurrencyKeyPl.GetString());
-                            return;
-                        }
-
-                        else if (!int.TryParse(amount, out amountnum))
-                        {
-                            player.Message("&eThe amount must be a number without any decimals!");
-                            return;
-                        }
-                        if (cmd.IsConfirmed)
-                        {
-                            //actually give the player the money
-                            int tNewMoney = target.Info.Money + amountnum;
-
-                            if (amountnum == 1)
+                            break;
+                        case "take":
+                            if (!player.Can(Permission.ManageEconomy))
                             {
-                                player.Message(
-                                    "&eYou have given {0} &C" + ConfigKey.CurrencyKeySl.GetString() + " &ecoin.",
-                                    target.ClassyName, amountnum);
-                                target.Message("&e{0} &ehas given you {1} &e" + ConfigKey.CurrencyKeySl.GetString(),
-                                    player.ClassyName, amountnum);
-                                Server.Players.Except(target)
-                                    .Except(player)
-                                    .Message(
-                                        "&e{0} &ewas given {1} &e" + ConfigKey.CurrencyKeySl.GetString() + " by {2}&e.",
-                                        target.ClassyName, amountnum, player.ClassyName);
-                            }
-                            else
-                            {
-                                player.Message("&eYou have given {0} &C{1} &e" + ConfigKey.CurrencyKeyPl.GetString(),
-                                    target.ClassyName, amountnum);
-                                target.Message("&e{0} &ehas given you {1} &e" + ConfigKey.CurrencyKeyPl.GetString(),
-                                    player.ClassyName, amountnum);
-                                Server.Players.Except(target)
-                                    .Except(player)
-                                    .Message(
-                                        "&e{0} &ewas given {1} &e" + ConfigKey.CurrencyKeyPl.GetString() + " by {2}&e.",
-                                        target.ClassyName, amountnum, player.ClassyName);
-                            }
-
-                            target.Info.Money = tNewMoney;
-                            return;
-                        }
-                        else
-                        {
-                            if (amountnum == 1)
-                            {
-                                player.Confirm(cmd,
-                                    "&eAre you sure you want to give {0} &C{1} &e " +
-                                    ConfigKey.CurrencyKeySl.GetString() + "?", target.ClassyName, amountnum);
+                                player.Message("&cYou do not have permission to use that command.");
                                 return;
                             }
-                            else
+
+                            if (target == player)
                             {
-                                player.Confirm(cmd,
-                                    "&eAre you sure you want to give {0} &C{1} &e " +
-                                    ConfigKey.CurrencyKeyPl.GetString() + "?", target.ClassyName, amountnum);
+                                player.Message("&eYou cannot take take " + ConfigKey.CurrencyKeyPl.GetString() +
+                                               " from yourself.");
                                 return;
                             }
-                        }
-                    }
-                }
-                if (option == "take")
-                {
-                    Player target = Server.FindPlayerOrPrintMatches(player, targetName, false, true);
-                    if (!player.Can(Permission.ManageEconomy))
-                    {
-                        player.Message("&cYou do not have permission to use that command.");
-                        return;
-                    }
-
-                    if (target == player)
-                    {
-                        player.Message("&eYou cannot take take " + ConfigKey.CurrencyKeyPl.GetString() +
-                                       " from yourself.");
-                        return;
-                    }
-                    if (targetName == null)
-                    {
-                        player.Message("&ePlease type in a player's name to take " + ConfigKey.CurrencyKeyPl.GetString() +
-                                       " away from.");
-                        return;
-                    }
-
-                    if (target == null)
-                    {
-                        return;
-                    }
-                    else
-                    {
-                        if (!int.TryParse(amount, out amountnum))
-                        {
-                            player.Message("&eThe amount must be a number!");
-                            return;
-                        }
-
-                        if (cmd.IsConfirmed)
-                        {
-                            if (amountnum > target.Info.Money)
+                            if (!int.TryParse(amount, out amountnum))
                             {
-                                player.Message(
-                                    "{0}&e doesn't have that many " + ConfigKey.CurrencyKeyPl.GetString() + "!",
-                                    target.ClassyName);
+                                player.Message("&eThe amount must be a number!");
                                 return;
                             }
-                            else
+
+                            if (cmd.IsConfirmed)
                             {
-                                //actually give the player the money
-                                int tNewMoney = target.Info.Money - amountnum;
-                                if (amountnum == 1)
+                                if (amountnum > target.Info.Money)
                                 {
                                     player.Message(
-                                        "&eYou have taken &c{1}&e " + ConfigKey.CurrencyKeySl.GetString() + " from {0}.",
-                                        target.ClassyName, amountnum);
-                                    target.Message(
-                                        "&e{0} &ehas taken {1} &e" + ConfigKey.CurrencyKeySl.GetString() + " from you.",
-                                        player.ClassyName, amountnum);
-                                    Server.Players.Except(target)
-                                        .Except(player)
-                                        .Message(
-                                            "&e{0} &etook {1} &e" + ConfigKey.CurrencyKeySl.GetString() + " from {2}&e.",
-                                            player.ClassyName, amountnum, target.ClassyName);
+                                        "{0}&e doesn't have that many " + ConfigKey.CurrencyKeyPl.GetString() + "!",
+                                        target.ClassyName);
                                 }
                                 else
                                 {
-                                    player.Message(
-                                        "&eYou have taken &c{1}&e " + ConfigKey.CurrencyKeyPl.GetString() + " from {0}.",
-                                        target.ClassyName, amountnum);
-                                    target.Message(
-                                        "&e{0} &ehas taken {1} &e" + ConfigKey.CurrencyKeyPl.GetString() + " from you.",
-                                        player.ClassyName, amountnum);
-                                    Server.Players.Except(target)
-                                        .Except(player)
-                                        .Message(
-                                            "&e{0} &etook {1} &e" + ConfigKey.CurrencyKeyPl.GetString() + " from {2}&e.",
-                                            player.ClassyName, amountnum, target.ClassyName);
+                                    //actually give the player the money
+                                    int tNewMoney = target.Info.Money - amountnum;
+                                    if (amountnum == 1)
+                                    {
+                                        player.Message(
+                                            "&eYou have taken &c{1}&e " + ConfigKey.CurrencyKeySl.GetString() +
+                                            " from {0}.",
+                                            target.ClassyName, amountnum);
+                                        target.Message(
+                                            "&e{0} &ehas taken {1} &e" + ConfigKey.CurrencyKeySl.GetString() +
+                                            " from you.",
+                                            player.ClassyName, amountnum);
+                                        Server.Players.Except(target)
+                                            .Except(player)
+                                            .Message(
+                                                "&e{0} &etook {1} &e" + ConfigKey.CurrencyKeySl.GetString() +
+                                                " from {2}&e.",
+                                                player.ClassyName, amountnum, target.ClassyName);
+                                    }
+                                    else
+                                    {
+                                        player.Message(
+                                            "&eYou have taken &c{1}&e " + ConfigKey.CurrencyKeyPl.GetString() +
+                                            " from {0}.",
+                                            target.ClassyName, amountnum);
+                                        target.Message(
+                                            "&e{0} &ehas taken {1} &e" + ConfigKey.CurrencyKeyPl.GetString() +
+                                            " from you.",
+                                            player.ClassyName, amountnum);
+                                        Server.Players.Except(target)
+                                            .Except(player)
+                                            .Message(
+                                                "&e{0} &etook {1} &e" + ConfigKey.CurrencyKeyPl.GetString() +
+                                                " from {2}&e.",
+                                                player.ClassyName, amountnum, target.ClassyName);
+                                    }
+                                    target.Info.Money = tNewMoney;
                                 }
-                                target.Info.Money = tNewMoney;
-                                return;
-                            }
-                        }
-                        else
-                        {
-                            player.Confirm(cmd,
-                                "&eAre you sure you want to take &c{1} &e" + ConfigKey.CurrencyKeyPl.GetString() +
-                                " from {0}?", target.ClassyName, amountnum);
-                            return;
-                        }
-                    }
-                }
-                if (option == "pay")
-                {
-                    if (targetName == null)
-                    {
-                        player.Message("&ePlease type in a player's name to pay.");
-                        return;
-                    }
-                    Player target = Server.FindPlayerOrPrintMatches(player, targetName, false, true);
-                    if (target == player)
-                    {
-                        player.Message("You cannot pay youself.");
-                        return;
-                    }
-
-                    if (target == null)
-                    {
-                        return;
-                    }
-                    else
-                    {
-                        if (!int.TryParse(amount, out amountnum))
-                        {
-                            player.Message("&eThe amount must be a number!");
-                            return;
-                        }
-
-                        if (cmd.IsConfirmed)
-                        {
-                            if (amountnum > player.Info.Money)
-                            {
-                                player.Message("You don't have enough " + ConfigKey.CurrencyKeyPl.GetString() + "!");
-                                return;
                             }
                             else
                             {
-                                //show him da monai
-                                int pNewMoney = player.Info.Money - amountnum;
-                                int tNewMoney = target.Info.Money + amountnum;
-                                if (amountnum == 1)
+                                player.Confirm(cmd,
+                                    "&eAre you sure you want to take &c{1} &e" + ConfigKey.CurrencyKeyPl.GetString() +
+                                    " from {0}?", target.ClassyName, amountnum);
+                            }
+                            break;
+                        case "pay":
+                            if (target == player)
+                            {
+                                player.Message("You cannot pay youself.");
+                                return;
+                            }
+                            if (!int.TryParse(amount, out amountnum))
+                            {
+                                player.Message("&eThe amount must be a number!");
+                                return;
+                            }
+
+                            if (cmd.IsConfirmed)
+                            {
+                                if (amountnum > player.Info.Money)
                                 {
-                                    player.Message(
-                                        "&eYou have paid &C{1}&e " + ConfigKey.CurrencyKeySl.GetString() + " to {0}.",
-                                        target.ClassyName, amountnum);
-                                    target.Message(
-                                        "&e{0} &ehas paid you {1} &e" + ConfigKey.CurrencyKeySl.GetString() + ".",
-                                        player.ClassyName, amountnum);
-                                    Server.Players.Except(target)
-                                        .Except(player)
-                                        .Message(
-                                            "&e{0} &ewas paid {1} &e" + ConfigKey.CurrencyKeySl.GetString() +
-                                            " from {2}&e.", target.ClassyName, amountnum, player.ClassyName);
+                                    player.Message("You don't have enough " + ConfigKey.CurrencyKeyPl.GetString() + "!");
                                 }
                                 else
                                 {
-                                    player.Message(
-                                        "&eYou have paid &C{1}&e " + ConfigKey.CurrencyKeyPl.GetString() + " to {0}.",
-                                        target.ClassyName, amountnum);
-                                    target.Message(
-                                        "&e{0} &ehas paid you {1} &e" + ConfigKey.CurrencyKeyPl.GetString() + ".",
-                                        player.ClassyName, amountnum);
-                                    Server.Players.Except(target)
-                                        .Except(player)
-                                        .Message(
-                                            "&e{0} &ewas paid {1} &e" + ConfigKey.CurrencyKeyPl.GetString() +
-                                            " from {2}&e.", target.ClassyName, amountnum, player.ClassyName);
+                                    //show him da monai
+                                    int pNewMoney = player.Info.Money - amountnum;
+                                    int tNewMoney = target.Info.Money + amountnum;
+                                    if (amountnum == 1)
+                                    {
+                                        player.Message(
+                                            "&eYou have paid &C{1}&e " + ConfigKey.CurrencyKeySl.GetString() +
+                                            " to {0}.",
+                                            target.ClassyName, amountnum);
+                                        target.Message(
+                                            "&e{0} &ehas paid you {1} &e" + ConfigKey.CurrencyKeySl.GetString() + ".",
+                                            player.ClassyName, amountnum);
+                                        Server.Players.Except(target)
+                                            .Except(player)
+                                            .Message(
+                                                "&e{0} &ewas paid {1} &e" + ConfigKey.CurrencyKeySl.GetString() +
+                                                " from {2}&e.", target.ClassyName, amountnum, player.ClassyName);
+                                    }
+                                    else
+                                    {
+                                        player.Message(
+                                            "&eYou have paid &C{1}&e " + ConfigKey.CurrencyKeyPl.GetString() +
+                                            " to {0}.",
+                                            target.ClassyName, amountnum);
+                                        target.Message(
+                                            "&e{0} &ehas paid you {1} &e" + ConfigKey.CurrencyKeyPl.GetString() + ".",
+                                            player.ClassyName, amountnum);
+                                        Server.Players.Except(target)
+                                            .Except(player)
+                                            .Message(
+                                                "&e{0} &ewas paid {1} &e" + ConfigKey.CurrencyKeyPl.GetString() +
+                                                " from {2}&e.", target.ClassyName, amountnum, player.ClassyName);
+                                    }
+                                    player.Info.Money = pNewMoney;
+                                    target.Info.Money = tNewMoney;
                                 }
-                                player.Info.Money = pNewMoney;
-                                target.Info.Money = tNewMoney;
-                                return;
                             }
-                        }
-                        else
-                        {
-                            player.Confirm(cmd,
-                                "&eAre you sure you want to pay {0}&e {1} &e" + ConfigKey.CurrencyKeyPl.GetString() +
-                                "? Type /ok to continue.", target.ClassyName, amountnum);
-                            return;
-                        }
-                    }
-                }
-
-
-                else if (option == "show")
-                {
-                    if (targetName == null)
-                    {
-                        player.Message("&ePlease type in a player's name to see how many " +
-                                       ConfigKey.CurrencyKeyPl.GetString() + " they have.");
-                        return;
-                    }
-                    Player target = Server.FindPlayerOrPrintMatches(player, targetName, false, true);
-                    if (target == null)
-                    {
-                        player.Message("&eYou have &C{1} &e" + ConfigKey.CurrencyKeyPl.GetString() + ".",
-                            player.Info.Money);
-                        return;
-                    }
-                    if (target == player)
-                    {
-                        player.Message("&eYou have &C{1} &e" + ConfigKey.CurrencyKeyPl.GetString() + ".",
-                            player.Info.Money);
-                        return;
-                    }
-                    if (target == null)
-                    {
-                        return;
-                    }
-                    else
-                    {
-                        //actually show how much money that person has
-                        player.Message("&e{0}&e has &C{1} &e" + ConfigKey.CurrencyKeyPl.GetString() + ".",
-                            target.ClassyName, target.Info.Money);
+                            else
+                            {
+                                player.Confirm(cmd,
+                                    "&eAre you sure you want to pay {0}&e {1} &e" + ConfigKey.CurrencyKeyPl.GetString() +
+                                    "? Type /ok to continue.", target.ClassyName, amountnum);
+                            }
+                            break;
                     }
                 }
             }
@@ -2907,200 +2868,181 @@ namespace fCraft
                 {
                     CdStore.PrintUsage(player);
                 }
-                if (option == "items")
+                switch (option)
                 {
-                    player.Message("&aHug&7 - &eHug Somebody! &c(&7" + ConfigKey.HugKey.GetInt() + " " +
-                                   ConfigKey.CurrencyKeyPl.GetString() + "&c)");
-                    player.Message("&aInsult&7 - &eInsult Somebody! &c(&7" + ConfigKey.InsultKey.GetInt() + " " +
-                                   ConfigKey.CurrencyKeyPl.GetString() + "&c)");
-                    player.Message("&aLottery&7 - &ePlay the Lottery! &c(&7" + ConfigKey.LotteryKey.GetInt() + " " +
-                                   ConfigKey.CurrencyKeyPl.GetString() + "&c)");
-                    //Custom options
-                    player.Message("&a" + ConfigKey.CustomKey1.GetString() + " &c(&7" + ConfigKey.PriceKey1.GetInt() +
-                                   " " + ConfigKey.CurrencyKeyPl.GetString() + "&c)");
-                    player.Message("&a" + ConfigKey.CustomKey2.GetString() + " &c(&7" + ConfigKey.PriceKey2.GetInt() +
-                                   " " + ConfigKey.CurrencyKeyPl.GetString() + "&c)");
-                    player.Message("&a" + ConfigKey.CustomKey3.GetString() + " &c(&7" + ConfigKey.PriceKey3.GetInt() +
-                                   " " + ConfigKey.CurrencyKeyPl.GetString() + "&c)");
-                    player.Message("&a" + ConfigKey.CustomKey4.GetString() + " &c(&7" + ConfigKey.PriceKey4.GetInt() +
-                                   " " + ConfigKey.CurrencyKeyPl.GetString() + "&c)");
+                    case "items":
+                        player.Message("&aHug&7 - &eHug Somebody! &c(&7" + ConfigKey.HugKey.GetInt() + " " +
+                                       ConfigKey.CurrencyKeyPl.GetString() + "&c)");
+                        player.Message("&aInsult&7 - &eInsult Somebody! &c(&7" + ConfigKey.InsultKey.GetInt() + " " +
+                                       ConfigKey.CurrencyKeyPl.GetString() + "&c)");
+                        player.Message("&aLottery&7 - &ePlay the Lottery! &c(&7" + ConfigKey.LotteryKey.GetInt() + " " +
+                                       ConfigKey.CurrencyKeyPl.GetString() + "&c)");
+                        break;
 
-                    return;
-                }
 
-                if (option == "buy")
-                {
-                    if (item == null)
-                    {
-                        player.Message("&ePlease select an option [&aitems/buy&e]");
-                    }
-                        #region Store - Hug
-
-                    else if (item == "hug")
-                        if (field == null)
+                    case "buy":
+                        if (item == null)
                         {
-                            player.Message("&ePlease enter a player's username");
+                            player.Message("&ePlease select an option [&aitems/buy&e]");
                         }
-
-                        else
+                        double time;
+                        int pNewMoney;
+                        switch (item)
                         {
-                            //Economy Stuff
-                            if (ConfigKey.HugKey.GetInt() > player.Info.Money)
-                            {
-                                player.Message("You dont have enough " + ConfigKey.CurrencyKeyPl.GetString() + "!");
-                                return;
-                            }
-                            else
-                            {
-                                Player target = Server.FindPlayerOrPrintMatches(player, field, false, true);
-                                //Taking the money...
-                                int pNewMoney = player.Info.Money - ConfigKey.HugKey.GetInt();
-
-                                //Actually Hug the Player
-                                if (target == player)
+                            case "hug":
+                                if (field == null)
                                 {
-                                    player.Message("&sAre you feeling lonley...");
-                                    return;
+                                    player.Message("&SPlease enter a player name.");
                                 }
-                                double time = (DateTime.UtcNow - player.LastUsedHug).TotalSeconds;
-                                if (time < 10)
-                                {
-                                    player.Message("&WYou can use /Hug again in " + Math.Round(10 - time) + " seconds.");
-                                    return;
-                                }
-                                if (target == null)
-                                {
-                                    return;
-                                }
-                                if (player.Can(Permission.Economy, target.Info.Rank))
-                                {
-                                    Server.Players.CanSee(target)
-                                        .Union(target)
-                                        .Message("{0} &Swas hugged by {1}", target.ClassyName, player.ClassyName);
-                                    IRC.PlayerSomethingMessage(player, "hugged", target, null);
-                                    player.LastUsedHug = DateTime.UtcNow;
-                                    player.Info.Money = pNewMoney;
-                                    return;
-                                }
-                            }
-                        }
-                        #endregion
 
-                        #region Store - Insult
-
-                    else if (item == "insult")
-                    {
-                        if (field == null)
-                        {
-                            player.Message("&ePlease enter a player's username");
-                        }
-
-                        else
-                        {
-                            //Economy Stuff
-                            if (ConfigKey.InsultKey.GetInt() > player.Info.Money)
-                            {
-                                player.Message("You dont have enough " + ConfigKey.CurrencyKeyPl.GetString() + "!");
-                                return;
-                            }
-                            else
-                            {
-                                //Taking the money...
-                                int pNewMoney = player.Info.Money - ConfigKey.LotteryKey.GetInt();
-                                //Insult Dat Bitch
-                                Player target = Server.FindPlayerOrPrintMatches(player, field, false, true);
-                                List<String> insults;
-                                Random randomizer = new Random();
-
-                                insults = new List<String>()
-                                {
-                                    "{0}&s shit on {1}&s's mom's face.",
-                                    "{0}&s spit in {1}&s's drink.",
-                                    "{0}&s threw a chair at {1}&s.",
-                                    "{0}&s rubbed their ass on {1}&s",
-                                    "{0}&s flicked off {1}&s.",
-                                    "{0}&s pulled down their pants and flashed {1}&s.",
-                                    "{0}&s went into {1}&s's house on their birthday, locked them in the closet, and ate their birthday dinner.",
-                                    "{0}&s went up to {1}&s and said 'mama, mama, mama, mama, mommy, mommy, mommy, mommy, ma, ma, ma, ma, mum, mum, mum, mum. Hi! hehehehe'",
-                                    "{0}&s asked {1}&s if they were single, just to hear them say a painful 'yes'...",
-                                    "{0}&s shoved a pineapple up {1}&s's ass",
-                                    "{0}&s beat {1}&s with a cane.",
-                                    "{0}&s put {1}&s in a boiling pot and started chanting.",
-                                    "{0}&s ate cheetos then wiped their hands all over {1}&s's white clothes",
-                                    "{0}&s sprayed {1}&s's crotch with water, then pointed and laughed.",
-                                    "{0}&s tied up {1}&s and ate their last candy bar right in front of them.",
-                                    "{0}&s gave {1}&s a wet willy.",
-                                    "{0}&s gave {1}&s a wedgie.",
-                                    "{0}&s gave {1}&s counterfeit money and then called the Secret Service on them.",
-                                    "{0}&s shot {1}&s in the knee with an arrow.",
-                                    "{0}&s called {1}&s a disfigured, bearded clam.",
-                                    "{0}&s flipped a table onto {1}&s.",
-                                    "{0}&s smashed {1}&s over the head with their vintage record.",
-                                    "{0}&s dropped a piano on {1}&s.",
-                                    "{0}&s burned {1}&s with a cigarette.",
-                                    "{0}&s incinerated {1}&s with a Kamehameha!",
-                                    "{0}&s had sex with {1}&s's mother."
-                                };
-
-                                int index = randomizer.Next(0, insults.Count); // (0, 18)
-                                double time = (DateTime.Now - player.LastUsedInsult).TotalSeconds;
-                                if (target == null)
-                                    return;
-                                if (target == player)
-                                {
-                                    player.Message("Are you mad at yourself...");
-                                    return;
-                                }
-                                double timeLeft = Math.Round(20 - time);
-                                if (time < 20)
-                                {
-                                    player.Message("You cannot use this command for another " + timeLeft + " second(s).");
-                                    return;
-                                }
                                 else
                                 {
-                                    Server.Message(insults[index], player.ClassyName, target.ClassyName);
+                                    //Economy Stuff
+                                    if (ConfigKey.HugKey.GetInt() > player.Info.Money)
+                                    {
+                                        player.Message("You dont have enough " + ConfigKey.CurrencyKeyPl.GetString() +
+                                                       "!");
+                                        return;
+                                    }
+                                    Player target = Server.FindPlayerOrPrintMatches(player, field, false, true);
+                                    //Taking the money...
+                                    pNewMoney = player.Info.Money - ConfigKey.HugKey.GetInt();
+
+                                    //Actually Hug the Player
+                                    if (target == player)
+                                    {
+                                        player.Message("&sAre you feeling lonley...");
+                                        return;
+                                    }
+                                    time = (DateTime.UtcNow - player.LastUsedHug).TotalSeconds;
+                                    if (time < 10)
+                                    {
+                                        player.Message("&WYou can use /Hug again in " + Math.Round(10 - time) +
+                                                       " seconds.");
+                                        return;
+                                    }
+                                    if (target == null)
+                                    {
+                                        return;
+                                    }
+                                    if (player.Can(Permission.Economy, target.Info.Rank))
+                                    {
+                                        Server.Players.CanSee(target)
+                                            .Union(target)
+                                            .Message("{0} &Swas hugged by {1}", target.ClassyName,
+                                                player.ClassyName);
+                                        IRC.PlayerSomethingMessage(player, "hugged", target, null);
+                                        player.LastUsedHug = DateTime.UtcNow;
+                                        player.Info.Money = pNewMoney;
+                                    }
+                                }
+                                break;
+
+                            case "insult":
+                                if (field == null)
+                                {
+                                    player.Message("&ePlease enter a player's username");
+                                }
+
+                                else
+                                {
+                                    //Economy Stuff
+                                    if (ConfigKey.InsultKey.GetInt() > player.Info.Money)
+                                    {
+                                        player.Message("You dont have enough " +
+                                                       ConfigKey.CurrencyKeyPl.GetString() + "!");
+                                        return;
+                                    }
+                                    //Taking the money...
+                                    pNewMoney = player.Info.Money - ConfigKey.LotteryKey.GetInt();
+                                    //Insult Dat Bitch
+                                    Player target = Server.FindPlayerOrPrintMatches(player, field, false,
+                                        true);
+                                    var randomizer = new Random();
+                                    var insults = new List<String>
+                                    {
+                                        "{0}&s pooped on {1}&s's mom's face.",
+                                        "{0}&s spit in {1}&s's drink.",
+                                        "{0}&s threw a chair at {1}&s.",
+                                        "{0}&s rubbed their ass on {1}&s",
+                                        "{0}&s flicked off {1}&s.",
+                                        "{0}&s pulled down their pants and flashed {1}&s.",
+                                        "{0}&s went into {1}&s's house on their birthday, locked them in the closet, and ate their birthday dinner.",
+                                        "{0}&s went up to {1}&s and said 'mama, mama, mama, mama, mommy, mommy, mommy, mommy, ma, ma, ma, ma, mum, mum, mum, mum. Hi! hehehehe'",
+                                        "{0}&s asked {1}&s if they were single, just to hear them say a painful 'yes'...",
+                                        "{0}&s shoved a pineapple up {1}&s's ass",
+                                        "{0}&s beat {1}&s with a cane.",
+                                        "{0}&s put {1}&s in a boiling pot and started chanting.",
+                                        "{0}&s ate cheetos then wiped their hands all over {1}&s's white clothes",
+                                        "{0}&s sprayed {1}&s's crotch with water, then pointed and laughed.",
+                                        "{0}&s tied up {1}&s and ate their last candy bar right in front of them.",
+                                        "{0}&s gave {1}&s a wet willy.",
+                                        "{0}&s gave {1}&s a wedgie.",
+                                        "{0}&s gave {1}&s counterfeit money and then called the Secret Service on them.",
+                                        "{0}&s shot {1}&s in the knee with an arrow.",
+                                        "{0}&s called {1}&s a disfigured, bearded clam.",
+                                        "{0}&s flipped a table onto {1}&s.",
+                                        "{0}&s smashed {1}&s over the head with their vintage record.",
+                                        "{0}&s dropped a piano on {1}&s.",
+                                        "{0}&s burned {1}&s with a cigarette.",
+                                        "{0}&s incinerated {1}&s with a Kamehameha!",
+                                        "{0}&s had sex with {1}&s's mother.",
+                                        "{0}&s shredded {1}&s's mother."
+                                    };
+
+                                    int index = randomizer.Next(0, insults.Count); // (0, 18)
+                                    time = (DateTime.Now - player.LastUsedInsult).TotalSeconds;
+                                    if (target == null)
+                                        return;
+                                    if (target == player)
+                                    {
+                                        player.Message("Are you mad at yourself...");
+                                        return;
+                                    }
+                                    double timeLeft = Math.Round(20 - time);
+                                    if (time < 20)
+                                    {
+                                        player.Message("You cannot use this command for another " +
+                                                       timeLeft +
+                                                       " second(s).");
+                                        return;
+                                    }
+                                    Server.Message(insults[index], player.ClassyName,
+                                        target.ClassyName);
                                     IRC.PlayerSomethingMessage(player, "insulted", target, null);
                                     player.LastUsedInsult = DateTime.Now;
                                     //Taking the money...
                                     player.Info.Money = pNewMoney;
+                                }
+                                break;
+
+                            case "lottery":
+
+                                //Economy Stuff
+                                if (ConfigKey.LotteryKey.GetInt() > player.Info.Money)
+                                {
+                                    player.Message("You dont have enough " + ConfigKey.CurrencyKeyPl.GetString() +
+                                                   "!");
                                     return;
                                 }
-                            }
-                        }
-                    }
-                        #endregion
-
-                        #region Store - Lottery
-
-                    else if (item == "lottery")
-                    {
-                        //Economy Stuff
-                        if (ConfigKey.LotteryKey.GetInt() > player.Info.Money)
-                        {
-                            player.Message("You dont have enough " + ConfigKey.CurrencyKeyPl.GetString() + "!");
-                            return;
-                        }
-                        else
-                        {
-                            double time = (DateTime.UtcNow - player.LastUsedLottery).TotalMinutes;
-                            if (time < ConfigKey.LottoTimeKey.GetInt())
-                            {
-                                player.Message("&eYou can play the lottery again in &c" +
-                                               Math.Round(ConfigKey.LottoTimeKey.GetInt() - time) + " &eminutes.");
-                                return;
-                            }
-                            else
-                            {
-                                Random rand = new Random();
+                                time = (DateTime.UtcNow - player.LastUsedLottery).TotalMinutes;
+                                if (time < ConfigKey.LottoTimeKey.GetInt())
+                                {
+                                    player.Message("&eYou can play the lottery again in &c" +
+                                                   Math.Round(ConfigKey.LottoTimeKey.GetInt() - time) +
+                                                   " &eminutes.");
+                                    return;
+                                }
+                                var rand = new Random();
                                 int min, max;
                                 min = ConfigKey.LottoMinKey.GetInt();
                                 max = ConfigKey.LottoMaxKey.GetInt();
                                 int num = rand.Next(min, max + 1);
                                 //actually give the player the money
-                                int pNewMoney = player.Info.Money + num - ConfigKey.LotteryKey.GetInt();
+                                pNewMoney = player.Info.Money + num - ConfigKey.LotteryKey.GetInt();
                                 player.Message(
-                                    "&eYou won &C{0} &e" + ConfigKey.CurrencyKeyPl.GetString() + " &efrom the lottery!",
+                                    "&eYou won &C{0} &e" + ConfigKey.CurrencyKeyPl.GetString() +
+                                    " &efrom the lottery!",
                                     num);
                                 Server.Players.Except(player)
                                     .Message(
@@ -3108,197 +3050,11 @@ namespace fCraft
                                         " &efrom the lottery!", player.ClassyName, num);
                                 player.Info.Money = pNewMoney;
                                 player.LastUsedLottery = DateTime.UtcNow;
-                                return;
-                            }
+                                break;
                         }
-                    }
-                        //First Custom Store Item
-                    else if (item == ConfigKey.CustomKey1.GetString())
-                    {
-                        //Economy Stuff
-                        if (ConfigKey.PriceKey1.GetInt() > player.Info.Money)
-                        {
-                            player.Message("You dont have enough " + ConfigKey.CurrencyKeyPl.GetString() + "!");
-                            return;
-                        }
-                        else
-                        {
-                            Player target = Server.FindPlayerOrPrintMatches(player, field, false, true);
-                            //Taking the money...
-                            int pNewMoney = player.Info.Money - ConfigKey.PriceKey1.GetInt();
-                            ;
-
-                            //Action stuff
-                            if (target == player)
-                            {
-                                player.Message("&sWhy would you do that to yourself?");
-                                return;
-                            }
-                            double time = (DateTime.UtcNow - player.LastUsedHug).TotalSeconds;
-                            if (time < 10)
-                            {
-                                player.Message("&WYou can use &a/" + ConfigKey.CustomKey1.GetString() + " &eagain in " +
-                                               Math.Round(10 - time) + " seconds.");
-                                return;
-                            }
-                            if (target == null)
-                            {
-                                return;
-                            }
-                            if (player.Can(Permission.Economy, target.Info.Rank))
-                            {
-                                Server.Players.CanSee(target)
-                                    .Union(target)
-                                    .Message("{0} &S" + ConfigKey.ActionKey1.GetString() + " {1}", player.ClassyName,
-                                        target.ClassyName);
-                                IRC.PlayerSomethingMessage(player, ConfigKey.ActionKey1.GetString(), target, null);
-                                player.LastUsedHug = DateTime.UtcNow;
-                                player.Info.Money = pNewMoney;
-                                return;
-                            }
-                        }
-                    }
-                        //Custom Store Item #2
-                    else if (item == ConfigKey.CustomKey2.GetString())
-                    {
-                        //Economy Stuff
-                        if (ConfigKey.PriceKey2.GetInt() > player.Info.Money)
-                        {
-                            player.Message("You dont have enough " + ConfigKey.CurrencyKeyPl.GetString() + "!");
-                            return;
-                        }
-                        else
-                        {
-                            Player target = Server.FindPlayerOrPrintMatches(player, field, false, true);
-                            //Taking the money...
-                            int pNewMoney = player.Info.Money - ConfigKey.PriceKey2.GetInt();
-
-                            //Action stuff
-                            if (target == player)
-                            {
-                                player.Message("&sWhy would you do that to yourself?");
-                                return;
-                            }
-                            double time = (DateTime.UtcNow - player.LastUsedHug).TotalSeconds;
-                            if (time < 10)
-                            {
-                                player.Message("&WYou can use &a/" + ConfigKey.CustomKey2.GetString() + " &eagain in " +
-                                               Math.Round(10 - time) + " seconds.");
-                                return;
-                            }
-                            if (target == null)
-                            {
-                                return;
-                            }
-                            if (player.Can(Permission.Economy, target.Info.Rank))
-                            {
-                                Server.Players.CanSee(target)
-                                    .Union(target)
-                                    .Message("{0} &S" + ConfigKey.ActionKey2.GetString() + " {1}", player.ClassyName,
-                                        target.ClassyName);
-                                IRC.PlayerSomethingMessage(player, ConfigKey.ActionKey2.GetString(), target, null);
-                                player.LastUsedHug = DateTime.UtcNow;
-                                player.Info.Money = pNewMoney;
-                                return;
-                            }
-                        }
-                    }
-                        //Custom Store Item #3
-                    else if (item == ConfigKey.CustomKey2.GetString())
-                    {
-                        //Economy Stuff
-                        if (150 > player.Info.Money)
-                        {
-                            player.Message("You dont have enough " + ConfigKey.CurrencyKeyPl.GetString() + "!");
-                            return;
-                        }
-                        else
-                        {
-                            Player target = Server.FindPlayerOrPrintMatches(player, field, false, true);
-                            //Taking the money...
-                            int pNewMoney = player.Info.Money - ConfigKey.PriceKey3.GetInt();
-
-                            //Action stuff
-                            if (target == player)
-                            {
-                                player.Message("&sWhy would you do that to yourself?");
-                                return;
-                            }
-                            double time = (DateTime.UtcNow - player.LastUsedHug).TotalSeconds;
-                            if (time < 10)
-                            {
-                                player.Message("&WYou can use &a/" + ConfigKey.CustomKey3.GetString() + " &eagain in " +
-                                               Math.Round(10 - time) + " seconds.");
-                                return;
-                            }
-                            if (target == null)
-                            {
-                                return;
-                            }
-                            if (player.Can(Permission.Economy, target.Info.Rank))
-                            {
-                                Server.Players.CanSee(target)
-                                    .Union(target)
-                                    .Message("{0} &S" + ConfigKey.ActionKey3.GetString() + " {1}", player.ClassyName,
-                                        target.ClassyName);
-                                IRC.PlayerSomethingMessage(player, ConfigKey.ActionKey3.GetString(), target, null);
-                                player.LastUsedHug = DateTime.UtcNow;
-                                player.Info.Money = pNewMoney;
-                                return;
-                            }
-                        }
-                    }
-                        //Custom Store Item #4
-                    else if (item == ConfigKey.CustomKey4.GetString())
-                    {
-                        //Economy Stuff
-                        if (150 > player.Info.Money)
-                        {
-                            player.Message("You dont have enough " + ConfigKey.CurrencyKeyPl.GetString() + "!");
-                            return;
-                        }
-                        else
-                        {
-                            Player target = Server.FindPlayerOrPrintMatches(player, field, false, true);
-                            //Taking the money...
-                            int pNewMoney = player.Info.Money - ConfigKey.PriceKey4.GetInt();
-
-                            //Action stuff
-                            if (target == player)
-                            {
-                                player.Message("&sWhy would you do that to yourself?");
-                                return;
-                            }
-                            double time = (DateTime.UtcNow - player.LastUsedHug).TotalSeconds;
-                            if (time < 10)
-                            {
-                                player.Message("&WYou can use &a/" + ConfigKey.CustomKey4.GetString() + " &eagain in " +
-                                               Math.Round(10 - time) + " seconds.");
-                                return;
-                            }
-                            if (target == null)
-                            {
-                                return;
-                            }
-                            if (player.Can(Permission.Economy, target.Info.Rank))
-                            {
-                                Server.Players.CanSee(target)
-                                    .Union(target)
-                                    .Message("{0} &S" + ConfigKey.ActionKey4.GetString() + " {1}", player.ClassyName,
-                                        target.ClassyName);
-                                IRC.PlayerSomethingMessage(player, ConfigKey.ActionKey4.GetString(), target, null);
-                                player.LastUsedHug = DateTime.UtcNow;
-                                player.Info.Money = pNewMoney;
-                                return;
-                            }
-                        }
-                    }
+                        break;
                 }
             }
-
-
-                #endregion
-
             catch (ArgumentNullException)
             {
                 CdStore.PrintUsage(player);
@@ -3309,7 +3065,8 @@ namespace fCraft
 
         #region Report
 
-        public static List<Player> Reports = new List<Player>();
+            public static
+            List<Player> Reports = new List<Player>();
 
         private static readonly CommandDescriptor CdReport = new CommandDescriptor
         {
@@ -3422,7 +3179,7 @@ namespace fCraft
 
 
         // warn player if others are still online from target's IP
-        private static void WarnIfOtherPlayersOnIP(Player player, PlayerInfo targetInfo, Player except)
+        private static void WarnIfOtherPlayersOnIp(Player player, PlayerInfo targetInfo, Player except)
         {
             Player[] otherPlayers = Server.Players.FromIP(targetInfo.LastIP)
                 .Except(except)
@@ -3437,69 +3194,5 @@ namespace fCraft
 
         #endregion
 
-        internal static void Init()
-        {
-            CdBan.Help += BanCommonHelp;
-            CdBanIP.Help += BanCommonHelp;
-            CdBanAll.Help += BanCommonHelp;
-            CdUnban.Help += BanCommonHelp;
-            CdUnbanIP.Help += BanCommonHelp;
-            CdUnbanAll.Help += BanCommonHelp;
-
-            CommandManager.RegisterCommand(CdBan);
-            CommandManager.RegisterCommand(CdBanIP);
-            CommandManager.RegisterCommand(CdBanAll);
-            CommandManager.RegisterCommand(CdUnban);
-            CommandManager.RegisterCommand(CdUnbanIP);
-            CommandManager.RegisterCommand(CdUnbanAll);
-
-            CommandManager.RegisterCommand(CdBanEx);
-
-            CommandManager.RegisterCommand(CdKick);
-
-            CommandManager.RegisterCommand(CdRank);
-
-            CommandManager.RegisterCommand(CdHide);
-            CommandManager.RegisterCommand(CdUnhide);
-
-            CommandManager.RegisterCommand(CdSetSpawn);
-
-            CommandManager.RegisterCommand(CdFreeze);
-            CommandManager.RegisterCommand(CdUnfreeze);
-
-            CommandManager.RegisterCommand(CdTP);
-            CommandManager.RegisterCommand(CdBring);
-            CommandManager.RegisterCommand(CdWorldBring);
-            CommandManager.RegisterCommand(CdBringAll);
-
-            CommandManager.RegisterCommand(CdPatrol);
-            CommandManager.RegisterCommand(CdSpecPatrol);
-
-            CommandManager.RegisterCommand(CdMute);
-            CommandManager.RegisterCommand(CdUnmute);
-
-            CommandManager.RegisterCommand(CdSpectate);
-            CommandManager.RegisterCommand(CdUnspectate);
-
-            CommandManager.RegisterCommand(CdSlap);
-            CommandManager.RegisterCommand(CdTPZone);
-            CommandManager.RegisterCommand(CdBasscannon);
-            CommandManager.RegisterCommand(CdKill);
-            CommandManager.RegisterCommand(CdTempBan);
-            CommandManager.RegisterCommand(CdWarn);
-            CommandManager.RegisterCommand(CdUnWarn);
-            CommandManager.RegisterCommand(CdDisconnect);
-            CommandManager.RegisterCommand(CdModerate);
-            CommandManager.RegisterCommand(CdImpersonate);
-            CommandManager.RegisterCommand(CdImmortal);
-            CommandManager.RegisterCommand(CdTitle);
-
-            CommandManager.RegisterCommand(CdPay);
-            CommandManager.RegisterCommand(CdEconomy);
-            CommandManager.RegisterCommand(CdStore);
-            CommandManager.RegisterCommand(CdBalance);
-            CommandManager.RegisterCommand(CdReport);
-            CommandManager.RegisterCommand(CdReports);
-        }
     }
 }
