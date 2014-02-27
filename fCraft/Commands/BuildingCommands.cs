@@ -119,13 +119,154 @@ namespace fCraft
             CommandManager.RegisterCommand(CdCylinder);
             CommandManager.RegisterCommand(CdCenter);
             CommandManager.RegisterCommand(CdDoor);
-            CommandManager.RegisterCommand(CdTower);
 
             CommandManager.RegisterCommand(CdWrite);
             CommandManager.RegisterCommand(CdDraw2D);
             CommandManager.RegisterCommand(CdSetFont);
             CommandManager.RegisterCommand(CdDrawImage);
         }
+
+        #region Bind
+
+        private static readonly CommandDescriptor CdBind = new CommandDescriptor
+        {
+            Name = "Bind",
+            Category = CommandCategory.Building,
+            Permissions = new[] { Permission.Build },
+            Help = "&HAssigns one blocktype to another. " +
+                   "Allows to build blocktypes that are not normally buildable directly: admincrete, lava, water, grass, double step. " +
+                   "Calling &H/Bind BlockType&S without second parameter resets the binding. If used with no params, ALL bindings are reset.",
+            Usage = "/Bind OriginalBlockType ReplacementBlockType",
+            Handler = BindHandler
+        };
+
+        private static void BindHandler(Player player, Command cmd)
+        {
+            string originalBlockName = cmd.Next();
+            if (originalBlockName == null)
+            {
+                player.Message("All bindings have been reset.");
+                player.ResetAllBinds();
+                return;
+            }
+            Block originalBlock = Map.GetBlockByName(originalBlockName);
+            if (originalBlock == Block.Undefined)
+            {
+                player.Message("Bind: Unrecognized block name: {0}", originalBlockName);
+                return;
+            }
+
+            string replacementBlockName = cmd.Next();
+            if (replacementBlockName == null)
+            {
+                if (player.GetBind(originalBlock) != originalBlock)
+                {
+                    player.Message("{0} is no longer bound to {1}",
+                        originalBlock,
+                        player.GetBind(originalBlock));
+                    player.ResetBind(originalBlock);
+                }
+                else
+                {
+                    player.Message("{0} is not bound to anything.",
+                        originalBlock);
+                }
+                return;
+            }
+
+            if (cmd.HasNext)
+            {
+                CdBind.PrintUsage(player);
+                return;
+            }
+
+            Block replacementBlock = Map.GetBlockByName(replacementBlockName);
+            if (replacementBlock == Block.Undefined)
+            {
+                player.Message("Bind: Unrecognized block name: {0}", replacementBlockName);
+            }
+            else
+            {
+                Permission permission = Permission.Build;
+                switch (replacementBlock)
+                {
+                    case Block.Bedrock:
+                        permission = Permission.PlaceAdmincrete;
+                        break;
+                }
+                if (player.Can(permission))
+                {
+                    player.Bind(originalBlock, replacementBlock);
+                    player.Message("{0} is now replaced with {1}", originalBlock, replacementBlock);
+                }
+                else
+                {
+                    player.Message("&WYou do not have {0} permission.", permission);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Center
+
+        private static readonly CommandDescriptor CdCenter = new CommandDescriptor
+        {
+            Name = "Center",
+            Aliases = new[] { "Centre" },
+            Category = CommandCategory.Building,
+            Permissions = new[] { Permission.Build },
+            IsConsoleSafe = false,
+            NotRepeatable = false,
+            Usage = "/Center",
+            Help = "Places a block at the center for a chosen cuboided area",
+            UsableByFrozenPlayers = false,
+            Handler = CenterHandler
+        };
+
+        private static void CenterHandler(Player player, Command cmd)
+        {
+            player.SelectionStart(2, CenterCallback, null, CdCenter.Permissions);
+            player.DrawOpBlock = player.HeldBlock;
+            string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
+            player.Message("Center: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to make a selection.",
+                drawOpBlockName);
+        }
+
+        private static void CenterCallback(Player player, Vector3I[] marks, object tag)
+        {
+            if (player.LastUsedBlockType != Block.Undefined)
+            {
+                int sx = Math.Min(marks[0].X, marks[1].X),
+                    ex = Math.Max(marks[0].X, marks[1].X),
+                    sy = Math.Min(marks[0].Y, marks[1].Y),
+                    ey = Math.Max(marks[0].Y, marks[1].Y),
+                    sz = Math.Min(marks[0].Z, marks[1].Z),
+                    ez = Math.Max(marks[0].Z, marks[1].Z);
+
+                BoundingBox bounds = new BoundingBox(sx, sy, sz, ex, ey, ez);
+                Vector3I cPos = new Vector3I((bounds.XMin + bounds.XMax) / 2,
+                    (bounds.YMin + bounds.YMax) / 2,
+                    (bounds.ZMin + bounds.ZMax) / 2);
+                int blocksDrawn = 0,
+                    blocksSkipped = 0;
+                UndoState undoState = player.DrawBegin(null);
+
+                World playerWorld = player.World;
+                if (playerWorld == null) PlayerOpException.ThrowNoWorld(player);
+                if (player.World != null)
+                    DrawOneBlock(player, player.World.Map, player.LastUsedBlockType, cPos,
+                        BlockChangeContext.Drawn,
+                        ref blocksDrawn, ref blocksSkipped, undoState);
+                DrawingFinished(player, "Placed", blocksDrawn, blocksSkipped);
+            }
+            else
+            {
+                player.Message("&WCannot deduce desired block. Click a block or type out the block name.");
+            }
+        }
+
+        #endregion
 
         #region Door
 
@@ -138,7 +279,7 @@ namespace fCraft
             Usage = "/Door [remove | info | list]",
             Help = "Controls doors, options are: remove, list, info\n&S" +
                    "See &H/Help Door <option>&S for details about each option.",
-            HelpSections = new Dictionary<string, string>()
+            HelpSections = new Dictionary<string, string>
             {
                 {
                     "remove", "&H/Door remove Door1\n&S" +
@@ -167,7 +308,6 @@ namespace fCraft
                 string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
                 player.Message("Door: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to make a selection.",
                     drawOpBlockName);
-                return;
             }
             else if (option.ToLower().Equals("remove") || option.ToLower().Equals("rd"))
             {
@@ -179,7 +319,7 @@ namespace fCraft
                 }
                 else
                 {
-                    if (player.World.Map.Doors != null && player.World.Map.Doors.Count > 0)
+                    if (player.World != null && (player.World.Map != null && (player.World != null && (player.World.Map.Doors != null && player.World.Map.Doors.Count > 0))))
                     {
                         bool found = false;
                         Door doorFound = null;
@@ -223,23 +363,24 @@ namespace fCraft
                 }
                 else
                 {
-                    if (player.World.Map.Doors != null && player.World.Map.Doors.Count > 0)
+                    //Wow much null checking
+                    if (player.World != null && (player.World.Map != null && (player.World.Map.Doors != null && player.World.Map.Doors.Count > 0)))
                     {
                         bool found = false;
 
-                        lock (player.World.Map.Doors.SyncRoot)
-                        {
-                            foreach (Door door in player.World.Map.Doors)
-                            {
-                                if (door.Name.ToLower().Equals(doorName.ToLower()))
-                                {
-                                    World doorWorld = WorldManager.FindWorldExact(door.World);
-                                    player.Message("Door '{0}&S' was created by {1}&S at {2}",
-                                        door.Name, door.Creator, door.Created);
-                                    found = true;
-                                }
-                            }
-                        }
+                        if (player.World != null)
+                            if (player.World.Map != null)
+                                if (player.World.Map.Doors != null)
+                                    lock (player.World.Map.Doors.SyncRoot)
+                                    {
+                                        foreach (Door door in player.World.Map.Doors.Cast<Door>().Where(door => door.Name.ToLower().Equals(doorName.ToLower())))
+                                        {
+                                            WorldManager.FindWorldExact(door.World);
+                                            player.Message("Door '{0}&S' was created by {1}&S at {2}",
+                                                door.Name, door.Creator, door.Created);
+                                            found = true;
+                                        }
+                                    }
 
                         if (!found)
                         {
@@ -254,23 +395,30 @@ namespace fCraft
             }
             else if (option.ToLower().Equals("list"))
             {
-                if (player.World.Map.Doors == null || player.World.Map.Doors.Count == 0)
+                if (player.World != null && (player.World.Map != null && (player.World != null && (player.World.Map.Doors == null || player.World.Map.Doors.Count == 0))))
                 {
                     player.Message("There are no doors in {0}&S.", player.World.ClassyName);
                 }
                 else
                 {
-                    String[] doorNames = new String[player.World.Map.Doors.Count];
-                    System.Text.StringBuilder output =
-                        new System.Text.StringBuilder("There are " + player.World.Map.Doors.Count + " doors in " +
-                                                      player.World.ClassyName + "&S: ");
-
-                    for (int i = 0; i < player.World.Map.Doors.Count; i++)
+                    if (player.World != null && player.World.Map == null) return;
+                    if (player.World != null)
                     {
-                        doorNames[i] = ((Door) player.World.Map.Doors[i]).Name;
+                        if (player.World.Map != null)
+                        {
+                            String[] doorNames = new String[player.World.Map.Doors.Count];
+                            var output =
+                                new System.Text.StringBuilder("There are " + player.World.Map.Doors.Count + " doors in " +
+                                                              player.World.ClassyName + "&S: ");
+
+                            for (int i = 0; i < player.World.Map.Doors.Count; i++)
+                            {
+                                doorNames[i] = ((Door) player.World.Map.Doors[i]).Name;
+                            }
+                            output.Append(doorNames.JoinToString(", "));
+                            player.Message(output.ToString());
+                        }
                     }
-                    output.Append(doorNames.JoinToString(", "));
-                    player.Message(output.ToString());
                 }
             }
             else if (option.ToLower() == "check")
@@ -289,12 +437,12 @@ namespace fCraft
 
         private static void DoorCheckCallback(Player player, Vector3I[] marks, object tag)
         {
-            Vector3I Pos = marks[0];
+            Vector3I pos = marks[0];
             if (player.World != null && player.World.Map != null)
             {
                 if (player.WorldMap.Doors.Count > 0)
                 {
-                    Door door = fCraft.Doors.DoorHandler.GetDoor(Pos, player);
+                    Door door = DoorHandler.GetDoor(pos, player);
                     if (door == null)
                     {
                         player.Message("DoorCheck: There is no door at this position.");
@@ -325,18 +473,21 @@ namespace fCraft
             }
             if (!player.Info.Rank.AllowSecurityCircumvention)
             {
-                SecurityCheckResult buildCheck = player.World.BuildSecurity.CheckDetailed(player.Info);
-                switch (buildCheck)
+                if (player.World != null)
                 {
-                    case SecurityCheckResult.BlackListed:
-                        player.Message("Cannot add a door to world {0}&S: You are barred from building here.",
-                            player.World.ClassyName);
-                        return;
-                    case SecurityCheckResult.RankTooLow:
-                        player.Message("Cannot add a door to world {0}&S: You are not allowed to build here.",
-                            player.World.ClassyName);
-                        return;
-                        //case SecurityCheckResult.RankTooHigh:
+                    SecurityCheckResult buildCheck = player.World.BuildSecurity.CheckDetailed(player.Info);
+                    switch (buildCheck)
+                    {
+                        case SecurityCheckResult.BlackListed:
+                            player.Message("Cannot add a door to world {0}&S: You are barred from building here.",
+                                player.World.ClassyName);
+                            return;
+                        case SecurityCheckResult.RankTooLow:
+                            player.Message("Cannot add a door to world {0}&S: You are not allowed to build here.",
+                                player.World.ClassyName);
+                            return;
+                            //case SecurityCheckResult.RankTooHigh:
+                    }
                 }
             }
             List<Vector3I> blocks = new List<Vector3I>();
@@ -347,12 +498,13 @@ namespace fCraft
                     for (int z = sh; z < eh; z++)
                     {
                         if (
-                            player.CanPlace(player.World.Map, new Vector3I(x, y, z), Block.Plank,
+                            player.World != null && player.CanPlace(player.World.Map, new Vector3I(x, y, z), Block.Plank,
                                 BlockChangeContext.Manual) != CanPlaceResult.Allowed)
                         {
-                            player.Message(
-                                "Cannot add a door to world {0}&S: Build permissions in this area replied with 'denied'.",
-                                player.World.ClassyName);
+                            if (player.World != null)
+                                player.Message(
+                                    "Cannot add a door to world {0}&S: Build permissions in this area replied with 'denied'.",
+                                    player.World.ClassyName);
                             return;
                         }
                         blocks.Add(new Vector3I(x, y, z));
@@ -360,9 +512,10 @@ namespace fCraft
                 }
             }
 
+            if (player.World == null) return;
             Door door = new Door(player.World.Name,
                 blocks.ToArray(),
-                fCraft.Doors.Door.GenerateName(player.World),
+                Doors.Door.GenerateName(player.World),
                 player.ClassyName);
             door.Range = new DoorRange(sx, ex, sy, ey, sh, eh);
 
@@ -381,7 +534,7 @@ namespace fCraft
             Name = "DrawImage",
             Aliases = new[] {"Drawimg", "Imgdraw", "ImgPrint"},
             Category = CommandCategory.Building,
-            Permissions = new Permission[] {Permission.DrawAdvanced},
+            Permissions = new[] {Permission.DrawAdvanced},
             IsConsoleSafe = false,
             Usage = "/DrawImage WebsiteUrl.com/picture.jpg",
             Help = "Draws an image file from a website in minecraft blocks. " +
@@ -391,15 +544,14 @@ namespace fCraft
 
         private static void DrawImageHandler(Player player, Command cmd)
         {
-            string Url = cmd.Next();
-            if (string.IsNullOrEmpty(Url))
+            string url = cmd.Next();
+            if (string.IsNullOrEmpty(url))
             {
                 CdDrawImage.PrintUsage(player);
-                return;
             }
             else
             {
-                player.SelectionStart(2, DrawImgCallback, Url, Permission.DrawAdvanced);
+                player.SelectionStart(2, DrawImgCallback, url, Permission.DrawAdvanced);
                 player.DrawOpBlock = player.HeldBlock;
                 string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
                 player.Message("DrawImage: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to make set the direction.",
@@ -409,11 +561,11 @@ namespace fCraft
 
         private static void DrawImgCallback(Player player, Vector3I[] marks, object tag)
         {
-            string Url = (string) tag;
-            if (Url.StartsWith("++")) Url = Url.Replace("++", "i.imgur.com/");
-            if (!Url.ToLower().StartsWith("http://")) Url = "http://" + Url;
+            string url = (string) tag;
+            if (url.StartsWith("++")) url = url.Replace("++", "i.imgur.com/");
+            if (!url.ToLower().StartsWith("http://")) url = "http://" + url;
 
-            player.MessageNow("&HDrawImg: Downloading image from {0}", Url);
+            player.MessageNow("&HDrawImg: Downloading image from {0}", url);
 
             Direction direction = DirectionFinder.GetDirection(marks);
             if (direction == Direction.Null)
@@ -421,31 +573,29 @@ namespace fCraft
                 player.Message("&WNo direction was set");
                 return;
             }
-            DrawImageOperation Op = null;
             try
             {
-                Op = new DrawImageOperation(); //create new instance
-                Op.DrawImage(1, direction, marks[0], player, Url);
+                DrawImageOperation op = new DrawImageOperation();
+                op.DrawImage(1, direction, marks[0], player, url);
                 player.Message("DrawImg: Drawing {0}",
-                    Url, Op.blocks);
+                    url);
             }
             catch (Exception e)
             {
                 player.Message(Color.Warning + "DrawImg: " + e.Message);
             }
-            Op = null; //get lost
         }
 
         #endregion
 
         #region SetFont
 
-        private static CommandDescriptor CdSetFont = new CommandDescriptor()
+        private static readonly CommandDescriptor CdSetFont = new CommandDescriptor
         {
             Name = "SetFont",
             Aliases = new[] {"FontSet", "Font", "Sf"},
             Category = CommandCategory.Building,
-            Permissions = new Permission[] {Permission.DrawAdvanced},
+            Permissions = new[] {Permission.DrawAdvanced},
             IsConsoleSafe = false,
             Help = "Sets the properties for /Write, such as: font and size",
             Handler = SetFontHandler,
@@ -454,20 +604,20 @@ namespace fCraft
 
         private static void SetFontHandler(Player player, Command cmd)
         {
-            string Param = cmd.Next();
-            if (Param == null)
+            string param = cmd.Next();
+            if (param == null)
             {
                 CdSetFont.PrintUsage(player);
                 return;
             }
-            if (Param.ToLower() == "reset")
+            if (param.ToLower() == "reset")
             {
                 player.font = new Font("Times New Roman", 20, FontStyle.Regular);
                 player.Message("SetFont: Font reverted back to default ({0} size {1})",
                     player.font.FontFamily.Name, player.font.Size);
                 return;
             }
-            if (Param.ToLower() == "font")
+            if (param.ToLower() == "font")
             {
                 string sectionName = cmd.NextAll();
                 if (!Directory.Exists(Paths.FontsPath))
@@ -479,37 +629,36 @@ namespace fCraft
                 }
                 string fontFileName = null;
                 string[] sectionFiles = Directory.GetFiles(Paths.FontsPath, "*.ttf", SearchOption.TopDirectoryOnly);
+                string[] sectionList;
                 if (sectionName.Length < 1)
                 {
-                    var sectionList = GetFontSectionList();
+                    sectionList = GetFontSectionList();
                     player.Message("{0} fonts Available: {1}", sectionList.Length, sectionList.JoinToString());
                         //print the folder contents
                     return;
                 }
-                for (int i = 0; i < sectionFiles.Length; i++)
+                foreach (string t in sectionFiles)
                 {
-                    string sectionFullName = Path.GetFileNameWithoutExtension(sectionFiles[i]);
+                    string sectionFullName = Path.GetFileNameWithoutExtension(t);
                     if (sectionFullName == null) continue;
-                    if (sectionFullName.StartsWith(sectionName, StringComparison.OrdinalIgnoreCase))
+                    if (!sectionFullName.StartsWith(sectionName, StringComparison.OrdinalIgnoreCase)) continue;
+                    if (sectionFullName.Equals(sectionName, StringComparison.OrdinalIgnoreCase))
                     {
-                        if (sectionFullName.Equals(sectionName, StringComparison.OrdinalIgnoreCase))
-                        {
-                            fontFileName = sectionFiles[i];
-                            break;
-                        }
-                        else if (fontFileName == null)
-                        {
-                            fontFileName = sectionFiles[i];
-                        }
-                        else
-                        {
-                            var matches = sectionFiles.Select(f => Path.GetFileNameWithoutExtension(f))
-                                .Where(
-                                    sn => sn != null && sn.StartsWith(sectionName, StringComparison.OrdinalIgnoreCase));
-                            player.Message("Multiple font files matched \"{0}\": {1}",
-                                sectionName, matches.JoinToString());
-                            return;
-                        }
+                        fontFileName = t;
+                        break;
+                    }
+                    if (fontFileName == null)
+                    {
+                        fontFileName = t;
+                    }
+                    else
+                    {
+                        var matches = sectionFiles.Select(Path.GetFileNameWithoutExtension)
+                            .Where(
+                                sn => sn != null && sn.StartsWith(sectionName, StringComparison.OrdinalIgnoreCase));
+                        player.Message("Multiple font files matched \"{0}\": {1}",
+                            sectionName, matches.JoinToString());
+                        return;
                     }
                 }
                 if (fontFileName != null)
@@ -517,48 +666,42 @@ namespace fCraft
                     string sectionFullName = Path.GetFileNameWithoutExtension(fontFileName);
                     player.Message("Your font has changed to \"{0}\":", sectionFullName);
                     //change font here
-                    player.font = new System.Drawing.Font(player.LoadFontFamily(fontFileName), player.font.Size);
+                    player.font = new Font(player.LoadFontFamily(fontFileName), player.font.Size);
                     return;
+                }
+                sectionList = GetFontSectionList();
+                if (sectionList == null)
+                {
+                    player.Message("No fonts have been found.");
                 }
                 else
                 {
-                    var sectionList = GetFontSectionList();
-                    if (sectionList == null)
-                    {
-                        player.Message("No fonts have been found.");
-                    }
-                    else
-                    {
-                        player.Message("No fonts found for \"{0}\". Available fonts: {1}",
-                            sectionName, sectionList.JoinToString());
-                    }
+                    player.Message("No fonts found for \"{0}\". Available fonts: {1}",
+                        sectionName, sectionList.JoinToString());
                 }
             }
-            if (Param.ToLower() == "size")
+            if (param.ToLower() == "size")
             {
-                int Size = -1;
-                if (cmd.NextInt(out Size))
+                int size;
+                if (cmd.NextInt(out size))
                 {
-                    if (Size > 48 || Size < 10)
+                    if (size > 48 || size < 10)
                     {
-                        player.Message("&WIncorrect font size ({0}): Size needs to be between 10 and 48", Size);
+                        player.Message("&WIncorrect font size ({0}): Size needs to be between 10 and 48", size);
                         return;
                     }
-                    player.Message("SetFont: Size changed from {0} to {1} ({2})", player.font.Size, Size,
+                    player.Message("SetFont: Size changed from {0} to {1} ({2})", player.font.Size, size,
                         player.font.FontFamily.Name);
-                    player.font = new System.Drawing.Font(player.font.FontFamily, Size);
+                    player.font = new Font(player.font.FontFamily, size);
                 }
                 else
                 {
                     player.Message("&WInvalid size, use /SetFont Size FontSize. Example: /SetFont Size 14");
-                    return;
                 }
-                return;
             }
             else
             {
                 CdSetFont.PrintUsage(player);
-                return;
             }
         }
 
@@ -571,7 +714,7 @@ namespace fCraft
             Name = "Draw2D",
             Aliases = new[] {"D2d"},
             Category = CommandCategory.Building,
-            Permissions = new Permission[] {Permission.DrawAdvanced},
+            Permissions = new[] {Permission.DrawAdvanced},
             RepeatableSelection = true,
             IsConsoleSafe = true,
             Help = "/Draw2D, then select a shape (Polygon, spiral, star). You can then choose a size in blocks " +
@@ -584,13 +727,13 @@ namespace fCraft
 
         private static void Draw2DHandler(Player player, Command cmd)
         {
-            string Shape = cmd.Next();
-            if (Shape == null)
+            string shape = cmd.Next();
+            if (shape == null)
             {
                 CdDraw2D.PrintUsage(player);
                 return;
             }
-            switch (Shape.ToLower())
+            switch (shape.ToLower())
             {
                 case "polygon":
                 case "star":
@@ -600,15 +743,15 @@ namespace fCraft
                     CdDraw2D.PrintUsage(player);
                     return;
             }
-            int radius = 0;
-            int Points = 0;
+            int radius;
+            int points;
             if (!cmd.NextInt(out radius))
             {
                 radius = 20;
             }
-            if (!cmd.NextInt(out Points))
+            if (!cmd.NextInt(out points))
             {
-                Points = 5;
+                points = 5;
             }
             bool fill = true;
             if (cmd.HasNext)
@@ -618,41 +761,34 @@ namespace fCraft
                     fill = true;
                 }
             }
-            Draw2DData tag = new Draw2DData() {Shape = Shape, Points = Points, Radius = radius, Fill = fill};
+            Draw2DData tag = new Draw2DData {Shape = shape, Points = points, Radius = radius, Fill = fill};
             player.SelectionStart(2, Draw2DCallback, tag, Permission.DrawAdvanced);
             player.DrawOpBlock = player.HeldBlock;
             string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
             player.Message("Draw2D({0}): Click 2 blocks while holding &H{1}&S or use &H/Mark&S to set the direction.",
-                Shape,  drawOpBlockName);
+                shape,  drawOpBlockName);
         }
 
         private static void Draw2DCallback(Player player, Vector3I[] marks, object tag)
         {
-            Block block = new Block();
+            Block block;
             Draw2DData data = (Draw2DData) tag;
             int radius = data.Radius;
-            int Points = data.Points;
+            int points = data.Points;
             bool fill = data.Fill;
-            string Shape = data.Shape;
-            if (player.LastUsedBlockType == Block.Undefined)
-            {
-                block = Block.Stone;
-            }
-            else
-            {
-                block = player.LastUsedBlockType;
-            }
+            string shape = data.Shape;
+            block = player.LastUsedBlockType == Block.Undefined ? Block.Stone : player.LastUsedBlockType;
             Direction direction = DirectionFinder.GetDirection(marks);
             try
             {
                 ShapesLib lib = new ShapesLib(block, marks, player, radius, direction);
-                switch (Shape.ToLower())
+                switch (shape.ToLower())
                 {
                     case "polygon":
-                        lib.DrawRegularPolygon(Points, 18, fill);
+                        lib.DrawRegularPolygon(points, 18, fill);
                         break;
                     case "star":
-                        lib.DrawStar(Points, radius, fill);
+                        lib.DrawStar(points, radius, fill);
                         break;
                     case "spiral":
                         lib.DrawSpiral();
@@ -660,23 +796,21 @@ namespace fCraft
                     default:
                         player.Message("&WUnknown shape");
                         CdDraw2D.PrintUsage(player);
-                        lib = null;
                         return;
                 }
 
                 if (lib.blockCount > 0)
                 {
                     player.Message("/Draw2D: Drawing {0} with a size of '{1}' using {2} blocks of {3}",
-                        Shape,
+                        shape,
                         radius,
                         lib.blockCount,
-                        block.ToString());
+                        block);
                 }
                 else
                 {
                     player.Message("&WNo direction was set");
                 }
-                lib = null; //get lost
             }
             catch (Exception e)
             {
@@ -701,7 +835,7 @@ namespace fCraft
             Name = "Write",
             Aliases = new[] {"Text", "Wt"},
             Category = CommandCategory.Building,
-            Permissions = new Permission[] {Permission.DrawAdvanced},
+            Permissions = new[] {Permission.DrawAdvanced},
             RepeatableSelection = true,
             IsConsoleSafe = false,
             Help = "/Write Sentence, then click 2 blocks. The first is the starting point, the second is the direction",
@@ -715,7 +849,6 @@ namespace fCraft
             if (sentence.Length < 1)
             {
                 CdWrite.PrintUsage(player);
-                return;
             }
             else
             {
@@ -729,17 +862,10 @@ namespace fCraft
 
         private static void WriteCallback(Player player, Vector3I[] marks, object tag)
         {
-            Block block = new Block();
+            Block block;
             string sentence = (string) tag;
             //block bugfix kinda
-            if (player.LastUsedBlockType == Block.Undefined)
-            {
-                block = Block.Stone;
-            }
-            else
-            {
-                block = player.LastUsedBlockType;
-            }
+            block = player.LastUsedBlockType == Block.Undefined ? Block.Stone : player.LastUsedBlockType;
             Direction direction = DirectionFinder.GetDirection(marks);
             try
             {
@@ -757,7 +883,6 @@ namespace fCraft
                 {
                     player.Message("&WNo direction was set");
                 }
-                render = null; //get lost
             }
             catch (Exception e)
             {
@@ -771,7 +896,7 @@ namespace fCraft
             if (Directory.Exists(Paths.FontsPath))
             {
                 string[] sections = Directory.GetFiles(Paths.FontsPath, "*.ttf", SearchOption.TopDirectoryOnly)
-                    .Select(name => Path.GetFileNameWithoutExtension(name))
+                    .Select(Path.GetFileNameWithoutExtension)
                     .Where(name => !String.IsNullOrEmpty(name))
                     .ToArray();
                 if (sections.Length != 0)
@@ -823,27 +948,27 @@ namespace fCraft
             int volume = (int) Math.Pow(height, 3);
             if (!player.CanDraw(volume))
             {
-                player.Message(
-                    String.Format(
-                        "You are only allowed to run commands that affect up to {0} blocks. This one would affect {1} blocks.",
-                        player.Info.Rank.DrawLimit, volume));
+                player.Message("You are only allowed to run commands that affect up to {0} blocks. This one would affect {1} blocks.", player.Info.Rank.DrawLimit, volume);
                 return;
             }
 
-            Map map = player.World.Map;
-
-            ForesterArgs args = new ForesterArgs
+            if (player.World != null)
             {
-                Height = height - 1,
-                Operation = Forester.ForesterOperation.Add,
-                Map = map,
-                Shape = shape,
-                TreeCount = 1,
-                RootButtresses = false,
-                Roots = Forester.RootMode.None,
-                Rand = new Random()
-            };
-            player.SelectionStart(1, TreeCallback, args, CdTree.Permissions);
+                Map map = player.World.Map;
+
+                ForesterArgs args = new ForesterArgs
+                {
+                    Height = height - 1,
+                    Operation = Forester.ForesterOperation.Add,
+                    Map = map,
+                    Shape = shape,
+                    TreeCount = 1,
+                    RootButtresses = false,
+                    Roots = Forester.RootMode.None,
+                    Rand = new Random()
+                };
+                player.SelectionStart(1, TreeCallback, args, CdTree.Permissions);
+            }
             player.MessageNow("Tree: Place a block or type /Mark to use your location.");
             player.DrawOpBlock = player.HeldBlock;
             string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
@@ -858,10 +983,13 @@ namespace fCraft
             UndoState undoState = player.DrawBegin(null);
             args.BlockPlacing +=
                 (sender, e) =>
-                    DrawOneBlock(player, player.World.Map, e.Block,
-                        new Vector3I(e.Coordinate.X, e.Coordinate.Y, e.Coordinate.Z),
-                        BlockChangeContext.Drawn,
-                        ref blocksPlaced, ref blocksDenied, undoState);
+                {
+                    if (player.World != null)
+                        DrawOneBlock(player, player.World.Map, e.Block,
+                            new Vector3I(e.Coordinate.X, e.Coordinate.Y, e.Coordinate.Z),
+                            BlockChangeContext.Drawn,
+                            ref blocksPlaced, ref blocksDenied, undoState);
+                };
             Forester.SexyPlant(args, marks[0]);
             DrawingFinished(player, "/Tree: Planted", blocksPlaced, blocksDenied);
         }
@@ -910,82 +1038,22 @@ namespace fCraft
         {
             if (player.LastUsedBlockType != Block.Undefined)
             {
-                Vector3I Pos = new Vector3I(player.Position.X/32, player.Position.Y/32, (player.Position.Z/32) - 2);
+                Vector3I pos = new Vector3I(player.Position.X/32, player.Position.Y/32, (player.Position.Z/32) - 2);
 
-                if (player.CanPlace(player.World.Map, Pos, player.LastUsedBlockType, BlockChangeContext.Manual) !=
+                if (player.World != null && player.CanPlace(player.World.Map, pos, player.LastUsedBlockType, BlockChangeContext.Manual) !=
                     CanPlaceResult.Allowed)
                 {
                     player.Message("&WYou are not allowed to build here");
                     return;
                 }
 
-                Player.RaisePlayerPlacedBlockEvent(player, player.WorldMap, Pos, player.WorldMap.GetBlock(Pos),
+                Player.RaisePlayerPlacedBlockEvent(player, player.WorldMap, pos, player.WorldMap.GetBlock(pos),
                     player.LastUsedBlockType, BlockChangeContext.Manual);
-                BlockUpdate blockUpdate = new BlockUpdate(null, Pos, player.LastUsedBlockType);
-                player.World.Map.QueueUpdate(blockUpdate);
+                BlockUpdate blockUpdate = new BlockUpdate(null, pos, player.LastUsedBlockType);
+                if (player.World != null) if (player.World.Map != null) player.World.Map.QueueUpdate(blockUpdate);
                 player.Message("Block placed below your feet");
             }
             else player.Message("&WError: No last used blocktype was found");
-        }
-
-        #endregion
-
-        #region Center
-
-        private static readonly CommandDescriptor CdCenter = new CommandDescriptor
-        {
-            Name = "Center",
-            Aliases = new[] {"Centre"},
-            Category = CommandCategory.Building,
-            Permissions = new[] {Permission.Build},
-            IsConsoleSafe = false,
-            NotRepeatable = false,
-            Usage = "/Center",
-            Help = "Places a block at the center for a chosen cuboided area",
-            UsableByFrozenPlayers = false,
-            Handler = CenterHandler
-        };
-
-        private static void CenterHandler(Player player, Command cmd)
-        {
-            player.SelectionStart(2, CenterCallback, null, CdCenter.Permissions);
-            player.DrawOpBlock = player.HeldBlock;
-            string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
-            player.Message("Center: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to make a selection.",
-                drawOpBlockName);
-        }
-
-        private static void CenterCallback(Player player, Vector3I[] marks, object tag)
-        {
-            if (player.LastUsedBlockType != Block.Undefined)
-            {
-                int sx = Math.Min(marks[0].X, marks[1].X),
-                    ex = Math.Max(marks[0].X, marks[1].X),
-                    sy = Math.Min(marks[0].Y, marks[1].Y),
-                    ey = Math.Max(marks[0].Y, marks[1].Y),
-                    sz = Math.Min(marks[0].Z, marks[1].Z),
-                    ez = Math.Max(marks[0].Z, marks[1].Z);
-
-                BoundingBox bounds = new BoundingBox(sx, sy, sz, ex, ey, ez);
-                Vector3I cPos = new Vector3I((bounds.XMin + bounds.XMax)/2,
-                    (bounds.YMin + bounds.YMax)/2,
-                    (bounds.ZMin + bounds.ZMax)/2);
-                int blocksDrawn = 0,
-                    blocksSkipped = 0;
-                UndoState undoState = player.DrawBegin(null);
-
-                World playerWorld = player.World;
-                if (playerWorld == null) PlayerOpException.ThrowNoWorld(player);
-                Map map = player.WorldMap;
-                DrawOneBlock(player, player.World.Map, player.LastUsedBlockType, cPos,
-                    BlockChangeContext.Drawn,
-                    ref blocksDrawn, ref blocksSkipped, undoState);
-                DrawingFinished(player, "Placed", blocksDrawn, blocksSkipped);
-            }
-            else
-            {
-                player.Message("&WCannot deduce desired block. Click a block or type out the block name.");
-            }
         }
 
         #endregion
@@ -1044,13 +1112,11 @@ namespace fCraft
                 {
                     if (ModerationCommands.Reports.Contains(reportTarget))
                     {
-                        Player targetPlayer = target.PlayerObject;
                         target.Ban(player, reason, false, true);
                         ModerationCommands.Reports.Remove(reportTarget);
                     }
                     else
                     {
-                        Player targetPlayer = target.PlayerObject;
                         target.Ban(player, reason, false, true);
                     }
                 }
@@ -1059,9 +1125,9 @@ namespace fCraft
                     player.Message(ex.MessageColored);
                     return;
                 }
-                if (player.World.BlockDB.IsEnabled)
+                if (player.World != null && player.World.BlockDB.IsEnabled)
                 {
-                    UndoPlayerHandler2(player, new PlayerInfo[] {target});
+                    UndoPlayerHandler2(player, new[] {target});
                 }
                 if (player.Can(Permission.Demote, target.Rank))
                 {
@@ -1075,20 +1141,17 @@ namespace fCraft
                     IRC.PlayerSomethingMessage(player, "BanX'd (with auto-demote)", target, reason);
                     return;
                 }
-                else
-                {
-                    player.Message("&WAuto demote failed: You didn't have the permissions to demote the target player");
-                    Server.Players.Message("{0}&S was BanX'd by {1}: &W{2}", target.ClassyName, player.ClassyName,
-                        reason);
-                    IRC.PlayerSomethingMessage(player, "BanX'd", target, reason);
-                }
+                player.Message("&WAuto demote failed: You didn't have the permissions to demote the target player");
+                Server.Players.Message("{0}&S was BanX'd by {1}: &W{2}", target.ClassyName, player.ClassyName,
+                    reason);
+                IRC.PlayerSomethingMessage(player, "BanX'd", target, reason);
                 player.Message("&SConfirm the undo with &A/ok");
             }
         }
 
         private static void UndoPlayerHandler2(Player player, PlayerInfo[] target)
         {
-            BlockDBUndoArgs args = new BlockDBUndoArgs()
+            BlockDbUndoArgs args = new BlockDbUndoArgs
             {
                 Player = player,
                 World = player.World,
@@ -1118,20 +1181,13 @@ namespace fCraft
             if (args.CountLimit > 0)
             {
                 // count-limited lookup
-                if (args.Targets.Length == 0)
-                {
-                    changes = args.World.BlockDB.Lookup(args.CountLimit);
-                }
-                else
-                {
-                    changes = args.World.BlockDB.Lookup(args.CountLimit, args.Targets, args.Not);
-                }
+                changes = args.Targets.Length == 0 ? args.World.BlockDB.Lookup(args.CountLimit) : args.World.BlockDB.Lookup(args.CountLimit, args.Targets, args.Not);
                 if (changes.Length > 0)
                 {
                     Logger.Log(LogType.UserActivity,
                         "{0}: Asked {1} to confirm undo on world {2}",
                         cmdName, args.Player.Name, args.World.Name);
-                    args.Player.Confirm(BlockDBUndoConfirmCallback, args,
+                    args.Player.Confirm(BlockDbUndoConfirmCallback, args,
                         "Undo last {0} changes made by {1}&S?",
                         changes.Length, targetList);
                 }
@@ -1139,20 +1195,13 @@ namespace fCraft
             else
             {
                 // time-limited lookup
-                if (args.Targets.Length == 0)
-                {
-                    changes = args.World.BlockDB.Lookup(Int32.MaxValue, args.AgeLimit);
-                }
-                else
-                {
-                    changes = args.World.BlockDB.Lookup(Int32.MaxValue, args.Targets, args.Not, args.AgeLimit);
-                }
+                changes = args.Targets.Length == 0 ? args.World.BlockDB.Lookup(Int32.MaxValue, args.AgeLimit) : args.World.BlockDB.Lookup(Int32.MaxValue, args.Targets, args.Not, args.AgeLimit);
                 if (changes.Length > 0)
                 {
                     Logger.Log(LogType.UserActivity,
                         "{0}: Asked {1} to confirm undo on world {2}",
                         cmdName, args.Player.Name, args.World.Name);
-                    args.Player.Confirm(BlockDBUndoConfirmCallback, args,
+                    args.Player.Confirm(BlockDbUndoConfirmCallback, args,
                         "Undo changes ({0}) made by {1}&S in the last {2}?",
                         changes.Length, targetList, args.AgeLimit.ToMiniString());
                 }
@@ -1532,88 +1581,6 @@ namespace fCraft
 
         #endregion
 
-        #region Bind
-
-        private static readonly CommandDescriptor CdBind = new CommandDescriptor
-        {
-            Name = "Bind",
-            Category = CommandCategory.Building,
-            Permissions = new[] {Permission.Build},
-            Help = "&HAssigns one blocktype to another. " +
-                   "Allows to build blocktypes that are not normally buildable directly: admincrete, lava, water, grass, double step. " +
-                   "Calling &H/Bind BlockType&S without second parameter resets the binding. If used with no params, ALL bindings are reset.",
-            Usage = "/Bind OriginalBlockType ReplacementBlockType",
-            Handler = BindHandler
-        };
-
-        private static void BindHandler(Player player, Command cmd)
-        {
-            string originalBlockName = cmd.Next();
-            if (originalBlockName == null)
-            {
-                player.Message("All bindings have been reset.");
-                player.ResetAllBinds();
-                return;
-            }
-            Block originalBlock = Map.GetBlockByName(originalBlockName);
-            if (originalBlock == Block.Undefined)
-            {
-                player.Message("Bind: Unrecognized block name: {0}", originalBlockName);
-                return;
-            }
-
-            string replacementBlockName = cmd.Next();
-            if (replacementBlockName == null)
-            {
-                if (player.GetBind(originalBlock) != originalBlock)
-                {
-                    player.Message("{0} is no longer bound to {1}",
-                        originalBlock,
-                        player.GetBind(originalBlock));
-                    player.ResetBind(originalBlock);
-                }
-                else
-                {
-                    player.Message("{0} is not bound to anything.",
-                        originalBlock);
-                }
-                return;
-            }
-
-            if (cmd.HasNext)
-            {
-                CdBind.PrintUsage(player);
-                return;
-            }
-
-            Block replacementBlock = Map.GetBlockByName(replacementBlockName);
-            if (replacementBlock == Block.Undefined)
-            {
-                player.Message("Bind: Unrecognized block name: {0}", replacementBlockName);
-            }
-            else
-            {
-                Permission permission = Permission.Build;
-                switch (replacementBlock)
-                {
-                    case Block.Bedrock:
-                        permission = Permission.PlaceAdmincrete;
-                        break;
-                }
-                if (player.Can(permission))
-                {
-                    player.Bind(originalBlock, replacementBlock);
-                    player.Message("{0} is now replaced with {1}", originalBlock, replacementBlock);
-                }
-                else
-                {
-                    player.Message("&WYou do not have {0} permission.", permission);
-                }
-            }
-        }
-
-        #endregion
-
         #region Drawing Helpers
 
         private static void DrawOneBlock([NotNull] Player player, [NotNull] Map map, Block drawBlock, Vector3I coord,
@@ -1651,14 +1618,9 @@ namespace fCraft
             if (player == null) throw new ArgumentNullException("player");
             if (blocks == 0)
             {
-                if (blocksDenied > 0)
-                {
-                    player.MessageNow("No blocks could be {0} due to permission issues.", verb.ToLower());
-                }
-                else
-                {
-                    player.MessageNow("No blocks were {0}.", verb.ToLower());
-                }
+                player.MessageNow(
+                    blocksDenied > 0 ? "No blocks could be {0} due to permission issues." : "No blocks were {0}.",
+                    verb.ToLower());
             }
             else
             {
@@ -1672,11 +1634,9 @@ namespace fCraft
                     player.MessageNow("{0} {1} blocks... The map is now being updated.", verb, blocks);
                 }
             }
-            if (blocks > 0)
-            {
-                player.Info.ProcessDrawCommand(blocks);
-                Server.RequestGC();
-            }
+            if (blocks <= 0) return;
+            player.Info.ProcessDrawCommand(blocks);
+            Server.RequestGC();
         }
 
         #endregion
@@ -1824,11 +1784,12 @@ namespace fCraft
             }
 
             // no need to set player.drawingInProgress here because this is done on the user thread
-            Logger.Log(LogType.UserActivity,
-                "Player {0} initiated /Undo affecting {1} blocks (on world {2})",
-                player.Name,
-                undoState.Buffer.Count,
-                playerWorld.Name);
+            if (playerWorld != null)
+                Logger.Log(LogType.UserActivity,
+                    "Player {0} initiated /Undo affecting {1} blocks (on world {2})",
+                    player.Name,
+                    undoState.Buffer.Count,
+                    playerWorld.Name);
 
             msg += String.Format("Restoring {0} blocks. Type &H/Redo&S to reverse.",
                 undoState.Buffer.Count);
@@ -1867,11 +1828,12 @@ namespace fCraft
             }
 
             // no need to set player.drawingInProgress here because this is done on the user thread
-            Logger.Log(LogType.UserActivity,
-                "Player {0} initiated /Redo affecting {1} blocks (on world {2})",
-                player.Name,
-                redoState.Buffer.Count,
-                playerWorld.Name);
+            if (playerWorld != null)
+                Logger.Log(LogType.UserActivity,
+                    "Player {0} initiated /Redo affecting {1} blocks (on world {2})",
+                    player.Name,
+                    redoState.Buffer.Count,
+                    playerWorld.Name);
 
             msg += String.Format("Restoring {0} blocks. Type &H/Undo&S to reverse.",
                 redoState.Buffer.Count);
@@ -2076,10 +2038,7 @@ namespace fCraft
             int volume = bounds.Volume;
             if (!player.CanDraw(volume))
             {
-                player.MessageNow(
-                    String.Format(
-                        "You are only allowed to run commands that affect up to {0} blocks. This one would affect {1} blocks.",
-                        player.Info.Rank.DrawLimit, volume));
+                player.MessageNow("You are only allowed to run commands that affect up to {0} blocks. This one would affect {1} blocks.", player.Info.Rank.DrawLimit, volume);
                 return;
             }
 
@@ -2101,6 +2060,7 @@ namespace fCraft
                 }
             }
 
+            if (playerWorld == null) return;
             copyInfo.OriginWorld = playerWorld.Name;
             copyInfo.CopyTime = DateTime.UtcNow;
             player.SetCopyInformation(copyInfo);
@@ -2251,39 +2211,24 @@ namespace fCraft
             {
                 if (flipY)
                 {
-                    if (flipH)
-                    {
-                        player.Message("Flipped copy along all axes.");
-                    }
-                    else
-                    {
-                        player.Message("Flipped copy along X (east/west) and Y (north/south) axes.");
-                    }
+                    player.Message(flipH
+                        ? "Flipped copy along all axes."
+                        : "Flipped copy along X (east/west) and Y (north/south) axes.");
                 }
                 else
                 {
-                    if (flipH)
-                    {
-                        player.Message("Flipped copy along X (east/west) and Z (vertical) axes.");
-                    }
-                    else
-                    {
-                        player.Message("Flipped copy along X (east/west) axis.");
-                    }
+                    player.Message(flipH
+                        ? "Flipped copy along X (east/west) and Z (vertical) axes."
+                        : "Flipped copy along X (east/west) axis.");
                 }
             }
             else
             {
                 if (flipY)
                 {
-                    if (flipH)
-                    {
-                        player.Message("Flipped copy along Y (north/south) and Z (vertical) axes.");
-                    }
-                    else
-                    {
-                        player.Message("Flipped copy along Y (north/south) axis.");
-                    }
+                    player.Message(flipH
+                        ? "Flipped copy along Y (north/south) and Z (vertical) axes."
+                        : "Flipped copy along Y (north/south) axis.");
                 }
                 else
                 {
@@ -2341,25 +2286,24 @@ namespace fCraft
             {
                 newBuffer = new Block[oldBuffer.GetLength(0), oldBuffer.GetLength(1), oldBuffer.GetLength(2)];
             }
-            else if (axis == Axis.X)
+            else switch (axis)
             {
-                newBuffer = new Block[oldBuffer.GetLength(0), oldBuffer.GetLength(2), oldBuffer.GetLength(1)];
-            }
-            else if (axis == Axis.Y)
-            {
-                newBuffer = new Block[oldBuffer.GetLength(2), oldBuffer.GetLength(1), oldBuffer.GetLength(0)];
-            }
-            else
-            {
-                // axis == Axis.Z
-                newBuffer = new Block[oldBuffer.GetLength(1), oldBuffer.GetLength(0), oldBuffer.GetLength(2)];
+                case Axis.X:
+                    newBuffer = new Block[oldBuffer.GetLength(0), oldBuffer.GetLength(2), oldBuffer.GetLength(1)];
+                    break;
+                case Axis.Y:
+                    newBuffer = new Block[oldBuffer.GetLength(2), oldBuffer.GetLength(1), oldBuffer.GetLength(0)];
+                    break;
+                default:
+                    newBuffer = new Block[oldBuffer.GetLength(1), oldBuffer.GetLength(0), oldBuffer.GetLength(2)];
+                    break;
             }
 
             // clone to avoid messing up any paste-in-progress
             CopyState info = new CopyState(originalInfo, newBuffer);
 
             // construct the rotation matrix
-            int[,] matrix = new[,]
+            var matrix = new[,]
             {
                 {1, 0, 0},
                 {0, 1, 0},
@@ -2580,13 +2524,14 @@ namespace fCraft
                 }
             }
 
-            Logger.Log(LogType.UserActivity,
-                "{0} restored {1} blocks on world {2} (@{3},{4},{5} - {6},{7},{8}) from file {9}.",
-                player.Name, blocksDrawn,
-                playerWorld.Name,
-                selection.XMin, selection.YMin, selection.ZMin,
-                selection.XMax, selection.YMax, selection.ZMax,
-                map.Metadata["fCraft.Temp", "FileName"]);
+            if (playerWorld != null)
+                Logger.Log(LogType.UserActivity,
+                    "{0} restored {1} blocks on world {2} (@{3},{4},{5} - {6},{7},{8}) from file {9}.",
+                    player.Name, blocksDrawn,
+                    playerWorld.Name,
+                    selection.XMin, selection.YMin, selection.ZMin,
+                    selection.XMax, selection.YMax, selection.ZMax,
+                    map.Metadata["fCraft.Temp", "FileName"]);
 
             DrawingFinished(player, "Restored", blocksDrawn, blocksSkipped);
         }
@@ -2677,7 +2622,7 @@ namespace fCraft
 
         // parses and checks command parameters (for both UndoPlayer and UndoArea)
         [CanBeNull]
-        private static BlockDBUndoArgs ParseBlockDBUndoParams(Player player, Command cmd, string cmdName, bool not)
+        private static BlockDbUndoArgs ParseBlockDbUndoParams(Player player, Command cmd, string cmdName, bool not)
         {
             // check if command's being called by a worldless player (e.g. console)
             World playerWorld = player.World;
@@ -2689,7 +2634,7 @@ namespace fCraft
                 player.Message("&W{0}: BlockDB is disabled on this server.", cmdName);
                 return null;
             }
-            if (!playerWorld.BlockDB.IsEnabled)
+            if (playerWorld != null && !playerWorld.BlockDB.IsEnabled)
             {
                 player.Message("&W{0}: BlockDB is disabled in this world.", cmdName);
                 return null;
@@ -2703,17 +2648,12 @@ namespace fCraft
             {
                 return null;
             }
-            else if (name == "*")
+            if (name == "*")
             {
                 // all players
                 if (not)
                 {
                     player.Message("{0}: \"*\" not allowed (cannot undo \"everyone except everyone\")", cmdName);
-                    return null;
-                }
-                if (allPlayers)
-                {
-                    player.Message("{0}: \"*\" was listed twice.", cmdName);
                     return null;
                 }
                 allPlayers = true;
@@ -2780,43 +2720,33 @@ namespace fCraft
                 player.Message("{0}: Second parameter should be a number or a timespan.", cmdName);
                 return null;
             }
-            if (ageLimit > DateTimeUtil.MaxTimeSpan)
-            {
-                player.MessageMaxTimeSpan();
-                return null;
-            }
+            if (ageLimit <= DateTimeUtil.MaxTimeSpan)
+                return new BlockDbUndoArgs
+                {
+                    Player = player,
+                    AgeLimit = ageLimit,
+                    CountLimit = countLimit,
+                    Area = player.WorldMap.Bounds,
+                    World = playerWorld,
+                    Targets = targets.ToArray(),
+                    Not = not
+                };
+            player.MessageMaxTimeSpan();
+            return null;
 
             // Queue UndoPlayerCallback to run
-            return new BlockDBUndoArgs
-            {
-                Player = player,
-                AgeLimit = ageLimit,
-                CountLimit = countLimit,
-                Area = player.WorldMap.Bounds,
-                World = playerWorld,
-                Targets = targets.ToArray(),
-                Not = not
-            };
         }
 
 
         // called after player types "/ok" to the confirmation prompt.
-        private static void BlockDBUndoConfirmCallback(Player player, object tag, bool fromConsole)
+        private static void BlockDbUndoConfirmCallback(Player player, object tag, bool fromConsole)
         {
-            BlockDBUndoArgs args = (BlockDBUndoArgs) tag;
+            BlockDbUndoArgs args = (BlockDbUndoArgs) tag;
             string cmdName = (args.Area == null ? "UndoArea" : "UndoPlayer");
             if (args.Not) cmdName += "Not";
 
             // Produce 
-            Vector3I[] coords;
-            if (args.Area != null)
-            {
-                coords = new[] {args.Area.MinVertex, args.Area.MaxVertex};
-            }
-            else
-            {
-                coords = new Vector3I[0];
-            }
+            Vector3I[] coords = args.Area != null ? new[] {args.Area.MinVertex, args.Area.MaxVertex} : new Vector3I[0];
 
             // Produce a brief param description for BlockDBDrawOperation
             string description;
@@ -2926,18 +2856,11 @@ namespace fCraft
                 CdUndoArea.PrintUsage(player);
                 return;
             }
-            BlockDBUndoArgs args = ParseBlockDBUndoParams(player, cmd, "UndoArea", false);
+            BlockDbUndoArgs args = ParseBlockDbUndoParams(player, cmd, "UndoArea", false);
             if (args == null) return;
 
             Permission permission;
-            if (args.Targets.Length == 0)
-            {
-                permission = Permission.UndoAll;
-            }
-            else
-            {
-                permission = Permission.UndoOthersActions;
-            }
+            permission = args.Targets.Length == 0 ? Permission.UndoAll : Permission.UndoOthersActions;
             player.SelectionStart(2, UndoAreaSelectionCallback, args, permission);
             player.DrawOpBlock = player.HeldBlock;
             string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
@@ -2952,7 +2875,7 @@ namespace fCraft
                 CdUndoAreaNot.PrintUsage(player);
                 return;
             }
-            BlockDBUndoArgs args = ParseBlockDBUndoParams(player, cmd, "UndoAreaNot", true);
+            BlockDbUndoArgs args = ParseBlockDbUndoParams(player, cmd, "UndoAreaNot", true);
             if (args == null) return;
 
             player.SelectionStart(2, UndoAreaSelectionCallback, args, CdUndoAreaNot.Permissions);
@@ -2966,7 +2889,7 @@ namespace fCraft
         // Queues UndoAreaLookup to run in the background
         private static void UndoAreaSelectionCallback(Player player, Vector3I[] marks, object tag)
         {
-            BlockDBUndoArgs args = (BlockDBUndoArgs) tag;
+            BlockDbUndoArgs args = (BlockDbUndoArgs) tag;
             args.Area = new BoundingBox(marks[0], marks[1]);
             Scheduler.NewBackgroundTask(UndoAreaLookup)
                 .RunOnce(args, TimeSpan.Zero);
@@ -2976,7 +2899,7 @@ namespace fCraft
         // Looks up the changes in BlockDB and prints a confirmation prompt. Runs on a background thread.
         private static void UndoAreaLookup(SchedulerTask task)
         {
-            BlockDBUndoArgs args = (BlockDBUndoArgs) task.UserState;
+            BlockDbUndoArgs args = (BlockDbUndoArgs) task.UserState;
             bool allPlayers = (args.Targets.Length == 0);
             string cmdName = (args.Not ? "UndoAreaNot" : "UndoArea");
 
@@ -3012,7 +2935,7 @@ namespace fCraft
                     Logger.Log(LogType.UserActivity,
                         "{0}: Asked {1} to confirm undo on world {2}",
                         cmdName, args.Player.Name, args.World.Name);
-                    args.Player.Confirm(BlockDBUndoConfirmCallback, args,
+                    args.Player.Confirm(BlockDbUndoConfirmCallback, args,
                         "Undo last {0} changes made here by {1}&S?",
                         changes.Length, targetList);
                 }
@@ -3020,20 +2943,13 @@ namespace fCraft
             else
             {
                 // time-limited lookup
-                if (args.Targets.Length == 0)
-                {
-                    changes = args.World.BlockDB.Lookup(Int32.MaxValue, args.Area, args.AgeLimit);
-                }
-                else
-                {
-                    changes = args.World.BlockDB.Lookup(Int32.MaxValue, args.Area, args.Targets, args.Not, args.AgeLimit);
-                }
+                changes = args.Targets.Length == 0 ? args.World.BlockDB.Lookup(Int32.MaxValue, args.Area, args.AgeLimit) : args.World.BlockDB.Lookup(Int32.MaxValue, args.Area, args.Targets, args.Not, args.AgeLimit);
                 if (changes.Length > 0)
                 {
                     Logger.Log(LogType.UserActivity,
                         "{0}: Asked {1} to confirm undo on world {2}",
                         cmdName, args.Player.Name, args.World.Name);
-                    args.Player.Confirm(BlockDBUndoConfirmCallback, args,
+                    args.Player.Confirm(BlockDbUndoConfirmCallback, args,
                         "Undo changes ({0}) made here by {1}&S in the last {2}?",
                         changes.Length, targetList, args.AgeLimit.ToMiniString());
                 }
@@ -3086,7 +3002,7 @@ namespace fCraft
                 CdUndoPlayer.PrintUsage(player);
                 return;
             }
-            BlockDBUndoArgs args = ParseBlockDBUndoParams(player, cmd, "UndoPlayer", false);
+            BlockDbUndoArgs args = ParseBlockDbUndoParams(player, cmd, "UndoPlayer", false);
             if (args == null) return;
             Scheduler.NewBackgroundTask(UndoPlayerLookup)
                 .RunOnce(args, TimeSpan.Zero);
@@ -3099,7 +3015,7 @@ namespace fCraft
                 CdUndoPlayerNot.PrintUsage(player);
                 return;
             }
-            BlockDBUndoArgs args = ParseBlockDBUndoParams(player, cmd, "UndoPlayerNot", true);
+            BlockDbUndoArgs args = ParseBlockDbUndoParams(player, cmd, "UndoPlayerNot", true);
             if (args == null) return;
             Scheduler.NewBackgroundTask(UndoPlayerLookup)
                 .RunOnce(args, TimeSpan.Zero);
@@ -3109,7 +3025,7 @@ namespace fCraft
         // Looks up the changes in BlockDB and prints a confirmation prompt. Runs on a background thread.
         private static void UndoPlayerLookup(SchedulerTask task)
         {
-            BlockDBUndoArgs args = (BlockDBUndoArgs) task.UserState;
+            BlockDbUndoArgs args = (BlockDbUndoArgs) task.UserState;
             bool allPlayers = (args.Targets.Length == 0);
             string cmdName = (args.Not ? "UndoPlayerNot" : "UndoPlayer");
 
@@ -3132,20 +3048,13 @@ namespace fCraft
             if (args.CountLimit > 0)
             {
                 // count-limited lookup
-                if (args.Targets.Length == 0)
-                {
-                    changes = args.World.BlockDB.Lookup(args.CountLimit);
-                }
-                else
-                {
-                    changes = args.World.BlockDB.Lookup(args.CountLimit, args.Targets, args.Not);
-                }
+                changes = args.Targets.Length == 0 ? args.World.BlockDB.Lookup(args.CountLimit) : args.World.BlockDB.Lookup(args.CountLimit, args.Targets, args.Not);
                 if (changes.Length > 0)
                 {
                     Logger.Log(LogType.UserActivity,
                         "{0}: Asked {1} to confirm undo on world {2}",
                         cmdName, args.Player.Name, args.World.Name);
-                    args.Player.Confirm(BlockDBUndoConfirmCallback, args,
+                    args.Player.Confirm(BlockDbUndoConfirmCallback, args,
                         "Undo last {0} changes made by {1}&S?",
                         changes.Length, targetList);
                 }
@@ -3153,20 +3062,13 @@ namespace fCraft
             else
             {
                 // time-limited lookup
-                if (args.Targets.Length == 0)
-                {
-                    changes = args.World.BlockDB.Lookup(Int32.MaxValue, args.AgeLimit);
-                }
-                else
-                {
-                    changes = args.World.BlockDB.Lookup(Int32.MaxValue, args.Targets, args.Not, args.AgeLimit);
-                }
+                changes = args.Targets.Length == 0 ? args.World.BlockDB.Lookup(Int32.MaxValue, args.AgeLimit) : args.World.BlockDB.Lookup(Int32.MaxValue, args.Targets, args.Not, args.AgeLimit);
                 if (changes.Length > 0)
                 {
                     Logger.Log(LogType.UserActivity,
                         "{0}: Asked {1} to confirm undo on world {2}",
                         cmdName, args.Player.Name, args.World.Name);
-                    args.Player.Confirm(BlockDBUndoConfirmCallback, args,
+                    args.Player.Confirm(BlockDbUndoConfirmCallback, args,
                         "Undo changes ({0}) made by {1}&S in the last {2}?",
                         changes.Length, targetList, args.AgeLimit.ToMiniString());
                 }
@@ -3185,7 +3087,7 @@ namespace fCraft
 
         #endregion
 
-        private sealed class BlockDBUndoArgs
+        private sealed class BlockDbUndoArgs
         {
             public TimeSpan AgeLimit;
             public BoundingBox Area;
@@ -3227,69 +3129,6 @@ namespace fCraft
                 player.Message("Static: On");
                 player.IsRepeatingSelection = true;
             }
-        }
-
-        #endregion
-
-        #region Tower
-
-        private static readonly CommandDescriptor CdTower = new CommandDescriptor
-        {
-            Name = "Tower",
-            Category = CommandCategory.Building,
-            Permissions = new[] {Permission.Tower},
-            IsConsoleSafe = false,
-            NotRepeatable = false,
-            Usage = "/Tower [/Tower Remove]",
-            Help = "&HToggles tower mode on for yourself. All Iron blocks will be replaced with towers.",
-            UsableByFrozenPlayers = false,
-            Handler = towerHandler
-        };
-
-        private static void towerHandler(Player player, Command cmd)
-        {
-            string Param = cmd.Next();
-            if (Param == null)
-            {
-                if (player.towerMode)
-                {
-                    player.towerMode = false;
-                    player.Message("TowerMode has been turned off.");
-                    return;
-                }
-                else
-                {
-                    player.towerMode = true;
-                    player.Message("TowerMode has been turned on. " +
-                                   "All Iron blocks are now being replaced with Towers.");
-                }
-            }
-            else if (Param.ToLower() == "remove")
-            {
-                if (player.TowerCache != null)
-                {
-                    World world = player.World;
-                    if (world.Map != null)
-                    {
-                        player.World.Map.QueueUpdate(new BlockUpdate(null, player.towerOrigin, Block.Air));
-                        foreach (Vector3I block in player.TowerCache.Values)
-                        {
-                            if (world.Map != null)
-                            {
-                                player.Send(PacketWriter.MakeSetBlock(block, player.WorldMap.GetBlock(block)));
-                            }
-                        }
-                    }
-                    player.TowerCache.Clear();
-                    return;
-                }
-                else
-                {
-                    player.Message("&WThere is no Tower to remove");
-                }
-            }
-
-            else CdTower.PrintUsage(player);
         }
 
         #endregion
