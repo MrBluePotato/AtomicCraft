@@ -68,7 +68,7 @@ namespace fCraft
         public LeaveReason LeaveReason;
 
         /// <summary> Player's amount of bits.</summary>
-        [CanBeNull] public int Money = ConfigKey.StartAmountKey.GetInt();
+        [CanBeNull] public int Money = ConfigKey.StartAmount.GetInt();
 
         public int PromoCount;
 

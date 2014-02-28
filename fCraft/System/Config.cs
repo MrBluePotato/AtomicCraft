@@ -250,6 +250,16 @@ namespace fCraft
             LegacyConfigKeys.Add("UpdateMode".ToLower(), ConfigKey.UpdaterMode);
             LegacyConfigKeys.Add("BackupInterval".ToLower(), ConfigKey.DefaultBackupInterval);
             LegacyConfigKeys.Add("EnableBlockDB".ToLower(), ConfigKey.BlockDBEnabled);
+            LegacyConfigKeys.Add("CurrencyKeyPl".ToLower(), ConfigKey.CurrencyPl);
+            LegacyConfigKeys.Add("CurrencyKeySl".ToLower(), ConfigKey.CurrencySl);
+            LegacyConfigKeys.Add("StartAmountKey".ToLower(), ConfigKey.StartAmount);
+            LegacyConfigKeys.Add("HugKey".ToLower(), ConfigKey.NickPrice);
+            LegacyConfigKeys.Add("InsultKey".ToLower(), ConfigKey.TitlePrice);
+            LegacyConfigKeys.Add("LotteryKey".ToLower(), ConfigKey.LotteryPrice);
+            LegacyConfigKeys.Add("LottoMaxKey".ToLower(), ConfigKey.LotteryMax);
+            LegacyConfigKeys.Add("LottoMinKey".ToLower(), ConfigKey.LotteryMin);
+            LegacyConfigKeys.Add("LottoTimeKey".ToLower(), ConfigKey.LotteryTimeBetween);
+            LegacyConfigKeys.Add("GCKey".ToLower(), ConfigKey.GlobalChat);
 
             // These values have been renamed at some point. LEGACY
             LegacyConfigValues.Add(ConfigKey.ProcessPriority,
@@ -523,10 +533,34 @@ namespace fCraft
                     "Adjust your configuration accordingly.");
                 ConfigKey.MaxConnectionsPerIP.TrySetValue(1);
             }
-            else if (keyName != "consoleoptions" &&
+            else if (keyName == "hugkey")
+            {
+                Logger.Log(LogType.Warning, "Config: HugKey was changed to NickPrice."
+                                            + "Adjust your configuration accordingly.");
+        }
+            else if (keyName == "insultkey")
+            {
+                Logger.Log(LogType.Warning, "Config: InsultKey was changed to NickPrice."
+                                            + "Adjust your configuration accordingly.");
+            }
+
+    else if (keyName != "consoleoptions" &&
                      keyName != "logfileoptions" &&
                      keyName != "ranks" &&
-                     keyName != "legacyrankmapping")
+                     keyName != "legacyrankmapping" &&
+                keyName != "customkey1" &&
+                keyName != "customkey2" &&
+                keyName != "customkey3" &&
+                keyName != "customkey4" &&
+                keyName != "actionkey1" &&
+                keyName != "actionkey2" &&
+                keyName != "actionkey3" &&
+                keyName != "actionkey4" &&
+                keyName != "PriceKey1" &&
+                keyName != "PriceKey2" &&
+                keyName != "PriceKey3" &&
+                keyName != "PriceKey4"
+                )
             {
                 // unknown key
                 Logger.Log(LogType.Warning,
@@ -899,10 +933,7 @@ namespace fCraft
             {
                 return SettingsEnabledCache[(int) key];
             }
-            else
-            {
-                return Boolean.Parse(GetString(key));
-            }
+            return Boolean.Parse(GetString(key));
         }
 
 
@@ -917,11 +948,8 @@ namespace fCraft
                 result = SettingsEnabledCache[(int) key];
                 return true;
             }
-            else
-            {
-                result = false;
-                return false;
-            }
+            result = false;
+            return false;
         }
 
 
@@ -1078,17 +1106,17 @@ namespace fCraft
             {
                 foreach (XElement rankPair in legacyRankMappingTag.Elements("LegacyRankPair"))
                 {
-                    XAttribute fromRankID = rankPair.Attribute("from");
-                    XAttribute toRankID = rankPair.Attribute("to");
-                    if (fromRankID == null || String.IsNullOrEmpty(fromRankID.Value) ||
-                        toRankID == null || String.IsNullOrEmpty(toRankID.Value))
+                    XAttribute fromRankId = rankPair.Attribute("from");
+                    XAttribute toRankId = rankPair.Attribute("to");
+                    if (fromRankId == null || String.IsNullOrEmpty(fromRankId.Value) ||
+                        toRankId == null || String.IsNullOrEmpty(toRankId.Value))
                     {
                         Logger.Log(LogType.Error,
                             "Config.Load: Could not parse a LegacyRankMapping entry: {0}", rankPair);
                     }
                     else
                     {
-                        RankManager.LegacyRankMapping.Add(fromRankID.Value, toRankID.Value);
+                        RankManager.LegacyRankMapping.Add(fromRankId.Value, toRankId.Value);
                     }
                 }
             }

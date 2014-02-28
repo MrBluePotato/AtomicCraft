@@ -524,7 +524,7 @@ namespace fCraft
 
             IsRunning = true;
             RaiseEvent(Started);
-            if (ConfigKey.GCKey.Enabled())
+            if (ConfigKey.GlobalChat.Enabled())
             {
                 GlobalChat.Init();
                 GlobalChat.Start();

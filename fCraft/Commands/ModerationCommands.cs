@@ -2511,7 +2511,7 @@ namespace fCraft
             {
                 if (targetName == null)
                 {
-                    player.Message("&cYou &ehave &c{0}&e " + ConfigKey.CurrencyKeyPl.GetString() + ".",
+                    player.Message("&cYou &ehave &c{0}&e " + ConfigKey.CurrencyPl.GetString() + ".",
                         player.Info.Money);
                     return;
                 }
@@ -2521,7 +2521,7 @@ namespace fCraft
                 }
                 else
                 {
-                    player.Message("&e{0}&e has &C{1} &e" + ConfigKey.CurrencyKeyPl.GetString() + ".", target.ClassyName,
+                    player.Message("&e{0}&e has &C{1} &e" + ConfigKey.CurrencyPl.GetString() + ".", target.ClassyName,
                         target.Info.Money);
                 }
             }
@@ -2589,29 +2589,29 @@ namespace fCraft
                                     if (amountnum == 1)
                                     {
                                         player.Message(
-                                            "&eYou have given {0} &C" + ConfigKey.CurrencyKeySl.GetString() + " &ecoin.",
+                                            "&eYou have given {0} &C" + ConfigKey.CurrencySl.GetString() + " &ecoin.",
                                             target.ClassyName, amountnum);
                                         target.Message(
-                                            "&e{0} &ehas given you {1} &e" + ConfigKey.CurrencyKeySl.GetString(),
+                                            "&e{0} &ehas given you {1} &e" + ConfigKey.CurrencySl.GetString(),
                                             player.ClassyName, amountnum);
                                         Server.Players.Except(target)
                                             .Except(player)
                                             .Message(
-                                                "&e{0} &ewas given {1} &e" + ConfigKey.CurrencyKeySl.GetString() +
+                                                "&e{0} &ewas given {1} &e" + ConfigKey.CurrencySl.GetString() +
                                                 " by {2}&e.", target.ClassyName, amountnum, player.ClassyName);
                                     }
                                     else
                                     {
                                         player.Message(
-                                            "&eYou have given {0} &C{1} &e" + ConfigKey.CurrencyKeyPl.GetString(),
+                                            "&eYou have given {0} &C{1} &e" + ConfigKey.CurrencyPl.GetString(),
                                             target.ClassyName, amountnum);
                                         target.Message(
-                                            "&e{0} &ehas given you {1} &e" + ConfigKey.CurrencyKeyPl.GetString(),
+                                            "&e{0} &ehas given you {1} &e" + ConfigKey.CurrencyPl.GetString(),
                                             player.ClassyName, amountnum);
                                         Server.Players.Except(target)
                                             .Except(player)
                                             .Message(
-                                                "&e{0} &ewas given {1} &e" + ConfigKey.CurrencyKeyPl.GetString() +
+                                                "&e{0} &ewas given {1} &e" + ConfigKey.CurrencyPl.GetString() +
                                                 " by {2}&e.", target.ClassyName, amountnum, player.ClassyName);
                                     }
 
@@ -2622,18 +2622,18 @@ namespace fCraft
                                 {
                                     player.Confirm(cmd,
                                         "&eAre you sure you want to give {0} &C{1} &e " +
-                                        ConfigKey.CurrencyKeySl.GetString() + "?", target.ClassyName, amountnum);
+                                        ConfigKey.CurrencySl.GetString() + "?", target.ClassyName, amountnum);
                                     return;
                                 }
                                 player.Confirm(cmd,
                                     "&eAre you sure you want to give {0} &C{1} &e " +
-                                    ConfigKey.CurrencyKeyPl.GetString() + "?", target.ClassyName, amountnum);
+                                    ConfigKey.CurrencyPl.GetString() + "?", target.ClassyName, amountnum);
                                 return;
                             } //der
                             if ((!player.Can(Permission.GiveSelf)) && (target == player))
                                 //Not letting dat scum give himslef da monai
                             {
-                                player.Message("&eYou cannot give yourself " + ConfigKey.CurrencyKeyPl.GetString());
+                                player.Message("&eYou cannot give yourself " + ConfigKey.CurrencyPl.GetString());
                                 return;
                             }
 
@@ -2650,28 +2650,28 @@ namespace fCraft
                                 if (amountnum == 1)
                                 {
                                     player.Message(
-                                        "&eYou have given {0} &C" + ConfigKey.CurrencyKeySl.GetString() + " &ecoin.",
+                                        "&eYou have given {0} &C" + ConfigKey.CurrencySl.GetString() + " &ecoin.",
                                         target.ClassyName, amountnum);
-                                    target.Message("&e{0} &ehas given you {1} &e" + ConfigKey.CurrencyKeySl.GetString(),
+                                    target.Message("&e{0} &ehas given you {1} &e" + ConfigKey.CurrencySl.GetString(),
                                         player.ClassyName, amountnum);
                                     Server.Players.Except(target)
                                         .Except(player)
                                         .Message(
-                                            "&e{0} &ewas given {1} &e" + ConfigKey.CurrencyKeySl.GetString() +
+                                            "&e{0} &ewas given {1} &e" + ConfigKey.CurrencySl.GetString() +
                                             " by {2}&e.",
                                             target.ClassyName, amountnum, player.ClassyName);
                                 }
                                 else
                                 {
                                     player.Message(
-                                        "&eYou have given {0} &C{1} &e" + ConfigKey.CurrencyKeyPl.GetString(),
+                                        "&eYou have given {0} &C{1} &e" + ConfigKey.CurrencyPl.GetString(),
                                         target.ClassyName, amountnum);
-                                    target.Message("&e{0} &ehas given you {1} &e" + ConfigKey.CurrencyKeyPl.GetString(),
+                                    target.Message("&e{0} &ehas given you {1} &e" + ConfigKey.CurrencyPl.GetString(),
                                         player.ClassyName, amountnum);
                                     Server.Players.Except(target)
                                         .Except(player)
                                         .Message(
-                                            "&e{0} &ewas given {1} &e" + ConfigKey.CurrencyKeyPl.GetString() +
+                                            "&e{0} &ewas given {1} &e" + ConfigKey.CurrencyPl.GetString() +
                                             " by {2}&e.",
                                             target.ClassyName, amountnum, player.ClassyName);
                                 }
@@ -2684,13 +2684,13 @@ namespace fCraft
                                 {
                                     player.Confirm(cmd,
                                         "&eAre you sure you want to give {0} &C{1} &e " +
-                                        ConfigKey.CurrencyKeySl.GetString() + "?", target.ClassyName, amountnum);
+                                        ConfigKey.CurrencySl.GetString() + "?", target.ClassyName, amountnum);
                                 }
                                 else
                                 {
                                     player.Confirm(cmd,
                                         "&eAre you sure you want to give {0} &C{1} &e " +
-                                        ConfigKey.CurrencyKeyPl.GetString() + "?", target.ClassyName, amountnum);
+                                        ConfigKey.CurrencyPl.GetString() + "?", target.ClassyName, amountnum);
                                 }
                             }
                             break;
@@ -2703,7 +2703,7 @@ namespace fCraft
 
                             if (target == player)
                             {
-                                player.Message("&eYou cannot take take " + ConfigKey.CurrencyKeyPl.GetString() +
+                                player.Message("&eYou cannot take take " + ConfigKey.CurrencyPl.GetString() +
                                                " from yourself.");
                                 return;
                             }
@@ -2718,7 +2718,7 @@ namespace fCraft
                                 if (amountnum > target.Info.Money)
                                 {
                                     player.Message(
-                                        "{0}&e doesn't have that many " + ConfigKey.CurrencyKeyPl.GetString() + "!",
+                                        "{0}&e doesn't have that many " + ConfigKey.CurrencyPl.GetString() + "!",
                                         target.ClassyName);
                                 }
                                 else
@@ -2728,34 +2728,34 @@ namespace fCraft
                                     if (amountnum == 1)
                                     {
                                         player.Message(
-                                            "&eYou have taken &c{1}&e " + ConfigKey.CurrencyKeySl.GetString() +
+                                            "&eYou have taken &c{1}&e " + ConfigKey.CurrencySl.GetString() +
                                             " from {0}.",
                                             target.ClassyName, amountnum);
                                         target.Message(
-                                            "&e{0} &ehas taken {1} &e" + ConfigKey.CurrencyKeySl.GetString() +
+                                            "&e{0} &ehas taken {1} &e" + ConfigKey.CurrencySl.GetString() +
                                             " from you.",
                                             player.ClassyName, amountnum);
                                         Server.Players.Except(target)
                                             .Except(player)
                                             .Message(
-                                                "&e{0} &etook {1} &e" + ConfigKey.CurrencyKeySl.GetString() +
+                                                "&e{0} &etook {1} &e" + ConfigKey.CurrencySl.GetString() +
                                                 " from {2}&e.",
                                                 player.ClassyName, amountnum, target.ClassyName);
                                     }
                                     else
                                     {
                                         player.Message(
-                                            "&eYou have taken &c{1}&e " + ConfigKey.CurrencyKeyPl.GetString() +
+                                            "&eYou have taken &c{1}&e " + ConfigKey.CurrencyPl.GetString() +
                                             " from {0}.",
                                             target.ClassyName, amountnum);
                                         target.Message(
-                                            "&e{0} &ehas taken {1} &e" + ConfigKey.CurrencyKeyPl.GetString() +
+                                            "&e{0} &ehas taken {1} &e" + ConfigKey.CurrencyPl.GetString() +
                                             " from you.",
                                             player.ClassyName, amountnum);
                                         Server.Players.Except(target)
                                             .Except(player)
                                             .Message(
-                                                "&e{0} &etook {1} &e" + ConfigKey.CurrencyKeyPl.GetString() +
+                                                "&e{0} &etook {1} &e" + ConfigKey.CurrencyPl.GetString() +
                                                 " from {2}&e.",
                                                 player.ClassyName, amountnum, target.ClassyName);
                                     }
@@ -2765,7 +2765,7 @@ namespace fCraft
                             else
                             {
                                 player.Confirm(cmd,
-                                    "&eAre you sure you want to take &c{1} &e" + ConfigKey.CurrencyKeyPl.GetString() +
+                                    "&eAre you sure you want to take &c{1} &e" + ConfigKey.CurrencyPl.GetString() +
                                     " from {0}?", target.ClassyName, amountnum);
                             }
                             break;
@@ -2785,7 +2785,7 @@ namespace fCraft
                             {
                                 if (amountnum > player.Info.Money)
                                 {
-                                    player.Message("You don't have enough " + ConfigKey.CurrencyKeyPl.GetString() + "!");
+                                    player.Message("You don't have enough " + ConfigKey.CurrencyPl.GetString() + "!");
                                 }
                                 else
                                 {
@@ -2795,31 +2795,31 @@ namespace fCraft
                                     if (amountnum == 1)
                                     {
                                         player.Message(
-                                            "&eYou have paid &C{1}&e " + ConfigKey.CurrencyKeySl.GetString() +
+                                            "&eYou have paid &C{1}&e " + ConfigKey.CurrencySl.GetString() +
                                             " to {0}.",
                                             target.ClassyName, amountnum);
                                         target.Message(
-                                            "&e{0} &ehas paid you {1} &e" + ConfigKey.CurrencyKeySl.GetString() + ".",
+                                            "&e{0} &ehas paid you {1} &e" + ConfigKey.CurrencySl.GetString() + ".",
                                             player.ClassyName, amountnum);
                                         Server.Players.Except(target)
                                             .Except(player)
                                             .Message(
-                                                "&e{0} &ewas paid {1} &e" + ConfigKey.CurrencyKeySl.GetString() +
+                                                "&e{0} &ewas paid {1} &e" + ConfigKey.CurrencySl.GetString() +
                                                 " from {2}&e.", target.ClassyName, amountnum, player.ClassyName);
                                     }
                                     else
                                     {
                                         player.Message(
-                                            "&eYou have paid &C{1}&e " + ConfigKey.CurrencyKeyPl.GetString() +
+                                            "&eYou have paid &C{1}&e " + ConfigKey.CurrencyPl.GetString() +
                                             " to {0}.",
                                             target.ClassyName, amountnum);
                                         target.Message(
-                                            "&e{0} &ehas paid you {1} &e" + ConfigKey.CurrencyKeyPl.GetString() + ".",
+                                            "&e{0} &ehas paid you {1} &e" + ConfigKey.CurrencyPl.GetString() + ".",
                                             player.ClassyName, amountnum);
                                         Server.Players.Except(target)
                                             .Except(player)
                                             .Message(
-                                                "&e{0} &ewas paid {1} &e" + ConfigKey.CurrencyKeyPl.GetString() +
+                                                "&e{0} &ewas paid {1} &e" + ConfigKey.CurrencyPl.GetString() +
                                                 " from {2}&e.", target.ClassyName, amountnum, player.ClassyName);
                                     }
                                     player.Info.Money = pNewMoney;
@@ -2829,7 +2829,7 @@ namespace fCraft
                             else
                             {
                                 player.Confirm(cmd,
-                                    "&eAre you sure you want to pay {0}&e {1} &e" + ConfigKey.CurrencyKeyPl.GetString() +
+                                    "&eAre you sure you want to pay {0}&e {1} &e" + ConfigKey.CurrencyPl.GetString() +
                                     "? Type /ok to continue.", target.ClassyName, amountnum);
                             }
                             break;
@@ -2872,12 +2872,12 @@ namespace fCraft
                 switch (option)
                 {
                     case "items":
-                        player.Message("&aHug&7 - &eHug Somebody! &c(&7" + ConfigKey.HugKey.GetInt() + " " +
-                                       ConfigKey.CurrencyKeyPl.GetString() + "&c)");
-                        player.Message("&aInsult&7 - &eInsult Somebody! &c(&7" + ConfigKey.InsultKey.GetInt() + " " +
-                                       ConfigKey.CurrencyKeyPl.GetString() + "&c)");
-                        player.Message("&aLottery&7 - &ePlay the Lottery! &c(&7" + ConfigKey.LotteryKey.GetInt() + " " +
-                                       ConfigKey.CurrencyKeyPl.GetString() + "&c)");
+                        player.Message("&aHug&7 - &eHug Somebody! &c(&7" + ConfigKey.NickPrice.GetInt() + " " +
+                                       ConfigKey.CurrencyPl.GetString() + "&c)");
+                        player.Message("&aInsult&7 - &eInsult Somebody! &c(&7" + ConfigKey.TitlePrice.GetInt() + " " +
+                                       ConfigKey.CurrencyPl.GetString() + "&c)");
+                        player.Message("&aLottery&7 - &ePlay the Lottery! &c(&7" + ConfigKey.LotteryPrice.GetInt() + " " +
+                                       ConfigKey.CurrencyPl.GetString() + "&c)");
                         break;
 
 
@@ -2899,15 +2899,15 @@ namespace fCraft
                                 else
                                 {
                                     //Economy Stuff
-                                    if (ConfigKey.HugKey.GetInt() > player.Info.Money)
+                                    if (ConfigKey.NickPrice.GetInt() > player.Info.Money)
                                     {
-                                        player.Message("You dont have enough " + ConfigKey.CurrencyKeyPl.GetString() +
+                                        player.Message("You dont have enough " + ConfigKey.CurrencyPl.GetString() +
                                                        "!");
                                         return;
                                     }
                                     Player target = Server.FindPlayerOrPrintMatches(player, field, false, true);
                                     //Taking the money...
-                                    pNewMoney = player.Info.Money - ConfigKey.HugKey.GetInt();
+                                    pNewMoney = player.Info.Money - ConfigKey.NickPrice.GetInt();
 
                                     //Actually Hug the Player
                                     if (target == player)
@@ -2948,14 +2948,14 @@ namespace fCraft
                                 else
                                 {
                                     //Economy Stuff
-                                    if (ConfigKey.InsultKey.GetInt() > player.Info.Money)
+                                    if (ConfigKey.TitlePrice.GetInt() > player.Info.Money)
                                     {
                                         player.Message("You dont have enough " +
-                                                       ConfigKey.CurrencyKeyPl.GetString() + "!");
+                                                       ConfigKey.CurrencyPl.GetString() + "!");
                                         return;
                                     }
                                     //Taking the money...
-                                    pNewMoney = player.Info.Money - ConfigKey.LotteryKey.GetInt();
+                                    pNewMoney = player.Info.Money - ConfigKey.LotteryPrice.GetInt();
                                     //Insult Dat Bitch
                                     Player target = Server.FindPlayerOrPrintMatches(player, field, false,
                                         true);
@@ -3020,34 +3020,34 @@ namespace fCraft
                             case "lottery":
 
                                 //Economy Stuff
-                                if (ConfigKey.LotteryKey.GetInt() > player.Info.Money)
+                                if (ConfigKey.LotteryPrice.GetInt() > player.Info.Money)
                                 {
-                                    player.Message("You dont have enough " + ConfigKey.CurrencyKeyPl.GetString() +
+                                    player.Message("You dont have enough " + ConfigKey.CurrencyPl.GetString() +
                                                    "!");
                                     return;
                                 }
                                 time = (DateTime.UtcNow - player.LastUsedLottery).TotalMinutes;
-                                if (time < ConfigKey.LottoTimeKey.GetInt())
+                                if (time < ConfigKey.LotteryTimeBetween.GetInt())
                                 {
                                     player.Message("&eYou can play the lottery again in &c" +
-                                                   Math.Round(ConfigKey.LottoTimeKey.GetInt() - time) +
+                                                   Math.Round(ConfigKey.LotteryTimeBetween.GetInt() - time) +
                                                    " &eminutes.");
                                     return;
                                 }
                                 var rand = new Random();
                                 int min, max;
-                                min = ConfigKey.LottoMinKey.GetInt();
-                                max = ConfigKey.LottoMaxKey.GetInt();
+                                min = ConfigKey.LotteryMin.GetInt();
+                                max = ConfigKey.LotteryMax.GetInt();
                                 int num = rand.Next(min, max + 1);
                                 //actually give the player the money
-                                pNewMoney = player.Info.Money + num - ConfigKey.LotteryKey.GetInt();
+                                pNewMoney = player.Info.Money + num - ConfigKey.LotteryPrice.GetInt();
                                 player.Message(
-                                    "&eYou won &C{0} &e" + ConfigKey.CurrencyKeyPl.GetString() +
+                                    "&eYou won &C{0} &e" + ConfigKey.CurrencyPl.GetString() +
                                     " &efrom the lottery!",
                                     num);
                                 Server.Players.Except(player)
                                     .Message(
-                                        "&e{0} won &C{1} &e" + ConfigKey.CurrencyKeyPl.GetString() +
+                                        "&e{0} won &C{1} &e" + ConfigKey.CurrencyPl.GetString() +
                                         " &efrom the lottery!", player.ClassyName, num);
                                 player.Info.Money = pNewMoney;
                                 player.LastUsedLottery = DateTime.UtcNow;

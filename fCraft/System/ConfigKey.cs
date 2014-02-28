@@ -131,6 +131,9 @@ colorcodes in announcement and rule files.")] AnnouncementColor,
         [ColorKey(ConfigSection.Chat, Color.WarningDefault,
             @"Color of error and warning messages.")] WarningColor,
 
+        [ColorKey(ConfigSection.Chat, Color.GlobalDefault,
+            @"Color of global chat messages.")] GlobalColor,
+
         [IntKey(ConfigSection.Chat, 0,
             @"Announcement interval, in minutes. Set to 0 to disable announcements.
 Announcements are shown to all players, one line at a time, in random order.",
@@ -277,7 +280,7 @@ If exceeded, oldest backups will be deleted first.",
             @"Starts the heartbeatsaver on shutdown")] HbSaverKey,
 
         [BoolKey(ConfigSection.General, true,
-            @"Enables Global Chat (/Global) for the server.")] GCKey,
+            @"Enables Global Chat (/Global) for the server.")] GlobalChat,
 
         #endregion
 
@@ -370,89 +373,39 @@ with IRC bots falling behind on messages.",
 
         [StringKey(ConfigSection.Econ, "coins",
             @"The name of your servers currency (Ex: Dollars)",
-            MinLength = 0, MaxLength = 10)] CurrencyKeyPl,
+            MinLength = 0, MaxLength = 10)] CurrencyPl,
 
         [StringKey(ConfigSection.Econ, "coin",
             @"The name of your servers currency (Ex: Dollars)",
-            MinLength = 0, MaxLength = 10)] CurrencyKeySl,
+            MinLength = 0, MaxLength = 10)] CurrencySl,
 
         [IntKey(ConfigSection.Econ, 300,
             @"",
-            MinValue = 1, MaxValue = 1000)] StartAmountKey,
-
-        [StringKey(ConfigSection.Econ, "marry",
-            @"Custom store action",
-            MinLength = 0, MaxLength = 10)] CustomKey1,
-
-        [StringKey(ConfigSection.Econ, "makeout",
-            @"Custom store action",
-            MinLength = 0, MaxLength = 10)] CustomKey2,
-
-        [StringKey(ConfigSection.Econ, "dinner",
-            @"Custom store action",
-            MinLength = 0, MaxLength = 10)] CustomKey3,
-
-        [StringKey(ConfigSection.Econ, "murder",
-            @"Custom store action",
-            MinLength = 0, MaxLength = 10)] CustomKey4,
-
-        [StringKey(ConfigSection.Econ, "got married to",
-            @"Custom store action",
-            MinLength = 0, MaxLength = 25)] ActionKey1,
-
-        [StringKey(ConfigSection.Econ, "madeout with",
-            @"Custom store action",
-            MinLength = 0, MaxLength = 25)] ActionKey2,
-
-        [StringKey(ConfigSection.Econ, "bought dinner for",
-            @"Custom store action",
-            MinLength = 0, MaxLength = 25)] ActionKey3,
-
-        [StringKey(ConfigSection.Econ, "murdered",
-            @"Custom store action",
-            MinLength = 0, MaxLength = 25)] ActionKey4,
-
-        // Price stuff
+            MinValue = 1, MaxValue = 1000)] StartAmount,
 
         [IntKey(ConfigSection.Econ, 150,
             @"",
-            MinValue = 0, MaxValue = 1000)] PriceKey1,
+            MinValue = 0, MaxValue = 1000)] NickPrice,
 
         [IntKey(ConfigSection.Econ, 150,
             @"",
-            MinValue = 0, MaxValue = 1000)] PriceKey2,
+            MinValue = 0, MaxValue = 1000)] TitlePrice,
 
         [IntKey(ConfigSection.Econ, 150,
             @"",
-            MinValue = 0, MaxValue = 1000)] PriceKey3,
-
-        [IntKey(ConfigSection.Econ, 150,
-            @"",
-            MinValue = 0, MaxValue = 1000)] PriceKey4,
-
-        [IntKey(ConfigSection.Econ, 150,
-            @"",
-            MinValue = 0, MaxValue = 1000)] HugKey,
-
-        [IntKey(ConfigSection.Econ, 150,
-            @"",
-            MinValue = 0, MaxValue = 1000)] InsultKey,
-
-        [IntKey(ConfigSection.Econ, 150,
-            @"",
-            MinValue = 0, MaxValue = 1000)] LotteryKey,
+            MinValue = 0, MaxValue = 1000)] LotteryPrice,
 
         [IntKey(ConfigSection.Econ, 1000,
             @"",
-            MinValue = 0, MaxValue = 5000)] LottoMaxKey,
+            MinValue = 0, MaxValue = 5000)] LotteryMax,
 
         [IntKey(ConfigSection.Econ, 1,
             @"",
-            MinValue = 0, MaxValue = 5000)] LottoMinKey,
+            MinValue = 0, MaxValue = 5000)] LotteryMin,
 
         [IntKey(ConfigSection.Econ, 360,
             @"",
-            MinValue = 0, MaxValue = 2880)] LottoTimeKey,
+            MinValue = 0, MaxValue = 2880)] LotteryTimeBetween,
 
         #endregion
 

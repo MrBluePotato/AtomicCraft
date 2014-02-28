@@ -23,20 +23,6 @@ namespace fCraft
 {
     internal static class ChatCommands
     {
-        #region GlobalChat
-
-        private static readonly CommandDescriptor CdGlobal = new CommandDescriptor
-        {
-            Name = "Global",
-            Category = CommandCategory.Chat,
-            Aliases = new[] {"gl", "gc"},
-            IsConsoleSafe = true,
-            Permissions = new[] {Permission.Chat},
-            Usage = "&a/Global [<message to send>/help/rules/accept/ignore/reconnect]",
-            Help = "Sends a global message to other AtomicCraft servers",
-            Handler = GlobalHandler
-        };
-
         public static void Init()
         {
             CommandManager.RegisterCommand(CdSay);
@@ -66,15 +52,28 @@ namespace fCraft
             CommandManager.RegisterCommand(CdRageQuit);
             CommandManager.RegisterCommand(CdQuit);
             CommandManager.RegisterCommand(CdGlobal);
-            //CommandManager.RegisterCommand(CdOmegle);
 
-            Player.Moved += new EventHandler<Events.PlayerMovedEventArgs>(Player_IsBack);
+            Player.Moved += Player_IsBack;
         }
+        #region GlobalChat
+
+        private static readonly CommandDescriptor CdGlobal = new CommandDescriptor
+        {
+            Name = "Global",
+            Category = CommandCategory.Chat,
+            Aliases = new[] { "gl", "gc" },
+            IsConsoleSafe = true,
+            Permissions = new[] { Permission.Chat },
+            Usage = "&a/Global [<message to send>/help/rules/accept/ignore/reconnect]",
+            Help = "Sends a global message to other AtomicCraft servers",
+            Handler = GlobalHandler
+        };
 
         private static void GlobalHandler(Player player, Command cmd)
         {
-            string Msg = cmd.NextAll();
-            if (!ConfigKey.GCKey.Enabled())
+            var sendList = Server.Players.Where(p => p.GlobalChatAllowed && !p.IsDeaf);
+            string msg = cmd.NextAll();
+            if (!ConfigKey.GlobalChat.Enabled())
             {
                 player.Message("Global Chat is disabled on this server.");
                 return;
@@ -84,104 +83,106 @@ namespace fCraft
                 player.Message("Global Chat is not connected.");
                 return;
             }
-            if (Msg == "reconnect")
+            switch (msg)
             {
-                if (player.Can(Permission.ManageGlobalChat))
-                {
-                    if (GlobalChat.GlobalThread.GCReady)
+                case "reconnect":
+                    if (player.Can(Permission.ManageGlobalChat))
                     {
-                        player.Message("&cThis server is currently connected to global chat.");
-                        return;
-                    }
-                    else
-                    {
+                        if (GlobalChat.GlobalThread.GCReady)
+                        {
+                            player.Message("&cThis server is currently connected to global chat.");
+                            return;
+                        }
                         GlobalChat.GlobalThread.GCReady = true;
                         Server.Message(
-                            "&eAttempting to connect to AtomicCraft Global Chat Network. This may take up to two minutes.");
+                            "&SAttempting to connect to AtomicCraft Global Chat Network. This may take up to few seconds.");
                         GlobalChat.Init();
                         GlobalChat.Start();
                         return;
                     }
-                }
+                    break;
+                case "rules":
+                    if (!player.GlobalChatAllowed)
+                    {
+                        player.Message(
+                            " &cRules: No spamming and no advertising. All chat rules that apply to your server apply here.\n" +
+                            "&eServer staff have the right to kick you.\n" +
+                            "&9By using the Global Chat, you accept these conditions.\n" +
+                            "&eType &a/Global accept &eto connect");
+                        return;
+                    }
+
+                    if (player.GlobalChatAllowed)
+                    {
+                        player.Message(
+                            " &cRules: No spamming and no advertising. All chat rules that apply to your server apply here.\n" +
+                            "&eServer staff have the right to kick you.\n" +
+                            "&9By using the Global Chat, you accept these conditions.");
+                        return;
+                    }
+                    break;
+                case "accept":
+
+                    if (!player.GlobalChatAllowed)
+                    {
+                        player.GlobalChatAllowed = true;
+                        player.Message("&wThank you for accepting the global chat rules.\n" +
+                                       "&cYou now have global chat enabled.");
+                        GlobalChat.GlobalThread.SendChannelMessage(player.ClassyName + " &Sjoined global chat.");
+                        sendList.Message(player.ClassyName + " &Sjoined global chat.");
+                        return;
+                    }
+
+                    if (player.GlobalChatAllowed)
+                    {
+                        player.Message("&You have already accepted the global chat rules.");
+                        return;
+                    }
+                    break;
+                case "ignore":
+                    if (!player.GlobalChatIgnore)
+                    {
+                        player.GlobalChatIgnore = true;
+                        player.Message("&cYou have disconnected from global chat.");
+                        sendList.Message(player.ClassyName + " &Sdisconnected from global chat.");
+                        GlobalChat.GlobalThread.SendChannelMessage(player.ClassyName +
+                                                                   " &Sdisconnected from global chat.");
+                        return;
+                    }
+                    break;
+                case "help":
+                    if (msg == "help")
+                    {
+                        CdGlobal.PrintUsage(player);
+                        return;
+                    }
+                    break;
             }
-
-            var SendList = Server.Players.Where(p => p.GlobalChatAllowed && !p.IsDeaf);
-
-            if ((!player.GlobalChatAllowed) && (Msg == "rules"))
-            {
-                player.Message(
-                    " &cRules: No spamming and no advertising. All chat rules that apply to your server apply here.\n" +
-                    "&eServer staff have the right to kick you.\n" +
-                    "&9By using the Global Chat, you accept these conditions.\n" +
-                    "&eType &a/Global accept &eto connect");
-                return;
-            }
-
-            else if ((player.GlobalChatAllowed) && (Msg == "rules"))
-            {
-                player.Message(
-                    " &cRules: No spamming and no advertising. All chat rules that apply to your server apply here.\n" +
-                    "&eServer staff have the right to kick you.\n" +
-                    "&9By using the Global Chat, you accept these conditions.");
-                return;
-            }
-
-            else if ((!player.GlobalChatAllowed) && (Msg == "accept"))
-            {
-                player.GlobalChatAllowed = true;
-                player.Message("&wThank you for accepting the global chat rules.\n" +
-                               "&cYou now have global chat enabled.");
-                GlobalChat.GlobalThread.SendChannelMessage(player.ClassyName + " &Sjoined global chat.");
-                SendList.Message(player.ClassyName + " &Sjoined global chat.");
-                return;
-            }
-
-            else if ((player.GlobalChatAllowed) && (Msg == "accept"))
-            {
-                player.Message("&You have already accepted the global chat rules.");
-                return;
-            }
-
-            else if ((!player.GlobalChatIgnore) && (Msg == "ignore"))
-            {
-                player.GlobalChatIgnore = true;
-                player.Message("&cYou have disconnected from global chat.");
-                SendList.Message(player.ClassyName + " &Sdisconnected from global chat.");
-                GlobalChat.GlobalThread.SendChannelMessage(player.ClassyName + " &Sdisconnected from global chat.");
-                return;
-            }
-
-            else if (player.Info.IsMuted)
+            if (player.Info.IsMuted)
             {
                 player.MessageMuted();
                 return;
             }
 
-            if ((!player.GlobalChatAllowed) && ((Msg.Length < 1) || (Msg.Length > 1)))
+            if ((!player.GlobalChatAllowed) && ((msg.Length < 1) || (msg.Length > 1)))
             {
                 player.Message("&WYou must read and accept the global chat rules. Type &a/Global rules.");
                 return;
             }
 
-            else if ((player.GlobalChatAllowed) && ((Msg == "") || (Msg == null)))
+            if ((player.GlobalChatAllowed) && string.IsNullOrEmpty(msg))
             {
                 player.Message("You must enter a message!");
                 return;
             }
-            else if (Msg == "help")
+            if (player.GlobalChatAllowed)
             {
-                CdGlobal.PrintUsage(player);
-                return;
-            }
-
-            else if (player.GlobalChatAllowed)
-            {
-                string pMsg = player.ClassyName + Color.White + ": " + Msg;
-                Msg = player.ClassyName + Color.Black + ": " + Msg;
-                SendList.Message("&i[Global] " + pMsg); //send the white message to Server
-                Msg = Color.MinecraftToIrcColors(Msg);
-                Msg = Color.ReplacePercentCodes(Msg);
-                GlobalChat.GlobalThread.SendChannelMessage(Msg); //send the black message to GC
+                string pMsg = player.ClassyName + Color.White + ": " + msg;
+                msg = player.ClassyName + Color.Black + ": " + msg;
+                sendList.Message("&i[Global] " + pMsg); //send the white message to Server
+                msg = Color.MinecraftToIrcColors(msg);
+                msg = Color.ReplacePercentCodes(msg);
+                GlobalChat.GlobalThread.SendChannelMessage(msg); //send the black message to GC
             }
         }
 
@@ -190,10 +191,10 @@ namespace fCraft
         private static readonly CommandDescriptor CdQuit = new CommandDescriptor
         {
             Name = "Quitmsg",
-            Aliases = new[] {"quit", "quitmessage"},
+            Aliases = new[] { "quit", "quitmessage" },
             Category = CommandCategory.Chat,
             IsConsoleSafe = false,
-            Permissions = new[] {Permission.Chat},
+            Permissions = new[] { Permission.Chat },
             Usage = "/Quitmsg [message]",
             Help = "Adds a farewell message which is displayed when you leave the server.",
             Handler = QuitHandler
@@ -201,18 +202,15 @@ namespace fCraft
 
         private static void QuitHandler(Player player, Command cmd)
         {
-            string Msg = cmd.NextAll();
+            string msg = cmd.NextAll();
 
-            if (Msg.Length < 1)
+            if (msg.Length < 1)
             {
                 CdQuit.PrintUsage(player);
                 return;
             }
-            else
-            {
-                player.Info.LeaveMsg = "left the server: &C" + Msg;
-                player.Message("Your quit message is now set to: {0}", Msg);
-            }
+            player.Info.LeaveMsg = "left the server: &C" + msg;
+            player.Message("Your quit message is now set to: {0}", msg);
         }
 
         #endregion
@@ -222,10 +220,10 @@ namespace fCraft
         private static readonly CommandDescriptor CdRageQuit = new CommandDescriptor
         {
             Name = "Ragequit",
-            Aliases = new[] {"rq"},
+            Aliases = new[] { "rq" },
             Category = CommandCategory.Chat | CommandCategory.Fun,
             IsConsoleSafe = false,
-            Permissions = new[] {Permission.RageQuit},
+            Permissions = new[] { Permission.RageQuit },
             Usage = "/Ragequit [reason]",
             Help = "An anger-quenching way to leave the server.",
             Handler = RageHandler
@@ -241,13 +239,10 @@ namespace fCraft
                 IRC.SendAction(player.ClassyName + " &4Ragequit from the server");
                 return;
             }
-            else
-            {
-                Server.Players.Message("{0} &4Ragequit from the server: &C{1}",
-                    player.ClassyName, reason);
-                IRC.SendAction(player.ClassyName + " &WRagequit from the server: " + reason);
-                player.Kick(Player.Console, reason, LeaveReason.RageQuit, false, false, false);
-            }
+            Server.Players.Message("{0} &4Ragequit from the server: &C{1}",
+                player.ClassyName, reason);
+            IRC.SendAction(player.ClassyName + " &WRagequit from the server: " + reason);
+            player.Kick(Player.Console, reason, LeaveReason.RageQuit, false, false, false);
         }
 
         #endregion
@@ -257,9 +252,9 @@ namespace fCraft
         private static readonly CommandDescriptor CdBroMode = new CommandDescriptor
         {
             Name = "Bromode",
-            Aliases = new string[] {"bm"},
+            Aliases = new string[] { "bm" },
             Category = CommandCategory.Chat | CommandCategory.Fun,
-            Permissions = new[] {Permission.BroMode},
+            Permissions = new[] { Permission.BroMode },
             IsConsoleSafe = true,
             Usage = "/Bromode",
             Help = "Toggles bromode.",
@@ -268,13 +263,13 @@ namespace fCraft
 
         private static void BroMode(Player player, Command command)
         {
-            if (!fCraft.Utils.BroMode.Active)
+            if (!Utils.BroMode.Active)
             {
                 foreach (Player p in Server.Players)
                 {
-                    fCraft.Utils.BroMode.GetInstance().RegisterPlayer(p);
+                    Utils.BroMode.GetInstance().RegisterPlayer(p);
                 }
-                fCraft.Utils.BroMode.Active = true;
+                Utils.BroMode.Active = true;
                 Server.Players.Message("{0}&S turned Bro mode on.", player.Info.Rank.Color + player.Name);
 
                 IRC.SendAction(player.Name + " turned Bro mode on.");
@@ -283,10 +278,10 @@ namespace fCraft
             {
                 foreach (Player p in Server.Players)
                 {
-                    fCraft.Utils.BroMode.GetInstance().UnregisterPlayer(p);
+                    Utils.BroMode.GetInstance().UnregisterPlayer(p);
                 }
 
-                fCraft.Utils.BroMode.Active = false;
+                Utils.BroMode.Active = false;
                 Server.Players.Message("{0}&S turned Bro Mode off.", player.Info.Rank.Color + player.Name);
                 IRC.SendAction(player.Name + " turned Bro mode off");
             }
@@ -294,18 +289,16 @@ namespace fCraft
 
         public static void Player_IsBack(object sender, Events.PlayerMovedEventArgs e)
         {
-            if (e.Player.IsAway)
-            {
-                // We need to have block positions, so we divide by 32
-                Vector3I oldPos = new Vector3I(e.OldPosition.X/32, e.OldPosition.Y/32, e.OldPosition.Z/32);
-                Vector3I newPos = new Vector3I(e.NewPosition.X/32, e.NewPosition.Y/32, e.NewPosition.Z/32);
+            if (!e.Player.IsAway) return;
+            // We need to have block positions, so we divide by 32
+            Vector3I oldPos = new Vector3I(e.OldPosition.X / 32, e.OldPosition.Y / 32, e.OldPosition.Z / 32);
+            Vector3I newPos = new Vector3I(e.NewPosition.X / 32, e.NewPosition.Y / 32, e.NewPosition.Z / 32);
 
-                // Check if the player actually moved and not just rotated
-                if ((oldPos.X != newPos.X) || (oldPos.Y != newPos.Y) || (oldPos.Z != newPos.Z))
-                {
-                    Server.Players.Message("{0} &Eis back", e.Player.ClassyName);
-                    e.Player.IsAway = false;
-                }
+            // Check if the player actually moved and not just rotated
+            if ((oldPos.X != newPos.X) || (oldPos.Y != newPos.Y) || (oldPos.Z != newPos.Z))
+            {
+                Server.Players.Message("{0} &Eis back", e.Player.ClassyName);
+                e.Player.IsAway = false;
             }
         }
 
@@ -317,7 +310,7 @@ namespace fCraft
         {
             Name = "Vote",
             Category = CommandCategory.Chat | CommandCategory.Fun,
-            Permissions = new[] {Permission.Chat},
+            Permissions = new[] { Permission.Chat },
             IsConsoleSafe = false,
             NotRepeatable = true,
             Usage = "/Vote | Ask | Kick | Yes | No | Abort",
@@ -338,8 +331,8 @@ namespace fCraft
         {
             Name = ConfigKey.CustomChatName.GetString(),
             Category = CommandCategory.Chat,
-            Aliases = new[] {ConfigKey.CustomAliasName.GetString()},
-            Permissions = new[] {Permission.Chat},
+            Aliases = new[] { ConfigKey.CustomAliasName.GetString() },
+            Permissions = new[] { Permission.Chat },
             IsConsoleSafe = true,
             NotRepeatable = true,
             Usage = "/Customname Message",
@@ -358,14 +351,12 @@ namespace fCraft
             if (player.DetectChatSpam()) return;
 
             string message = cmd.NextAll().Trim();
-            if (message.Length > 0)
+            if (message.Length <= 0) return;
+            if (player.Can(Permission.UseColorCodes) && message.Contains("%"))
             {
-                if (player.Can(Permission.UseColorCodes) && message.Contains("%"))
-                {
-                    message = Color.ReplacePercentCodes(message);
-                }
-                Chat.SendCustom(player, message);
+                message = Color.ReplacePercentCodes(message);
             }
+            Chat.SendCustom(player, message);
         }
 
         #endregion
@@ -376,7 +367,7 @@ namespace fCraft
         {
             Name = "Away",
             Category = CommandCategory.Chat,
-            Aliases = new[] {"afk"},
+            Aliases = new[] { "afk" },
             IsConsoleSafe = true,
             Usage = "/away [optional message]",
             Help = "Shows an away message.",
@@ -399,11 +390,8 @@ namespace fCraft
                 player.IsAway = true;
                 return;
             }
-            else
-            {
-                Server.Players.Message("&S{0} &Eis away &9(Away From Keyboard)", player.ClassyName);
-                player.IsAway = true;
-            }
+            Server.Players.Message("&S{0} &Eis away &9(Away From Keyboard)", player.ClassyName);
+            player.IsAway = true;
         }
 
         #endregion
@@ -413,9 +401,9 @@ namespace fCraft
         private static readonly CommandDescriptor CdHigh5 = new CommandDescriptor
         {
             Name = "High5",
-            Aliases = new string[] {"h5", "highfive"},
+            Aliases = new string[] { "h5", "highfive" },
             Category = CommandCategory.Chat | CommandCategory.Fun,
-            Permissions = new Permission[] {Permission.HighFive},
+            Permissions = new Permission[] { Permission.HighFive },
             IsConsoleSafe = true,
             Usage = "/High5 playername",
             Help = "High fives a given player.",
@@ -488,12 +476,9 @@ namespace fCraft
             {
                 return;
             }
-            else
-            {
-                target.Message("&8You were just poked by {0}",
-                    player.ClassyName);
-                player.Message("&8Successfully poked {0}", target.ClassyName);
-            }
+            target.Message("&8You were just poked by {0}",
+                player.ClassyName);
+            player.Message("&8Successfully poked {0}", target.ClassyName);
         }
 
         #endregion
@@ -543,9 +528,9 @@ namespace fCraft
         private static readonly CommandDescriptor CdAdminChat = new CommandDescriptor
         {
             Name = "Adminchat",
-            Aliases = new[] {"ac"},
+            Aliases = new[] { "ac" },
             Category = CommandCategory.Chat | CommandCategory.Moderation,
-            Permissions = new[] {Permission.Chat},
+            Permissions = new[] { Permission.Chat },
             IsConsoleSafe = true,
             NotRepeatable = true,
             Usage = "/Adminchat Message",
@@ -588,7 +573,7 @@ namespace fCraft
             IsConsoleSafe = true,
             NotRepeatable = true,
             DisableLogging = true,
-            Permissions = new[] {Permission.Chat, Permission.Say},
+            Permissions = new[] { Permission.Chat, Permission.Say },
             Usage = "/Say Message",
             Help = "&HShows a message in special color, without the player name prefix. " +
                    "Can be used for making announcements.",
@@ -630,9 +615,9 @@ namespace fCraft
         private static readonly CommandDescriptor CdStaff = new CommandDescriptor
         {
             Name = "Staff",
-            Aliases = new[] {"st"},
+            Aliases = new[] { "st" },
             Category = CommandCategory.Chat | CommandCategory.Moderation,
-            Permissions = new[] {Permission.Chat},
+            Permissions = new[] { Permission.Chat },
             NotRepeatable = true,
             IsConsoleSafe = true,
             DisableLogging = true,
@@ -769,7 +754,7 @@ namespace fCraft
         {
             Name = "Me",
             Category = CommandCategory.Chat,
-            Permissions = new[] {Permission.Chat},
+            Permissions = new[] { Permission.Chat },
             IsConsoleSafe = true,
             NotRepeatable = true,
             DisableLogging = true,
@@ -807,7 +792,7 @@ namespace fCraft
         {
             Name = "Roll",
             Category = CommandCategory.Chat,
-            Permissions = new[] {Permission.Chat},
+            Permissions = new[] { Permission.Chat },
             IsConsoleSafe = true,
             Help = "Gives random number between 1 and 100.\n" +
                    "&H/Roll MaxNumber\n" +
@@ -861,7 +846,7 @@ namespace fCraft
         private static readonly CommandDescriptor CdDeafen = new CommandDescriptor
         {
             Name = "Deafen",
-            Aliases = new[] {"deaf"},
+            Aliases = new[] { "deaf" },
             Category = CommandCategory.Chat,
             IsConsoleSafe = true,
             Help = "Blocks all chat messages from being sent to you.",
@@ -927,7 +912,7 @@ namespace fCraft
         private static readonly CommandDescriptor CdTimer = new CommandDescriptor
         {
             Name = "Timer",
-            Permissions = new[] {Permission.Say},
+            Permissions = new[] { Permission.Say },
             IsConsoleSafe = true,
             Category = CommandCategory.Chat,
             Usage = "/Timer <Duration> <Message>",
@@ -1041,4 +1026,4 @@ namespace fCraft
     }
 }
 
-#endregion
+        #endregion
