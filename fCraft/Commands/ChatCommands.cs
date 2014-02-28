@@ -64,8 +64,8 @@ namespace fCraft
             Aliases = new[] { "gl", "gc" },
             IsConsoleSafe = true,
             Permissions = new[] { Permission.Chat },
-            Usage = "&a/Global [<message to send>/help/rules/accept/ignore/reconnect]",
-            Help = "Sends a global message to other AtomicCraft servers",
+            Usage = "&H/Global [<message to send>/help/rules/accept/ignore/reconnect]",
+            Help = "&SSends a global message to other AtomicCraft servers",
             Handler = GlobalHandler
         };
 
@@ -75,12 +75,12 @@ namespace fCraft
             string msg = cmd.NextAll();
             if (!ConfigKey.GlobalChat.Enabled())
             {
-                player.Message("Global Chat is disabled on this server.");
+                player.Message("&WGlobal Chat is disabled on this server.");
                 return;
             }
             if (!GlobalChat.GlobalThread.GCReady)
             {
-                player.Message("Global Chat is not connected.");
+                player.Message("&WGlobal Chat is not connected.");
                 return;
             }
             switch (msg)
@@ -90,12 +90,12 @@ namespace fCraft
                     {
                         if (GlobalChat.GlobalThread.GCReady)
                         {
-                            player.Message("&cThis server is currently connected to global chat.");
+                            player.Message("&WThis server is currently connected to global chat.");
                             return;
                         }
                         GlobalChat.GlobalThread.GCReady = true;
                         Server.Message(
-                            "&SAttempting to connect to AtomicCraft Global Chat Network. This may take up to few seconds.");
+                            "&WAttempting to connect to AtomicCraft Global Chat Network. This may take up to few seconds.");
                         GlobalChat.Init();
                         GlobalChat.Start();
                         return;
@@ -105,19 +105,19 @@ namespace fCraft
                     if (!player.GlobalChatAllowed)
                     {
                         player.Message(
-                            " &cRules: No spamming and no advertising. All chat rules that apply to your server apply here.\n" +
-                            "&eServer staff have the right to kick you.\n" +
-                            "&9By using the Global Chat, you accept these conditions.\n" +
-                            "&eType &a/Global accept &eto connect");
+                            "&RRules: No spamming and no advertising. All chat rules that apply to your server apply here.\n" +
+                            "&WServer staff have the right to kick you.\n" +
+                            "&SBy using the Global Chat, you accept these conditions.\n" +
+                            "&SType &H/global accept &Sto connect");
                         return;
                     }
 
                     if (player.GlobalChatAllowed)
                     {
                         player.Message(
-                            " &cRules: No spamming and no advertising. All chat rules that apply to your server apply here.\n" +
-                            "&eServer staff have the right to kick you.\n" +
-                            "&9By using the Global Chat, you accept these conditions.");
+                            "&RRules: No spamming and no advertising. All chat rules that apply to your server apply here.\n" +
+                            "&WServer staff have the right to kick you.\n" +
+                            "&SBy using the Global Chat, you accept these conditions.");
                         return;
                     }
                     break;
@@ -126,8 +126,8 @@ namespace fCraft
                     if (!player.GlobalChatAllowed)
                     {
                         player.GlobalChatAllowed = true;
-                        player.Message("&wThank you for accepting the global chat rules.\n" +
-                                       "&cYou now have global chat enabled.");
+                        player.Message("&SThank you for accepting the global chat rules.\n" +
+                                       "&WYou now have global chat enabled.");
                         GlobalChat.GlobalThread.SendChannelMessage(player.ClassyName + " &Sjoined global chat.");
                         sendList.Message(player.ClassyName + " &Sjoined global chat.");
                         return;
@@ -135,7 +135,7 @@ namespace fCraft
 
                     if (player.GlobalChatAllowed)
                     {
-                        player.Message("&You have already accepted the global chat rules.");
+                        player.Message("&WYou have already accepted the global chat rules.");
                         return;
                     }
                     break;
@@ -143,7 +143,7 @@ namespace fCraft
                     if (!player.GlobalChatIgnore)
                     {
                         player.GlobalChatIgnore = true;
-                        player.Message("&cYou have disconnected from global chat.");
+                        player.Message("&WYou have disconnected from global chat.");
                         sendList.Message(player.ClassyName + " &Sdisconnected from global chat.");
                         GlobalChat.GlobalThread.SendChannelMessage(player.ClassyName +
                                                                    " &Sdisconnected from global chat.");
@@ -151,11 +151,7 @@ namespace fCraft
                     }
                     break;
                 case "help":
-                    if (msg == "help")
-                    {
                         CdGlobal.PrintUsage(player);
-                        return;
-                    }
                     break;
             }
             if (player.Info.IsMuted)
@@ -166,20 +162,20 @@ namespace fCraft
 
             if ((!player.GlobalChatAllowed) && ((msg.Length < 1) || (msg.Length > 1)))
             {
-                player.Message("&WYou must read and accept the global chat rules. Type &a/Global rules.");
+                player.Message("&WYou must read and accept the global chat rules. Type &H/global rules");
                 return;
             }
 
             if ((player.GlobalChatAllowed) && string.IsNullOrEmpty(msg))
             {
-                player.Message("You must enter a message!");
+                player.Message("&WYou must enter a message!");
                 return;
             }
             if (player.GlobalChatAllowed)
             {
                 string pMsg = player.ClassyName + Color.White + ": " + msg;
                 msg = player.ClassyName + Color.Black + ": " + msg;
-                sendList.Message("&i[Global] " + pMsg); //send the white message to Server
+                sendList.Message("&g[Global] " + pMsg); //send the white message to Server
                 msg = Color.MinecraftToIrcColors(msg);
                 msg = Color.ReplacePercentCodes(msg);
                 GlobalChat.GlobalThread.SendChannelMessage(msg); //send the black message to GC
