@@ -25,9 +25,9 @@
         /// </summary>
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.tabSavingAndBackup = new System.Windows.Forms.TabPage();
             this.gDataBackup = new System.Windows.Forms.GroupBox();
             this.xBackupDataOnStartup = new System.Windows.Forms.CheckBox();
@@ -122,6 +122,8 @@
             this.vRanks = new System.Windows.Forms.ListBox();
             this.tabChat = new System.Windows.Forms.TabPage();
             this.gChatColors = new System.Windows.Forms.GroupBox();
+            this.label31 = new System.Windows.Forms.Label();
+            this.bColorGlobal = new System.Windows.Forms.Button();
             this.lColorMe = new System.Windows.Forms.Label();
             this.bColorMe = new System.Windows.Forms.Button();
             this.lColorWarning = new System.Windows.Forms.Label();
@@ -143,13 +145,14 @@
             this.xRankPrefixesInList = new System.Windows.Forms.CheckBox();
             this.xRankPrefixesInChat = new System.Windows.Forms.CheckBox();
             this.xRankColorsInChat = new System.Windows.Forms.CheckBox();
+            this.chatPreview = new fCraft.ConfigGUI.ChatPreview();
             this.tabs = new System.Windows.Forms.TabControl();
             this.tabGeneral = new System.Windows.Forms.TabPage();
             this.groupBox9 = new System.Windows.Forms.GroupBox();
             this.cStartMode = new System.Windows.Forms.ComboBox();
             this.label29 = new System.Windows.Forms.Label();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.GCcheckBox = new System.Windows.Forms.CheckBox();
+            this.xGlobalchat = new System.Windows.Forms.CheckBox();
             this.gUpdaterSettings = new System.Windows.Forms.GroupBox();
             this.bShowAdvancedUpdaterSettings = new System.Windows.Forms.Button();
             this.cUpdaterMode = new System.Windows.Forms.ComboBox();
@@ -186,6 +189,26 @@
             this.nMaxPlayers = new System.Windows.Forms.NumericUpDown();
             this.lPublic = new System.Windows.Forms.Label();
             this.lMaxPlayers = new System.Windows.Forms.Label();
+            this.tabWorlds = new System.Windows.Forms.TabPage();
+            this.label30 = new System.Windows.Forms.Label();
+            this.dgvWorlds = new System.Windows.Forms.DataGridView();
+            this.dgvcName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgvcDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgvcAccess = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.dgvcBuild = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.dgvcBackup = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.dgvcBlockDB = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.dgvcHidden = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.bMapPath = new System.Windows.Forms.Button();
+            this.xMapPath = new System.Windows.Forms.CheckBox();
+            this.tMapPath = new System.Windows.Forms.TextBox();
+            this.lDefaultBuildRank = new System.Windows.Forms.Label();
+            this.cDefaultBuildRank = new System.Windows.Forms.ComboBox();
+            this.cMainWorld = new System.Windows.Forms.ComboBox();
+            this.lMainWorld = new System.Windows.Forms.Label();
+            this.bWorldEdit = new System.Windows.Forms.Button();
+            this.bAddWorld = new System.Windows.Forms.Button();
+            this.bWorldDelete = new System.Windows.Forms.Button();
             this.tabLogging = new System.Windows.Forms.TabPage();
             this.gLogFile = new System.Windows.Forms.GroupBox();
             this.lLogFileOptionsDescription = new System.Windows.Forms.Label();
@@ -282,53 +305,28 @@
             this.Econ = new System.Windows.Forms.TabPage();
             this.groupBox8 = new System.Windows.Forms.GroupBox();
             this.label25 = new System.Windows.Forms.Label();
-            this.LottoTime = new System.Windows.Forms.NumericUpDown();
-            this.LottoMin = new System.Windows.Forms.NumericUpDown();
-            this.LottoMax = new System.Windows.Forms.NumericUpDown();
+            this.nLotteryTimeBetween = new System.Windows.Forms.NumericUpDown();
+            this.nLotteryMin = new System.Windows.Forms.NumericUpDown();
+            this.nLotteryMax = new System.Windows.Forms.NumericUpDown();
             this.label26 = new System.Windows.Forms.Label();
             this.label27 = new System.Windows.Forms.Label();
             this.label28 = new System.Windows.Forms.Label();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.label24 = new System.Windows.Forms.Label();
-            this.LotteryPrice = new System.Windows.Forms.NumericUpDown();
-            this.InsultPrice = new System.Windows.Forms.NumericUpDown();
-            this.HugPrice = new System.Windows.Forms.NumericUpDown();
+            this.nLotteryPrice = new System.Windows.Forms.NumericUpDown();
+            this.nTitlePrice = new System.Windows.Forms.NumericUpDown();
+            this.nNickPrice = new System.Windows.Forms.NumericUpDown();
             this.label21 = new System.Windows.Forms.Label();
             this.label22 = new System.Windows.Forms.Label();
             this.label23 = new System.Windows.Forms.Label();
-            this.groupBox6 = new System.Windows.Forms.GroupBox();
-            this.Price2 = new System.Windows.Forms.NumericUpDown();
-            this.Price3 = new System.Windows.Forms.NumericUpDown();
-            this.Price4 = new System.Windows.Forms.NumericUpDown();
-            this.Price1 = new System.Windows.Forms.NumericUpDown();
-            this.Custom4 = new System.Windows.Forms.TextBox();
-            this.label20 = new System.Windows.Forms.Label();
-            this.Custom2 = new System.Windows.Forms.TextBox();
-            this.label19 = new System.Windows.Forms.Label();
-            this.Custom3 = new System.Windows.Forms.TextBox();
-            this.label18 = new System.Windows.Forms.Label();
-            this.Custom1 = new System.Windows.Forms.TextBox();
-            this.label17 = new System.Windows.Forms.Label();
-            this.label15 = new System.Windows.Forms.Label();
-            this.label14 = new System.Windows.Forms.Label();
-            this.label13 = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
-            this.Action3 = new System.Windows.Forms.TextBox();
-            this.Action4 = new System.Windows.Forms.TextBox();
-            this.label11 = new System.Windows.Forms.Label();
-            this.label10 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
-            this.Action1 = new System.Windows.Forms.TextBox();
-            this.Action2 = new System.Windows.Forms.TextBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.StartAmount = new System.Windows.Forms.NumericUpDown();
+            this.nStartAmount = new System.Windows.Forms.NumericUpDown();
             this.label16 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
-            this.CurrencyBoxSl = new System.Windows.Forms.TextBox();
-            this.CurrencyBoxPl = new System.Windows.Forms.TextBox();
+            this.tCurrencySl = new System.Windows.Forms.TextBox();
+            this.tCurrencyPl = new System.Windows.Forms.TextBox();
             this.sMode = new System.Windows.Forms.ComboBox();
             this.bOK = new System.Windows.Forms.Button();
             this.bCancel = new System.Windows.Forms.Button();
@@ -336,27 +334,6 @@
             this.bResetAll = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.bApply = new System.Windows.Forms.Button();
-            this.bWorldDelete = new System.Windows.Forms.Button();
-            this.bAddWorld = new System.Windows.Forms.Button();
-            this.bWorldEdit = new System.Windows.Forms.Button();
-            this.lMainWorld = new System.Windows.Forms.Label();
-            this.cMainWorld = new System.Windows.Forms.ComboBox();
-            this.cDefaultBuildRank = new System.Windows.Forms.ComboBox();
-            this.lDefaultBuildRank = new System.Windows.Forms.Label();
-            this.tMapPath = new System.Windows.Forms.TextBox();
-            this.xMapPath = new System.Windows.Forms.CheckBox();
-            this.bMapPath = new System.Windows.Forms.Button();
-            this.tabWorlds = new System.Windows.Forms.TabPage();
-            this.dgvWorlds = new System.Windows.Forms.DataGridView();
-            this.label30 = new System.Windows.Forms.Label();
-            this.chatPreview = new fCraft.ConfigGUI.ChatPreview();
-            this.dgvcName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dgvcDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dgvcAccess = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.dgvcBuild = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.dgvcBackup = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.dgvcBlockDB = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.dgvcHidden = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.tabSavingAndBackup.SuspendLayout();
             this.gDataBackup.SuspendLayout();
             this.gSaving.SuspendLayout();
@@ -401,6 +378,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.nPort)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nUploadBandwidth)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxPlayers)).BeginInit();
+            this.tabWorlds.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvWorlds)).BeginInit();
             this.tabLogging.SuspendLayout();
             this.gLogFile.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nLogLimit)).BeginInit();
@@ -424,22 +403,15 @@
             this.groupBox1.SuspendLayout();
             this.Econ.SuspendLayout();
             this.groupBox8.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.LottoTime)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.LottoMin)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.LottoMax)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nLotteryTimeBetween)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nLotteryMin)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nLotteryMax)).BeginInit();
             this.groupBox7.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.LotteryPrice)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.InsultPrice)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.HugPrice)).BeginInit();
-            this.groupBox6.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Price2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Price3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Price4)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Price1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nLotteryPrice)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nTitlePrice)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nNickPrice)).BeginInit();
             this.groupBox4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.StartAmount)).BeginInit();
-            this.tabWorlds.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvWorlds)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nStartAmount)).BeginInit();
             this.SuspendLayout();
             // 
             // tabSavingAndBackup
@@ -1524,6 +1496,8 @@
             // gChatColors
             // 
             this.gChatColors.BackColor = System.Drawing.SystemColors.Control;
+            this.gChatColors.Controls.Add(this.label31);
+            this.gChatColors.Controls.Add(this.bColorGlobal);
             this.gChatColors.Controls.Add(this.lColorMe);
             this.gChatColors.Controls.Add(this.bColorMe);
             this.gChatColors.Controls.Add(this.lColorWarning);
@@ -1545,10 +1519,29 @@
             this.gChatColors.TabStop = false;
             this.gChatColors.Text = "Colors";
             // 
+            // label31
+            // 
+            this.label31.AutoSize = true;
+            this.label31.Location = new System.Drawing.Point(84, 81);
+            this.label31.Name = "label31";
+            this.label31.Size = new System.Drawing.Size(103, 15);
+            this.label31.TabIndex = 15;
+            this.label31.Text = "Global Chat Color";
+            // 
+            // bColorGlobal
+            // 
+            this.bColorGlobal.BackColor = System.Drawing.Color.White;
+            this.bColorGlobal.Location = new System.Drawing.Point(193, 81);
+            this.bColorGlobal.Name = "bColorGlobal";
+            this.bColorGlobal.Size = new System.Drawing.Size(100, 23);
+            this.bColorGlobal.TabIndex = 14;
+            this.bColorGlobal.UseVisualStyleBackColor = false;
+            this.bColorGlobal.Click += new System.EventHandler(this.bColorGlobal_Click);
+            // 
             // lColorMe
             // 
             this.lColorMe.AutoSize = true;
-            this.lColorMe.Location = new System.Drawing.Point(402, 82);
+            this.lColorMe.Location = new System.Drawing.Point(407, 114);
             this.lColorMe.Name = "lColorMe";
             this.lColorMe.Size = new System.Drawing.Size(117, 15);
             this.lColorMe.TabIndex = 12;
@@ -1557,7 +1550,7 @@
             // bColorMe
             // 
             this.bColorMe.BackColor = System.Drawing.Color.White;
-            this.bColorMe.Location = new System.Drawing.Point(525, 78);
+            this.bColorMe.Location = new System.Drawing.Point(530, 110);
             this.bColorMe.Name = "bColorMe";
             this.bColorMe.Size = new System.Drawing.Size(100, 23);
             this.bColorMe.TabIndex = 13;
@@ -1605,7 +1598,7 @@
             // bColorPM
             // 
             this.bColorPM.BackColor = System.Drawing.Color.White;
-            this.bColorPM.Location = new System.Drawing.Point(193, 78);
+            this.bColorPM.Location = new System.Drawing.Point(193, 110);
             this.bColorPM.Name = "bColorPM";
             this.bColorPM.Size = new System.Drawing.Size(100, 23);
             this.bColorPM.TabIndex = 5;
@@ -1615,7 +1608,7 @@
             // lColorHelp
             // 
             this.lColorHelp.AutoSize = true;
-            this.lColorHelp.Location = new System.Drawing.Point(70, 111);
+            this.lColorHelp.Location = new System.Drawing.Point(407, 24);
             this.lColorHelp.Name = "lColorHelp";
             this.lColorHelp.Size = new System.Drawing.Size(117, 15);
             this.lColorHelp.TabIndex = 6;
@@ -1624,7 +1617,7 @@
             // lColorPM
             // 
             this.lColorPM.AutoSize = true;
-            this.lColorPM.Location = new System.Drawing.Point(26, 82);
+            this.lColorPM.Location = new System.Drawing.Point(26, 110);
             this.lColorPM.Name = "lColorPM";
             this.lColorPM.Size = new System.Drawing.Size(161, 15);
             this.lColorPM.TabIndex = 4;
@@ -1633,7 +1626,7 @@
             // lColorSay
             // 
             this.lColorSay.AutoSize = true;
-            this.lColorSay.Location = new System.Drawing.Point(407, 53);
+            this.lColorSay.Location = new System.Drawing.Point(412, 85);
             this.lColorSay.Name = "lColorSay";
             this.lColorSay.Size = new System.Drawing.Size(114, 15);
             this.lColorSay.TabIndex = 10;
@@ -1642,7 +1635,7 @@
             // bColorAnnouncement
             // 
             this.bColorAnnouncement.BackColor = System.Drawing.Color.White;
-            this.bColorAnnouncement.Location = new System.Drawing.Point(525, 20);
+            this.bColorAnnouncement.Location = new System.Drawing.Point(530, 49);
             this.bColorAnnouncement.Name = "bColorAnnouncement";
             this.bColorAnnouncement.Size = new System.Drawing.Size(100, 23);
             this.bColorAnnouncement.TabIndex = 9;
@@ -1652,7 +1645,7 @@
             // lColorAnnouncement
             // 
             this.lColorAnnouncement.AutoSize = true;
-            this.lColorAnnouncement.Location = new System.Drawing.Point(342, 24);
+            this.lColorAnnouncement.Location = new System.Drawing.Point(347, 56);
             this.lColorAnnouncement.Name = "lColorAnnouncement";
             this.lColorAnnouncement.Size = new System.Drawing.Size(182, 15);
             this.lColorAnnouncement.TabIndex = 8;
@@ -1661,7 +1654,7 @@
             // bColorHelp
             // 
             this.bColorHelp.BackColor = System.Drawing.Color.White;
-            this.bColorHelp.Location = new System.Drawing.Point(193, 107);
+            this.bColorHelp.Location = new System.Drawing.Point(530, 20);
             this.bColorHelp.Name = "bColorHelp";
             this.bColorHelp.Size = new System.Drawing.Size(100, 23);
             this.bColorHelp.TabIndex = 7;
@@ -1671,7 +1664,7 @@
             // bColorSay
             // 
             this.bColorSay.BackColor = System.Drawing.Color.White;
-            this.bColorSay.Location = new System.Drawing.Point(525, 49);
+            this.bColorSay.Location = new System.Drawing.Point(530, 81);
             this.bColorSay.Name = "bColorSay";
             this.bColorSay.Size = new System.Drawing.Size(100, 23);
             this.bColorSay.TabIndex = 11;
@@ -1755,6 +1748,13 @@
             this.xRankColorsInChat.Text = "Show rank colors.";
             this.xRankColorsInChat.UseVisualStyleBackColor = true;
             // 
+            // chatPreview
+            // 
+            this.chatPreview.Location = new System.Drawing.Point(7, 256);
+            this.chatPreview.Name = "chatPreview";
+            this.chatPreview.Size = new System.Drawing.Size(637, 241);
+            this.chatPreview.TabIndex = 2;
+            // 
             // tabs
             // 
             this.tabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -1829,7 +1829,7 @@
             // 
             // groupBox5
             // 
-            this.groupBox5.Controls.Add(this.GCcheckBox);
+            this.groupBox5.Controls.Add(this.xGlobalchat);
             this.groupBox5.Location = new System.Drawing.Point(8, 307);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(636, 50);
@@ -1837,15 +1837,15 @@
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Global Chat";
             // 
-            // GCcheckBox
+            // xGlobalchat
             // 
-            this.GCcheckBox.AutoSize = true;
-            this.GCcheckBox.Location = new System.Drawing.Point(9, 20);
-            this.GCcheckBox.Name = "GCcheckBox";
-            this.GCcheckBox.Size = new System.Drawing.Size(132, 19);
-            this.GCcheckBox.TabIndex = 1;
-            this.GCcheckBox.Text = "Enable Global Chat";
-            this.GCcheckBox.UseVisualStyleBackColor = true;
+            this.xGlobalchat.AutoSize = true;
+            this.xGlobalchat.Location = new System.Drawing.Point(9, 20);
+            this.xGlobalchat.Name = "xGlobalchat";
+            this.xGlobalchat.Size = new System.Drawing.Size(132, 19);
+            this.xGlobalchat.TabIndex = 1;
+            this.xGlobalchat.Text = "Enable Global Chat";
+            this.xGlobalchat.UseVisualStyleBackColor = true;
             // 
             // gUpdaterSettings
             // 
@@ -2312,6 +2312,228 @@
             this.lMaxPlayers.Size = new System.Drawing.Size(107, 15);
             this.lMaxPlayers.TabIndex = 4;
             this.lMaxPlayers.Text = "Max players (total)";
+            // 
+            // tabWorlds
+            // 
+            this.tabWorlds.BackColor = System.Drawing.SystemColors.Control;
+            this.tabWorlds.Controls.Add(this.label30);
+            this.tabWorlds.Controls.Add(this.dgvWorlds);
+            this.tabWorlds.Controls.Add(this.bMapPath);
+            this.tabWorlds.Controls.Add(this.xMapPath);
+            this.tabWorlds.Controls.Add(this.tMapPath);
+            this.tabWorlds.Controls.Add(this.lDefaultBuildRank);
+            this.tabWorlds.Controls.Add(this.cDefaultBuildRank);
+            this.tabWorlds.Controls.Add(this.cMainWorld);
+            this.tabWorlds.Controls.Add(this.lMainWorld);
+            this.tabWorlds.Controls.Add(this.bWorldEdit);
+            this.tabWorlds.Controls.Add(this.bAddWorld);
+            this.tabWorlds.Controls.Add(this.bWorldDelete);
+            this.tabWorlds.Location = new System.Drawing.Point(4, 24);
+            this.tabWorlds.Name = "tabWorlds";
+            this.tabWorlds.Padding = new System.Windows.Forms.Padding(5, 10, 5, 10);
+            this.tabWorlds.Size = new System.Drawing.Size(652, 482);
+            this.tabWorlds.TabIndex = 9;
+            this.tabWorlds.Text = "Worlds";
+            // 
+            // label30
+            // 
+            this.label30.AutoSize = true;
+            this.label30.Location = new System.Drawing.Point(49, 424);
+            this.label30.Name = "label30";
+            this.label30.Size = new System.Drawing.Size(342, 15);
+            this.label30.TabIndex = 24;
+            this.label30.Text = "Default rank requirement for building on newly-loaded worlds:";
+            // 
+            // dgvWorlds
+            // 
+            this.dgvWorlds.AllowUserToAddRows = false;
+            this.dgvWorlds.AllowUserToDeleteRows = false;
+            this.dgvWorlds.AllowUserToOrderColumns = true;
+            this.dgvWorlds.AllowUserToResizeRows = false;
+            this.dgvWorlds.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dgvWorlds.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvWorlds.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dgvcName,
+            this.dgvcDescription,
+            this.dgvcAccess,
+            this.dgvcBuild,
+            this.dgvcBackup,
+            this.dgvcBlockDB,
+            this.dgvcHidden});
+            this.dgvWorlds.Location = new System.Drawing.Point(8, 46);
+            this.dgvWorlds.MultiSelect = false;
+            this.dgvWorlds.Name = "dgvWorlds";
+            this.dgvWorlds.RowHeadersVisible = false;
+            dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(0, 1, 0, 1);
+            this.dgvWorlds.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            this.dgvWorlds.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dgvWorlds.Size = new System.Drawing.Size(636, 364);
+            this.dgvWorlds.TabIndex = 23;
+            // 
+            // dgvcName
+            // 
+            this.dgvcName.DataPropertyName = "Name";
+            this.dgvcName.HeaderText = "World Name";
+            this.dgvcName.Name = "dgvcName";
+            this.dgvcName.Width = 110;
+            // 
+            // dgvcDescription
+            // 
+            this.dgvcDescription.DataPropertyName = "Description";
+            this.dgvcDescription.HeaderText = "Size";
+            this.dgvcDescription.Name = "dgvcDescription";
+            this.dgvcDescription.ReadOnly = true;
+            // 
+            // dgvcAccess
+            // 
+            this.dgvcAccess.DataPropertyName = "AccessPermission";
+            this.dgvcAccess.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
+            this.dgvcAccess.HeaderText = "Access";
+            this.dgvcAccess.Name = "dgvcAccess";
+            this.dgvcAccess.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            // 
+            // dgvcBuild
+            // 
+            this.dgvcBuild.DataPropertyName = "BuildPermission";
+            this.dgvcBuild.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
+            this.dgvcBuild.HeaderText = "Build";
+            this.dgvcBuild.Name = "dgvcBuild";
+            this.dgvcBuild.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            // 
+            // dgvcBackup
+            // 
+            this.dgvcBackup.DataPropertyName = "Backup";
+            this.dgvcBackup.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
+            this.dgvcBackup.HeaderText = "Backup";
+            this.dgvcBackup.Name = "dgvcBackup";
+            this.dgvcBackup.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.dgvcBackup.Width = 90;
+            // 
+            // dgvcBlockDB
+            // 
+            this.dgvcBlockDB.DataPropertyName = "BlockDBEnabled";
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.dgvcBlockDB.DefaultCellStyle = dataGridViewCellStyle1;
+            this.dgvcBlockDB.HeaderText = "BlockDB";
+            this.dgvcBlockDB.Name = "dgvcBlockDB";
+            this.dgvcBlockDB.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.dgvcBlockDB.ThreeState = true;
+            this.dgvcBlockDB.Width = 60;
+            // 
+            // dgvcHidden
+            // 
+            this.dgvcHidden.DataPropertyName = "Hidden";
+            this.dgvcHidden.HeaderText = "Hide";
+            this.dgvcHidden.Name = "dgvcHidden";
+            this.dgvcHidden.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this.dgvcHidden.Width = 40;
+            // 
+            // bMapPath
+            // 
+            this.bMapPath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.bMapPath.Enabled = false;
+            this.bMapPath.Location = new System.Drawing.Point(587, 445);
+            this.bMapPath.Name = "bMapPath";
+            this.bMapPath.Size = new System.Drawing.Size(57, 23);
+            this.bMapPath.TabIndex = 10;
+            this.bMapPath.Text = "Browse";
+            this.bMapPath.UseVisualStyleBackColor = true;
+            this.bMapPath.Click += new System.EventHandler(this.bMapPath_Click);
+            // 
+            // xMapPath
+            // 
+            this.xMapPath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.xMapPath.AutoSize = true;
+            this.xMapPath.Location = new System.Drawing.Point(8, 450);
+            this.xMapPath.Name = "xMapPath";
+            this.xMapPath.Size = new System.Drawing.Size(189, 19);
+            this.xMapPath.TabIndex = 8;
+            this.xMapPath.Text = "Custom path for storing maps:";
+            this.xMapPath.UseVisualStyleBackColor = true;
+            this.xMapPath.CheckedChanged += new System.EventHandler(this.xMapPath_CheckedChanged);
+            // 
+            // tMapPath
+            // 
+            this.tMapPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tMapPath.Enabled = false;
+            this.tMapPath.Font = new System.Drawing.Font("Lucida Console", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tMapPath.Location = new System.Drawing.Point(203, 450);
+            this.tMapPath.Name = "tMapPath";
+            this.tMapPath.Size = new System.Drawing.Size(378, 19);
+            this.tMapPath.TabIndex = 9;
+            // 
+            // lDefaultBuildRank
+            // 
+            this.lDefaultBuildRank.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lDefaultBuildRank.AutoSize = true;
+            this.lDefaultBuildRank.Location = new System.Drawing.Point(24, 381);
+            this.lDefaultBuildRank.Name = "lDefaultBuildRank";
+            this.lDefaultBuildRank.Size = new System.Drawing.Size(0, 15);
+            this.lDefaultBuildRank.TabIndex = 6;
+            // 
+            // cDefaultBuildRank
+            // 
+            this.cDefaultBuildRank.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.cDefaultBuildRank.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cDefaultBuildRank.FormattingEnabled = true;
+            this.cDefaultBuildRank.Location = new System.Drawing.Point(397, 421);
+            this.cDefaultBuildRank.Name = "cDefaultBuildRank";
+            this.cDefaultBuildRank.Size = new System.Drawing.Size(121, 23);
+            this.cDefaultBuildRank.TabIndex = 7;
+            this.cDefaultBuildRank.SelectedIndexChanged += new System.EventHandler(this.cDefaultBuildRank_SelectedIndexChanged);
+            // 
+            // cMainWorld
+            // 
+            this.cMainWorld.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cMainWorld.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cMainWorld.Location = new System.Drawing.Point(542, 17);
+            this.cMainWorld.Name = "cMainWorld";
+            this.cMainWorld.Size = new System.Drawing.Size(102, 23);
+            this.cMainWorld.TabIndex = 5;
+            // 
+            // lMainWorld
+            // 
+            this.lMainWorld.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lMainWorld.AutoSize = true;
+            this.lMainWorld.Location = new System.Drawing.Point(465, 20);
+            this.lMainWorld.Name = "lMainWorld";
+            this.lMainWorld.Size = new System.Drawing.Size(0, 15);
+            this.lMainWorld.TabIndex = 4;
+            // 
+            // bWorldEdit
+            // 
+            this.bWorldEdit.Enabled = false;
+            this.bWorldEdit.Location = new System.Drawing.Point(114, 13);
+            this.bWorldEdit.Name = "bWorldEdit";
+            this.bWorldEdit.Size = new System.Drawing.Size(100, 28);
+            this.bWorldEdit.TabIndex = 2;
+            this.bWorldEdit.Text = "Edit";
+            this.bWorldEdit.UseVisualStyleBackColor = true;
+            this.bWorldEdit.Click += new System.EventHandler(this.bWorldEdit_Click);
+            // 
+            // bAddWorld
+            // 
+            this.bAddWorld.Location = new System.Drawing.Point(8, 13);
+            this.bAddWorld.Name = "bAddWorld";
+            this.bAddWorld.Size = new System.Drawing.Size(100, 28);
+            this.bAddWorld.TabIndex = 1;
+            this.bAddWorld.Text = "Add World";
+            this.bAddWorld.UseVisualStyleBackColor = true;
+            this.bAddWorld.Click += new System.EventHandler(this.bAddWorld_Click);
+            // 
+            // bWorldDelete
+            // 
+            this.bWorldDelete.Enabled = false;
+            this.bWorldDelete.Location = new System.Drawing.Point(220, 13);
+            this.bWorldDelete.Name = "bWorldDelete";
+            this.bWorldDelete.Size = new System.Drawing.Size(100, 28);
+            this.bWorldDelete.TabIndex = 3;
+            this.bWorldDelete.Text = "Delete World";
+            this.bWorldDelete.UseVisualStyleBackColor = true;
+            this.bWorldDelete.Click += new System.EventHandler(this.bWorldDel_Click);
             // 
             // tabLogging
             // 
@@ -3440,7 +3662,6 @@
             this.Econ.BackColor = System.Drawing.SystemColors.Control;
             this.Econ.Controls.Add(this.groupBox8);
             this.Econ.Controls.Add(this.groupBox7);
-            this.Econ.Controls.Add(this.groupBox6);
             this.Econ.Controls.Add(this.groupBox4);
             this.Econ.Location = new System.Drawing.Point(4, 24);
             this.Econ.Name = "Econ";
@@ -3452,13 +3673,13 @@
             // groupBox8
             // 
             this.groupBox8.Controls.Add(this.label25);
-            this.groupBox8.Controls.Add(this.LottoTime);
-            this.groupBox8.Controls.Add(this.LottoMin);
-            this.groupBox8.Controls.Add(this.LottoMax);
+            this.groupBox8.Controls.Add(this.nLotteryTimeBetween);
+            this.groupBox8.Controls.Add(this.nLotteryMin);
+            this.groupBox8.Controls.Add(this.nLotteryMax);
             this.groupBox8.Controls.Add(this.label26);
             this.groupBox8.Controls.Add(this.label27);
             this.groupBox8.Controls.Add(this.label28);
-            this.groupBox8.Location = new System.Drawing.Point(29, 381);
+            this.groupBox8.Location = new System.Drawing.Point(29, 232);
             this.groupBox8.Name = "groupBox8";
             this.groupBox8.Size = new System.Drawing.Size(595, 82);
             this.groupBox8.TabIndex = 54;
@@ -3477,74 +3698,74 @@
             this.label25.Text = "minutes";
             this.label25.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
-            // LottoTime
+            // nLotteryTimeBetween
             // 
-            this.LottoTime.Location = new System.Drawing.Point(370, 29);
-            this.LottoTime.Maximum = new decimal(new int[] {
+            this.nLotteryTimeBetween.Location = new System.Drawing.Point(370, 29);
+            this.nLotteryTimeBetween.Maximum = new decimal(new int[] {
             2880,
             0,
             0,
             0});
-            this.LottoTime.Minimum = new decimal(new int[] {
+            this.nLotteryTimeBetween.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.LottoTime.Name = "LottoTime";
-            this.LottoTime.Size = new System.Drawing.Size(117, 21);
-            this.LottoTime.TabIndex = 53;
-            this.LottoTime.Value = new decimal(new int[] {
+            this.nLotteryTimeBetween.Name = "nLotteryTimeBetween";
+            this.nLotteryTimeBetween.Size = new System.Drawing.Size(117, 21);
+            this.nLotteryTimeBetween.TabIndex = 53;
+            this.nLotteryTimeBetween.Value = new decimal(new int[] {
             360,
             0,
             0,
             0});
-            this.LottoTime.ValueChanged += new System.EventHandler(this.LottoTime_ValueChanged);
+            this.nLotteryTimeBetween.ValueChanged += new System.EventHandler(this.LottoTime_ValueChanged);
             // 
-            // LottoMin
+            // nLotteryMin
             // 
-            this.LottoMin.Location = new System.Drawing.Point(87, 55);
-            this.LottoMin.Maximum = new decimal(new int[] {
+            this.nLotteryMin.Location = new System.Drawing.Point(87, 55);
+            this.nLotteryMin.Maximum = new decimal(new int[] {
             4999,
             0,
             0,
             0});
-            this.LottoMin.Minimum = new decimal(new int[] {
+            this.nLotteryMin.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.LottoMin.Name = "LottoMin";
-            this.LottoMin.Size = new System.Drawing.Size(117, 21);
-            this.LottoMin.TabIndex = 52;
-            this.LottoMin.Value = new decimal(new int[] {
+            this.nLotteryMin.Name = "nLotteryMin";
+            this.nLotteryMin.Size = new System.Drawing.Size(117, 21);
+            this.nLotteryMin.TabIndex = 52;
+            this.nLotteryMin.Value = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.LottoMin.ValueChanged += new System.EventHandler(this.LottoMin_ValueChanged);
+            this.nLotteryMin.ValueChanged += new System.EventHandler(this.LottoMin_ValueChanged);
             // 
-            // LottoMax
+            // nLotteryMax
             // 
-            this.LottoMax.Location = new System.Drawing.Point(87, 29);
-            this.LottoMax.Maximum = new decimal(new int[] {
+            this.nLotteryMax.Location = new System.Drawing.Point(87, 29);
+            this.nLotteryMax.Maximum = new decimal(new int[] {
             5000,
             0,
             0,
             0});
-            this.LottoMax.Minimum = new decimal(new int[] {
+            this.nLotteryMax.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.LottoMax.Name = "LottoMax";
-            this.LottoMax.Size = new System.Drawing.Size(117, 21);
-            this.LottoMax.TabIndex = 51;
-            this.LottoMax.Value = new decimal(new int[] {
+            this.nLotteryMax.Name = "nLotteryMax";
+            this.nLotteryMax.Size = new System.Drawing.Size(117, 21);
+            this.nLotteryMax.TabIndex = 51;
+            this.nLotteryMax.Value = new decimal(new int[] {
             1000,
             0,
             0,
             0});
-            this.LottoMax.ValueChanged += new System.EventHandler(this.LottoMax_ValueChanged);
+            this.nLotteryMax.ValueChanged += new System.EventHandler(this.LottoMax_ValueChanged);
             // 
             // label26
             // 
@@ -3576,9 +3797,9 @@
             // groupBox7
             // 
             this.groupBox7.Controls.Add(this.label24);
-            this.groupBox7.Controls.Add(this.LotteryPrice);
-            this.groupBox7.Controls.Add(this.InsultPrice);
-            this.groupBox7.Controls.Add(this.HugPrice);
+            this.groupBox7.Controls.Add(this.nLotteryPrice);
+            this.groupBox7.Controls.Add(this.nTitlePrice);
+            this.groupBox7.Controls.Add(this.nNickPrice);
             this.groupBox7.Controls.Add(this.label21);
             this.groupBox7.Controls.Add(this.label22);
             this.groupBox7.Controls.Add(this.label23);
@@ -3601,74 +3822,74 @@
             this.label24.Text = "The prices should not have spaces\r\n or symbols\r\n";
             this.label24.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
-            // LotteryPrice
+            // nLotteryPrice
             // 
-            this.LotteryPrice.Location = new System.Drawing.Point(256, 29);
-            this.LotteryPrice.Maximum = new decimal(new int[] {
+            this.nLotteryPrice.Location = new System.Drawing.Point(256, 29);
+            this.nLotteryPrice.Maximum = new decimal(new int[] {
             1000,
             0,
             0,
             0});
-            this.LotteryPrice.Minimum = new decimal(new int[] {
+            this.nLotteryPrice.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.LotteryPrice.Name = "LotteryPrice";
-            this.LotteryPrice.Size = new System.Drawing.Size(117, 21);
-            this.LotteryPrice.TabIndex = 53;
-            this.LotteryPrice.Value = new decimal(new int[] {
+            this.nLotteryPrice.Name = "nLotteryPrice";
+            this.nLotteryPrice.Size = new System.Drawing.Size(117, 21);
+            this.nLotteryPrice.TabIndex = 53;
+            this.nLotteryPrice.Value = new decimal(new int[] {
             150,
             0,
             0,
             0});
-            this.LotteryPrice.ValueChanged += new System.EventHandler(this.LotteryPrice_ValueChanged);
+            this.nLotteryPrice.ValueChanged += new System.EventHandler(this.LotteryPrice_ValueChanged);
             // 
-            // InsultPrice
+            // nTitlePrice
             // 
-            this.InsultPrice.Location = new System.Drawing.Point(53, 56);
-            this.InsultPrice.Maximum = new decimal(new int[] {
+            this.nTitlePrice.Location = new System.Drawing.Point(53, 56);
+            this.nTitlePrice.Maximum = new decimal(new int[] {
             1000,
             0,
             0,
             0});
-            this.InsultPrice.Minimum = new decimal(new int[] {
+            this.nTitlePrice.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.InsultPrice.Name = "InsultPrice";
-            this.InsultPrice.Size = new System.Drawing.Size(117, 21);
-            this.InsultPrice.TabIndex = 52;
-            this.InsultPrice.Value = new decimal(new int[] {
+            this.nTitlePrice.Name = "nTitlePrice";
+            this.nTitlePrice.Size = new System.Drawing.Size(117, 21);
+            this.nTitlePrice.TabIndex = 52;
+            this.nTitlePrice.Value = new decimal(new int[] {
             150,
             0,
             0,
             0});
-            this.InsultPrice.ValueChanged += new System.EventHandler(this.InsultPrice_ValueChanged);
+            this.nTitlePrice.ValueChanged += new System.EventHandler(this.InsultPrice_ValueChanged);
             // 
-            // HugPrice
+            // nNickPrice
             // 
-            this.HugPrice.Location = new System.Drawing.Point(52, 29);
-            this.HugPrice.Maximum = new decimal(new int[] {
+            this.nNickPrice.Location = new System.Drawing.Point(52, 29);
+            this.nNickPrice.Maximum = new decimal(new int[] {
             1000,
             0,
             0,
             0});
-            this.HugPrice.Minimum = new decimal(new int[] {
+            this.nNickPrice.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.HugPrice.Name = "HugPrice";
-            this.HugPrice.Size = new System.Drawing.Size(117, 21);
-            this.HugPrice.TabIndex = 51;
-            this.HugPrice.Value = new decimal(new int[] {
+            this.nNickPrice.Name = "nNickPrice";
+            this.nNickPrice.Size = new System.Drawing.Size(117, 21);
+            this.nNickPrice.TabIndex = 51;
+            this.nNickPrice.Value = new decimal(new int[] {
             150,
             0,
             0,
             0});
-            this.HugPrice.ValueChanged += new System.EventHandler(this.HugPrice_ValueChanged);
+            this.nNickPrice.ValueChanged += new System.EventHandler(this.HugPrice_ValueChanged);
             // 
             // label21
             // 
@@ -3697,352 +3918,15 @@
             this.label23.TabIndex = 16;
             this.label23.Text = "Hug";
             // 
-            // groupBox6
-            // 
-            this.groupBox6.Controls.Add(this.Price2);
-            this.groupBox6.Controls.Add(this.Price3);
-            this.groupBox6.Controls.Add(this.Price4);
-            this.groupBox6.Controls.Add(this.Price1);
-            this.groupBox6.Controls.Add(this.Custom4);
-            this.groupBox6.Controls.Add(this.label20);
-            this.groupBox6.Controls.Add(this.Custom2);
-            this.groupBox6.Controls.Add(this.label19);
-            this.groupBox6.Controls.Add(this.Custom3);
-            this.groupBox6.Controls.Add(this.label18);
-            this.groupBox6.Controls.Add(this.Custom1);
-            this.groupBox6.Controls.Add(this.label17);
-            this.groupBox6.Controls.Add(this.label15);
-            this.groupBox6.Controls.Add(this.label14);
-            this.groupBox6.Controls.Add(this.label13);
-            this.groupBox6.Controls.Add(this.label12);
-            this.groupBox6.Controls.Add(this.Action3);
-            this.groupBox6.Controls.Add(this.Action4);
-            this.groupBox6.Controls.Add(this.label11);
-            this.groupBox6.Controls.Add(this.label10);
-            this.groupBox6.Controls.Add(this.label8);
-            this.groupBox6.Controls.Add(this.label9);
-            this.groupBox6.Controls.Add(this.Action1);
-            this.groupBox6.Controls.Add(this.Action2);
-            this.groupBox6.Location = new System.Drawing.Point(29, 232);
-            this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(595, 143);
-            this.groupBox6.TabIndex = 28;
-            this.groupBox6.TabStop = false;
-            this.groupBox6.Text = "Custom Store Items";
-            // 
-            // Price2
-            // 
-            this.Price2.Location = new System.Drawing.Point(472, 52);
-            this.Price2.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.Price2.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.Price2.Name = "Price2";
-            this.Price2.Size = new System.Drawing.Size(117, 21);
-            this.Price2.TabIndex = 50;
-            this.Price2.Value = new decimal(new int[] {
-            150,
-            0,
-            0,
-            0});
-            this.Price2.ValueChanged += new System.EventHandler(this.Price2_ValueChanged);
-            // 
-            // Price3
-            // 
-            this.Price3.Location = new System.Drawing.Point(472, 79);
-            this.Price3.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.Price3.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.Price3.Name = "Price3";
-            this.Price3.Size = new System.Drawing.Size(117, 21);
-            this.Price3.TabIndex = 49;
-            this.Price3.Value = new decimal(new int[] {
-            150,
-            0,
-            0,
-            0});
-            this.Price3.ValueChanged += new System.EventHandler(this.Price3_ValueChanged);
-            // 
-            // Price4
-            // 
-            this.Price4.Location = new System.Drawing.Point(472, 106);
-            this.Price4.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.Price4.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.Price4.Name = "Price4";
-            this.Price4.Size = new System.Drawing.Size(117, 21);
-            this.Price4.TabIndex = 48;
-            this.Price4.Value = new decimal(new int[] {
-            150,
-            0,
-            0,
-            0});
-            this.Price4.ValueChanged += new System.EventHandler(this.Price4_ValueChanged);
-            // 
-            // Price1
-            // 
-            this.Price1.Location = new System.Drawing.Point(472, 25);
-            this.Price1.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.Price1.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.Price1.Name = "Price1";
-            this.Price1.Size = new System.Drawing.Size(117, 21);
-            this.Price1.TabIndex = 47;
-            this.Price1.Value = new decimal(new int[] {
-            150,
-            0,
-            0,
-            0});
-            this.Price1.ValueChanged += new System.EventHandler(this.Price1_ValueChanged);
-            // 
-            // Custom4
-            // 
-            this.Custom4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.Custom4.HideSelection = false;
-            this.Custom4.Location = new System.Drawing.Point(53, 105);
-            this.Custom4.MaxLength = 64;
-            this.Custom4.Name = "Custom4";
-            this.Custom4.Size = new System.Drawing.Size(151, 21);
-            this.Custom4.TabIndex = 46;
-            this.Custom4.Text = "murder";
-            this.Custom4.TextChanged += new System.EventHandler(this.Custom4_TextChanged);
-            // 
-            // label20
-            // 
-            this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(6, 108);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(41, 15);
-            this.label20.TabIndex = 45;
-            this.label20.Text = "Name";
-            // 
-            // Custom2
-            // 
-            this.Custom2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.Custom2.HideSelection = false;
-            this.Custom2.Location = new System.Drawing.Point(53, 51);
-            this.Custom2.MaxLength = 64;
-            this.Custom2.Name = "Custom2";
-            this.Custom2.Size = new System.Drawing.Size(151, 21);
-            this.Custom2.TabIndex = 44;
-            this.Custom2.Text = "makeout";
-            this.Custom2.TextChanged += new System.EventHandler(this.Custom2_TextChanged);
-            // 
-            // label19
-            // 
-            this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(6, 54);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(41, 15);
-            this.label19.TabIndex = 43;
-            this.label19.Text = "Name";
-            // 
-            // Custom3
-            // 
-            this.Custom3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.Custom3.HideSelection = false;
-            this.Custom3.Location = new System.Drawing.Point(53, 78);
-            this.Custom3.MaxLength = 64;
-            this.Custom3.Name = "Custom3";
-            this.Custom3.Size = new System.Drawing.Size(151, 21);
-            this.Custom3.TabIndex = 42;
-            this.Custom3.Text = "dinner";
-            this.Custom3.TextChanged += new System.EventHandler(this.Custom3_TextChanged);
-            // 
-            // label18
-            // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(6, 81);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(41, 15);
-            this.label18.TabIndex = 41;
-            this.label18.Text = "Name";
-            // 
-            // Custom1
-            // 
-            this.Custom1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.Custom1.HideSelection = false;
-            this.Custom1.Location = new System.Drawing.Point(53, 24);
-            this.Custom1.MaxLength = 64;
-            this.Custom1.Name = "Custom1";
-            this.Custom1.Size = new System.Drawing.Size(151, 21);
-            this.Custom1.TabIndex = 40;
-            this.Custom1.Text = "marry";
-            this.Custom1.TextChanged += new System.EventHandler(this.Custom1_TextChanged);
-            // 
-            // label17
-            // 
-            this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(6, 27);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(41, 15);
-            this.label17.TabIndex = 39;
-            this.label17.Text = "Name";
-            // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(431, 108);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(35, 15);
-            this.label15.TabIndex = 37;
-            this.label15.Text = "Price";
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(431, 81);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(35, 15);
-            this.label14.TabIndex = 35;
-            this.label14.Text = "Price";
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(431, 54);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(35, 15);
-            this.label13.TabIndex = 33;
-            this.label13.Text = "Price";
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(431, 27);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(35, 15);
-            this.label12.TabIndex = 31;
-            this.label12.Text = "Price";
-            // 
-            // Action3
-            // 
-            this.Action3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.Action3.HideSelection = false;
-            this.Action3.Location = new System.Drawing.Point(256, 78);
-            this.Action3.MaxLength = 64;
-            this.Action3.Name = "Action3";
-            this.Action3.Size = new System.Drawing.Size(169, 21);
-            this.Action3.TabIndex = 30;
-            this.Action3.Text = "bought dinner for";
-            this.Action3.TextChanged += new System.EventHandler(this.Action3_TextChanged);
-            // 
-            // Action4
-            // 
-            this.Action4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.Action4.HideSelection = false;
-            this.Action4.Location = new System.Drawing.Point(256, 105);
-            this.Action4.MaxLength = 64;
-            this.Action4.Name = "Action4";
-            this.Action4.Size = new System.Drawing.Size(169, 21);
-            this.Action4.TabIndex = 29;
-            this.Action4.Text = "murdered";
-            this.Action4.TextChanged += new System.EventHandler(this.Action4_TextChanged);
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(210, 108);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(40, 15);
-            this.label11.TabIndex = 28;
-            this.label11.Text = "Action";
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(210, 81);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(40, 15);
-            this.label10.TabIndex = 27;
-            this.label10.Text = "Action";
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(210, 54);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(40, 15);
-            this.label8.TabIndex = 26;
-            this.label8.Text = "Action";
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(210, 27);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(40, 15);
-            this.label9.TabIndex = 16;
-            this.label9.Text = "Action";
-            // 
-            // Action1
-            // 
-            this.Action1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.Action1.HideSelection = false;
-            this.Action1.Location = new System.Drawing.Point(256, 24);
-            this.Action1.MaxLength = 64;
-            this.Action1.Name = "Action1";
-            this.Action1.Size = new System.Drawing.Size(169, 21);
-            this.Action1.TabIndex = 17;
-            this.Action1.Text = "got married to";
-            this.Action1.TextChanged += new System.EventHandler(this.Action1_TextChanged);
-            // 
-            // Action2
-            // 
-            this.Action2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.Action2.HideSelection = false;
-            this.Action2.Location = new System.Drawing.Point(256, 51);
-            this.Action2.MaxLength = 64;
-            this.Action2.Name = "Action2";
-            this.Action2.Size = new System.Drawing.Size(169, 21);
-            this.Action2.TabIndex = 19;
-            this.Action2.Text = "madeout with";
-            this.Action2.TextChanged += new System.EventHandler(this.Action2_TextChanged);
-            // 
             // groupBox4
             // 
-            this.groupBox4.Controls.Add(this.StartAmount);
+            this.groupBox4.Controls.Add(this.nStartAmount);
             this.groupBox4.Controls.Add(this.label16);
             this.groupBox4.Controls.Add(this.label7);
             this.groupBox4.Controls.Add(this.label5);
             this.groupBox4.Controls.Add(this.label6);
-            this.groupBox4.Controls.Add(this.CurrencyBoxSl);
-            this.groupBox4.Controls.Add(this.CurrencyBoxPl);
+            this.groupBox4.Controls.Add(this.tCurrencySl);
+            this.groupBox4.Controls.Add(this.tCurrencyPl);
             this.groupBox4.Location = new System.Drawing.Point(29, 22);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(595, 116);
@@ -4050,23 +3934,23 @@
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Currency";
             // 
-            // StartAmount
+            // nStartAmount
             // 
-            this.StartAmount.Location = new System.Drawing.Point(99, 83);
-            this.StartAmount.Maximum = new decimal(new int[] {
+            this.nStartAmount.Location = new System.Drawing.Point(99, 83);
+            this.nStartAmount.Maximum = new decimal(new int[] {
             1000,
             0,
             0,
             0});
-            this.StartAmount.Minimum = new decimal(new int[] {
+            this.nStartAmount.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.StartAmount.Name = "StartAmount";
-            this.StartAmount.Size = new System.Drawing.Size(75, 21);
-            this.StartAmount.TabIndex = 29;
-            this.StartAmount.Value = new decimal(new int[] {
+            this.nStartAmount.Name = "nStartAmount";
+            this.nStartAmount.Size = new System.Drawing.Size(75, 21);
+            this.nStartAmount.TabIndex = 29;
+            this.nStartAmount.Value = new decimal(new int[] {
             300,
             0,
             0,
@@ -4111,29 +3995,29 @@
             this.label6.Text = "The currency should not have spaces or \r\nsymbols";
             this.label6.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
-            // CurrencyBoxSl
+            // tCurrencySl
             // 
-            this.CurrencyBoxSl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.tCurrencySl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.CurrencyBoxSl.HideSelection = false;
-            this.CurrencyBoxSl.Location = new System.Drawing.Point(132, 28);
-            this.CurrencyBoxSl.MaxLength = 64;
-            this.CurrencyBoxSl.Name = "CurrencyBoxSl";
-            this.CurrencyBoxSl.Size = new System.Drawing.Size(154, 21);
-            this.CurrencyBoxSl.TabIndex = 17;
-            this.CurrencyBoxSl.Text = "dollar";
+            this.tCurrencySl.HideSelection = false;
+            this.tCurrencySl.Location = new System.Drawing.Point(132, 28);
+            this.tCurrencySl.MaxLength = 64;
+            this.tCurrencySl.Name = "tCurrencySl";
+            this.tCurrencySl.Size = new System.Drawing.Size(154, 21);
+            this.tCurrencySl.TabIndex = 17;
+            this.tCurrencySl.Text = "dollar";
             // 
-            // CurrencyBoxPl
+            // tCurrencyPl
             // 
-            this.CurrencyBoxPl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.tCurrencyPl.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.CurrencyBoxPl.HideSelection = false;
-            this.CurrencyBoxPl.Location = new System.Drawing.Point(119, 55);
-            this.CurrencyBoxPl.MaxLength = 64;
-            this.CurrencyBoxPl.Name = "CurrencyBoxPl";
-            this.CurrencyBoxPl.Size = new System.Drawing.Size(167, 21);
-            this.CurrencyBoxPl.TabIndex = 19;
-            this.CurrencyBoxPl.Text = "dollars";
+            this.tCurrencyPl.HideSelection = false;
+            this.tCurrencyPl.Location = new System.Drawing.Point(119, 55);
+            this.tCurrencyPl.MaxLength = 64;
+            this.tCurrencyPl.Name = "tCurrencyPl";
+            this.tCurrencyPl.Size = new System.Drawing.Size(167, 21);
+            this.tCurrencyPl.TabIndex = 19;
+            this.tCurrencyPl.Text = "dollars";
             // 
             // sMode
             // 
@@ -4213,235 +4097,6 @@
             this.bApply.Text = "Apply";
             this.bApply.Click += new System.EventHandler(this.bApply_Click);
             // 
-            // bWorldDelete
-            // 
-            this.bWorldDelete.Enabled = false;
-            this.bWorldDelete.Location = new System.Drawing.Point(220, 13);
-            this.bWorldDelete.Name = "bWorldDelete";
-            this.bWorldDelete.Size = new System.Drawing.Size(100, 28);
-            this.bWorldDelete.TabIndex = 3;
-            this.bWorldDelete.Text = "Delete World";
-            this.bWorldDelete.UseVisualStyleBackColor = true;
-            this.bWorldDelete.Click += new System.EventHandler(this.bWorldDel_Click);
-            // 
-            // bAddWorld
-            // 
-            this.bAddWorld.Location = new System.Drawing.Point(8, 13);
-            this.bAddWorld.Name = "bAddWorld";
-            this.bAddWorld.Size = new System.Drawing.Size(100, 28);
-            this.bAddWorld.TabIndex = 1;
-            this.bAddWorld.Text = "Add World";
-            this.bAddWorld.UseVisualStyleBackColor = true;
-            this.bAddWorld.Click += new System.EventHandler(this.bAddWorld_Click);
-            // 
-            // bWorldEdit
-            // 
-            this.bWorldEdit.Enabled = false;
-            this.bWorldEdit.Location = new System.Drawing.Point(114, 13);
-            this.bWorldEdit.Name = "bWorldEdit";
-            this.bWorldEdit.Size = new System.Drawing.Size(100, 28);
-            this.bWorldEdit.TabIndex = 2;
-            this.bWorldEdit.Text = "Edit";
-            this.bWorldEdit.UseVisualStyleBackColor = true;
-            this.bWorldEdit.Click += new System.EventHandler(this.bWorldEdit_Click);
-            // 
-            // lMainWorld
-            // 
-            this.lMainWorld.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lMainWorld.AutoSize = true;
-            this.lMainWorld.Location = new System.Drawing.Point(465, 20);
-            this.lMainWorld.Name = "lMainWorld";
-            this.lMainWorld.Size = new System.Drawing.Size(0, 15);
-            this.lMainWorld.TabIndex = 4;
-            // 
-            // cMainWorld
-            // 
-            this.cMainWorld.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.cMainWorld.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cMainWorld.Location = new System.Drawing.Point(542, 17);
-            this.cMainWorld.Name = "cMainWorld";
-            this.cMainWorld.Size = new System.Drawing.Size(102, 23);
-            this.cMainWorld.TabIndex = 5;
-            // 
-            // cDefaultBuildRank
-            // 
-            this.cDefaultBuildRank.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.cDefaultBuildRank.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cDefaultBuildRank.FormattingEnabled = true;
-            this.cDefaultBuildRank.Location = new System.Drawing.Point(397, 421);
-            this.cDefaultBuildRank.Name = "cDefaultBuildRank";
-            this.cDefaultBuildRank.Size = new System.Drawing.Size(121, 23);
-            this.cDefaultBuildRank.TabIndex = 7;
-            this.cDefaultBuildRank.SelectedIndexChanged += new System.EventHandler(this.cDefaultBuildRank_SelectedIndexChanged);
-            // 
-            // lDefaultBuildRank
-            // 
-            this.lDefaultBuildRank.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.lDefaultBuildRank.AutoSize = true;
-            this.lDefaultBuildRank.Location = new System.Drawing.Point(24, 381);
-            this.lDefaultBuildRank.Name = "lDefaultBuildRank";
-            this.lDefaultBuildRank.Size = new System.Drawing.Size(0, 15);
-            this.lDefaultBuildRank.TabIndex = 6;
-            // 
-            // tMapPath
-            // 
-            this.tMapPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tMapPath.Enabled = false;
-            this.tMapPath.Font = new System.Drawing.Font("Lucida Console", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tMapPath.Location = new System.Drawing.Point(203, 450);
-            this.tMapPath.Name = "tMapPath";
-            this.tMapPath.Size = new System.Drawing.Size(378, 19);
-            this.tMapPath.TabIndex = 9;
-            // 
-            // xMapPath
-            // 
-            this.xMapPath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.xMapPath.AutoSize = true;
-            this.xMapPath.Location = new System.Drawing.Point(8, 450);
-            this.xMapPath.Name = "xMapPath";
-            this.xMapPath.Size = new System.Drawing.Size(189, 19);
-            this.xMapPath.TabIndex = 8;
-            this.xMapPath.Text = "Custom path for storing maps:";
-            this.xMapPath.UseVisualStyleBackColor = true;
-            this.xMapPath.CheckedChanged += new System.EventHandler(this.xMapPath_CheckedChanged);
-            // 
-            // bMapPath
-            // 
-            this.bMapPath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bMapPath.Enabled = false;
-            this.bMapPath.Location = new System.Drawing.Point(587, 445);
-            this.bMapPath.Name = "bMapPath";
-            this.bMapPath.Size = new System.Drawing.Size(57, 23);
-            this.bMapPath.TabIndex = 10;
-            this.bMapPath.Text = "Browse";
-            this.bMapPath.UseVisualStyleBackColor = true;
-            this.bMapPath.Click += new System.EventHandler(this.bMapPath_Click);
-            // 
-            // tabWorlds
-            // 
-            this.tabWorlds.BackColor = System.Drawing.SystemColors.Control;
-            this.tabWorlds.Controls.Add(this.label30);
-            this.tabWorlds.Controls.Add(this.dgvWorlds);
-            this.tabWorlds.Controls.Add(this.bMapPath);
-            this.tabWorlds.Controls.Add(this.xMapPath);
-            this.tabWorlds.Controls.Add(this.tMapPath);
-            this.tabWorlds.Controls.Add(this.lDefaultBuildRank);
-            this.tabWorlds.Controls.Add(this.cDefaultBuildRank);
-            this.tabWorlds.Controls.Add(this.cMainWorld);
-            this.tabWorlds.Controls.Add(this.lMainWorld);
-            this.tabWorlds.Controls.Add(this.bWorldEdit);
-            this.tabWorlds.Controls.Add(this.bAddWorld);
-            this.tabWorlds.Controls.Add(this.bWorldDelete);
-            this.tabWorlds.Location = new System.Drawing.Point(4, 24);
-            this.tabWorlds.Name = "tabWorlds";
-            this.tabWorlds.Padding = new System.Windows.Forms.Padding(5, 10, 5, 10);
-            this.tabWorlds.Size = new System.Drawing.Size(652, 482);
-            this.tabWorlds.TabIndex = 9;
-            this.tabWorlds.Text = "Worlds";
-            // 
-            // dgvWorlds
-            // 
-            this.dgvWorlds.AllowUserToAddRows = false;
-            this.dgvWorlds.AllowUserToDeleteRows = false;
-            this.dgvWorlds.AllowUserToOrderColumns = true;
-            this.dgvWorlds.AllowUserToResizeRows = false;
-            this.dgvWorlds.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dgvWorlds.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvWorlds.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.dgvcName,
-            this.dgvcDescription,
-            this.dgvcAccess,
-            this.dgvcBuild,
-            this.dgvcBackup,
-            this.dgvcBlockDB,
-            this.dgvcHidden});
-            this.dgvWorlds.Location = new System.Drawing.Point(8, 46);
-            this.dgvWorlds.MultiSelect = false;
-            this.dgvWorlds.Name = "dgvWorlds";
-            this.dgvWorlds.RowHeadersVisible = false;
-            dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(0, 1, 0, 1);
-            this.dgvWorlds.RowsDefaultCellStyle = dataGridViewCellStyle2;
-            this.dgvWorlds.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvWorlds.Size = new System.Drawing.Size(636, 364);
-            this.dgvWorlds.TabIndex = 23;
-            // 
-            // label30
-            // 
-            this.label30.AutoSize = true;
-            this.label30.Location = new System.Drawing.Point(49, 424);
-            this.label30.Name = "label30";
-            this.label30.Size = new System.Drawing.Size(342, 15);
-            this.label30.TabIndex = 24;
-            this.label30.Text = "Default rank requirement for building on newly-loaded worlds:";
-            // 
-            // chatPreview
-            // 
-            this.chatPreview.Location = new System.Drawing.Point(7, 256);
-            this.chatPreview.Name = "chatPreview";
-            this.chatPreview.Size = new System.Drawing.Size(637, 241);
-            this.chatPreview.TabIndex = 2;
-            // 
-            // dgvcName
-            // 
-            this.dgvcName.DataPropertyName = "Name";
-            this.dgvcName.HeaderText = "World Name";
-            this.dgvcName.Name = "dgvcName";
-            this.dgvcName.Width = 110;
-            // 
-            // dgvcDescription
-            // 
-            this.dgvcDescription.DataPropertyName = "Description";
-            this.dgvcDescription.HeaderText = "Size";
-            this.dgvcDescription.Name = "dgvcDescription";
-            this.dgvcDescription.ReadOnly = true;
-            // 
-            // dgvcAccess
-            // 
-            this.dgvcAccess.DataPropertyName = "AccessPermission";
-            this.dgvcAccess.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
-            this.dgvcAccess.HeaderText = "Access";
-            this.dgvcAccess.Name = "dgvcAccess";
-            this.dgvcAccess.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            // 
-            // dgvcBuild
-            // 
-            this.dgvcBuild.DataPropertyName = "BuildPermission";
-            this.dgvcBuild.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
-            this.dgvcBuild.HeaderText = "Build";
-            this.dgvcBuild.Name = "dgvcBuild";
-            this.dgvcBuild.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            // 
-            // dgvcBackup
-            // 
-            this.dgvcBackup.DataPropertyName = "Backup";
-            this.dgvcBackup.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
-            this.dgvcBackup.HeaderText = "Backup";
-            this.dgvcBackup.Name = "dgvcBackup";
-            this.dgvcBackup.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.dgvcBackup.Width = 90;
-            // 
-            // dgvcBlockDB
-            // 
-            this.dgvcBlockDB.DataPropertyName = "BlockDBEnabled";
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.dgvcBlockDB.DefaultCellStyle = dataGridViewCellStyle1;
-            this.dgvcBlockDB.HeaderText = "BlockDB";
-            this.dgvcBlockDB.Name = "dgvcBlockDB";
-            this.dgvcBlockDB.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.dgvcBlockDB.ThreeState = true;
-            this.dgvcBlockDB.Width = 60;
-            // 
-            // dgvcHidden
-            // 
-            this.dgvcHidden.DataPropertyName = "Hidden";
-            this.dgvcHidden.HeaderText = "Hide";
-            this.dgvcHidden.Name = "dgvcHidden";
-            this.dgvcHidden.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.dgvcHidden.Width = 40;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -4519,6 +4174,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.nPort)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nUploadBandwidth)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxPlayers)).EndInit();
+            this.tabWorlds.ResumeLayout(false);
+            this.tabWorlds.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvWorlds)).EndInit();
             this.tabLogging.ResumeLayout(false);
             this.gLogFile.ResumeLayout(false);
             this.gLogFile.PerformLayout();
@@ -4553,26 +4211,17 @@
             this.Econ.ResumeLayout(false);
             this.groupBox8.ResumeLayout(false);
             this.groupBox8.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.LottoTime)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.LottoMin)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.LottoMax)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nLotteryTimeBetween)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nLotteryMin)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nLotteryMax)).EndInit();
             this.groupBox7.ResumeLayout(false);
             this.groupBox7.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.LotteryPrice)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.InsultPrice)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.HugPrice)).EndInit();
-            this.groupBox6.ResumeLayout(false);
-            this.groupBox6.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Price2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Price3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Price4)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Price1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nLotteryPrice)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nTitlePrice)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nNickPrice)).EndInit();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.StartAmount)).EndInit();
-            this.tabWorlds.ResumeLayout(false);
-            this.tabWorlds.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvWorlds)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nStartAmount)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -4698,7 +4347,7 @@
         private System.Windows.Forms.TabControl tabs;
         private System.Windows.Forms.TabPage tabGeneral;
         private System.Windows.Forms.GroupBox groupBox5;
-        private System.Windows.Forms.CheckBox GCcheckBox;
+        private System.Windows.Forms.CheckBox xGlobalchat;
         private System.Windows.Forms.GroupBox gUpdaterSettings;
         private System.Windows.Forms.Button bShowAdvancedUpdaterSettings;
         private System.Windows.Forms.ComboBox cUpdaterMode;
@@ -4831,53 +4480,28 @@
         private System.Windows.Forms.TabPage Econ;
         private System.Windows.Forms.GroupBox groupBox8;
         private System.Windows.Forms.Label label25;
-        private System.Windows.Forms.NumericUpDown LottoTime;
-        private System.Windows.Forms.NumericUpDown LottoMin;
-        private System.Windows.Forms.NumericUpDown LottoMax;
+        private System.Windows.Forms.NumericUpDown nLotteryTimeBetween;
+        private System.Windows.Forms.NumericUpDown nLotteryMin;
+        private System.Windows.Forms.NumericUpDown nLotteryMax;
         private System.Windows.Forms.Label label26;
         private System.Windows.Forms.Label label27;
         private System.Windows.Forms.Label label28;
         private System.Windows.Forms.GroupBox groupBox7;
         private System.Windows.Forms.Label label24;
-        private System.Windows.Forms.NumericUpDown LotteryPrice;
-        private System.Windows.Forms.NumericUpDown InsultPrice;
-        private System.Windows.Forms.NumericUpDown HugPrice;
+        private System.Windows.Forms.NumericUpDown nLotteryPrice;
+        private System.Windows.Forms.NumericUpDown nTitlePrice;
+        private System.Windows.Forms.NumericUpDown nNickPrice;
         private System.Windows.Forms.Label label21;
         private System.Windows.Forms.Label label22;
         private System.Windows.Forms.Label label23;
-        private System.Windows.Forms.GroupBox groupBox6;
-        private System.Windows.Forms.NumericUpDown Price2;
-        private System.Windows.Forms.NumericUpDown Price3;
-        private System.Windows.Forms.NumericUpDown Price4;
-        private System.Windows.Forms.NumericUpDown Price1;
-        private System.Windows.Forms.TextBox Custom4;
-        private System.Windows.Forms.Label label20;
-        private System.Windows.Forms.TextBox Custom2;
-        private System.Windows.Forms.Label label19;
-        private System.Windows.Forms.TextBox Custom3;
-        private System.Windows.Forms.Label label18;
-        private System.Windows.Forms.TextBox Custom1;
-        private System.Windows.Forms.Label label17;
-        private System.Windows.Forms.Label label15;
-        private System.Windows.Forms.Label label14;
-        private System.Windows.Forms.Label label13;
-        private System.Windows.Forms.Label label12;
-        private System.Windows.Forms.TextBox Action3;
-        private System.Windows.Forms.TextBox Action4;
-        private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.TextBox Action1;
-        private System.Windows.Forms.TextBox Action2;
         private System.Windows.Forms.GroupBox groupBox4;
-        private System.Windows.Forms.NumericUpDown StartAmount;
+        private System.Windows.Forms.NumericUpDown nStartAmount;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox CurrencyBoxSl;
-        private System.Windows.Forms.TextBox CurrencyBoxPl;
+        private System.Windows.Forms.TextBox tCurrencySl;
+        private System.Windows.Forms.TextBox tCurrencyPl;
         private System.Windows.Forms.Button bOK;
         private System.Windows.Forms.Button bCancel;
         private System.Windows.Forms.Button bResetTab;
@@ -4908,6 +4532,8 @@
         private System.Windows.Forms.DataGridViewComboBoxColumn dgvcBackup;
         private System.Windows.Forms.DataGridViewCheckBoxColumn dgvcBlockDB;
         private System.Windows.Forms.DataGridViewCheckBoxColumn dgvcHidden;
+        private System.Windows.Forms.Label label31;
+        private System.Windows.Forms.Button bColorGlobal;
 
     }
 }

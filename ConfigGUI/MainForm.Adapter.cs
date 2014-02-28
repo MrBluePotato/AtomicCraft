@@ -3,6 +3,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml.Linq;
@@ -48,12 +49,12 @@ namespace fCraft.ConfigGUI
                 {
                     if (loadLogger.HasMessages)
                     {
-                        MessageBox.Show(loadLogger.MessageString, "Config loading warnings");
+                        MessageBox.Show(loadLogger.MessageString, @"Config loading warnings");
                     }
                 }
                 else
                 {
-                    MessageBox.Show(loadLogger.MessageString, "Error occured while trying to load config");
+                    MessageBox.Show(loadLogger.MessageString, @"Error occured while trying to load config");
                 }
             }
 
@@ -64,7 +65,7 @@ namespace fCraft.ConfigGUI
             ApplyTabSecurity();
             ApplyTabSavingAndBackup();
             ApplyTabLogging();
-            ApplyTabIRC();
+            ApplyTabIrc();
             ApplyTabEcon();
             ApplyTabAdvanced();
 
@@ -89,7 +90,7 @@ namespace fCraft.ConfigGUI
                 XElement root = doc.Root;
                 if (root == null)
                 {
-                    MessageBox.Show("Worlds.xml is empty or corrupted.");
+                    MessageBox.Show(@"Worlds.xml is empty or corrupted.");
                     return;
                 }
 
@@ -109,13 +110,13 @@ namespace fCraft.ConfigGUI
                     }
                     if (logRecorder.HasMessages)
                     {
-                        MessageBox.Show(logRecorder.MessageString, "World list loading warnings.");
+                        MessageBox.Show(logRecorder.MessageString, @"World list loading warnings.");
                     }
                 }
                 if (errorLog.Length > 0)
                 {
                     MessageBox.Show(
-                        "Some errors occured while loading the world list:" + Environment.NewLine + errorLog, "Warning");
+                        @"Some errors occured while loading the world list:" + Environment.NewLine + errorLog, @"Warning");
                 }
 
                 FillWorldList();
@@ -134,7 +135,7 @@ namespace fCraft.ConfigGUI
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error occured while loading the world list: " + Environment.NewLine + ex, "Warning");
+                MessageBox.Show(@"Error occured while loading the world list: " + Environment.NewLine + ex, @"Warning");
             }
 
             Worlds.ListChanged += SomethingChanged;
@@ -144,7 +145,7 @@ namespace fCraft.ConfigGUI
         private void ApplyTabGeneral()
         {
             HbBox1.Checked = ConfigKey.HbSaverKey.Enabled();
-            GCcheckBox.Checked = ConfigKey.GCKey.Enabled();
+            xGlobalchat.Checked = ConfigKey.GlobalChat.Enabled();
             tServerName.Text = ConfigKey.ServerName.GetString();
             CustomName.Text = ConfigKey.CustomChatName.GetString();
             SwearBox.Text = ConfigKey.SwearName.GetString();
@@ -201,37 +202,41 @@ namespace fCraft.ConfigGUI
             xShowJoinedWorldMessages.Checked = ConfigKey.ShowJoinedWorldMessages.Enabled();
             xShowConnectionMessages.Checked = ConfigKey.ShowConnectionMessages.Enabled();
 
-            colorSys = Color.ParseToIndex(ConfigKey.SystemMessageColor.GetString());
-            ApplyColor(bColorSys, colorSys);
-            Color.Sys = Color.Parse(colorSys);
+            _colorSys = Color.ParseToIndex(ConfigKey.SystemMessageColor.GetString());
+            ApplyColor(bColorSys, _colorSys);
+            Color.Sys = Color.Parse(_colorSys);
 
-            colorCustom = Color.ParseToIndex(ConfigKey.CustomChatColor.GetString());
-            ApplyColor(CustomColor, colorCustom);
-            Color.Custom = Color.Parse(colorCustom);
+            _colorCustom = Color.ParseToIndex(ConfigKey.CustomChatColor.GetString());
+            ApplyColor(CustomColor, _colorCustom);
+            Color.Custom = Color.Parse(_colorCustom);
 
-            colorHelp = Color.ParseToIndex(ConfigKey.HelpColor.GetString());
-            ApplyColor(bColorHelp, colorHelp);
-            Color.Help = Color.Parse(colorHelp);
+            _colorHelp = Color.ParseToIndex(ConfigKey.HelpColor.GetString());
+            ApplyColor(bColorHelp, _colorHelp);
+            Color.Help = Color.Parse(_colorHelp);
 
-            colorSay = Color.ParseToIndex(ConfigKey.SayColor.GetString());
-            ApplyColor(bColorSay, colorSay);
-            Color.Say = Color.Parse(colorSay);
+            _colorSay = Color.ParseToIndex(ConfigKey.SayColor.GetString());
+            ApplyColor(bColorSay, _colorSay);
+            Color.Say = Color.Parse(_colorSay);
 
-            colorAnnouncement = Color.ParseToIndex(ConfigKey.AnnouncementColor.GetString());
-            ApplyColor(bColorAnnouncement, colorAnnouncement);
-            Color.Announcement = Color.Parse(colorAnnouncement);
+            _colorAnnouncement = Color.ParseToIndex(ConfigKey.AnnouncementColor.GetString());
+            ApplyColor(bColorAnnouncement, _colorAnnouncement);
+            Color.Announcement = Color.Parse(_colorAnnouncement);
 
-            colorPM = Color.ParseToIndex(ConfigKey.PrivateMessageColor.GetString());
-            ApplyColor(bColorPM, colorPM);
-            Color.PM = Color.Parse(colorPM);
+            _colorPm = Color.ParseToIndex(ConfigKey.PrivateMessageColor.GetString());
+            ApplyColor(bColorPM, _colorPm);
+            Color.PM = Color.Parse(_colorPm);
 
-            colorWarning = Color.ParseToIndex(ConfigKey.WarningColor.GetString());
-            ApplyColor(bColorWarning, colorWarning);
-            Color.Warning = Color.Parse(colorWarning);
+            _colorWarning = Color.ParseToIndex(ConfigKey.WarningColor.GetString());
+            ApplyColor(bColorWarning, _colorWarning);
+            Color.Warning = Color.Parse(_colorWarning);
 
-            colorMe = Color.ParseToIndex(ConfigKey.MeColor.GetString());
-            ApplyColor(bColorMe, colorMe);
-            Color.Me = Color.Parse(colorMe);
+            _colorMe = Color.ParseToIndex(ConfigKey.MeColor.GetString());
+            ApplyColor(bColorMe, _colorMe);
+            Color.Me = Color.Parse(_colorMe);
+
+            _colorGlobal = Color.ParseToIndex(ConfigKey.GlobalColor.GetString());
+            ApplyColor(bColorGlobal, _colorGlobal);
+            Color.Global = Color.Parse(_colorGlobal);
 
             UpdateChatPreview();
         }
@@ -247,7 +252,7 @@ namespace fCraft.ConfigGUI
                 };
                 foreach (Rank rank in RankManager.Ranks)
                 {
-                    rankNameList.Add(MainForm.ToComboBoxOption(rank));
+                    rankNameList.Add(ToComboBoxOption(rank));
                 }
                 dgvcAccess.DataSource = rankNameList;
                 dgvcBuild.DataSource = rankNameList;
@@ -263,7 +268,7 @@ namespace fCraft.ConfigGUI
                 rankNameList.Add(WorldListEntry.DefaultRankOption);
                 foreach (Rank rank in RankManager.Ranks)
                 {
-                    rankNameList.Add(MainForm.ToComboBoxOption(rank));
+                    rankNameList.Add(ToComboBoxOption(rank));
                 }
                 foreach (WorldListEntry world in Worlds)
                 {
@@ -402,7 +407,7 @@ namespace fCraft.ConfigGUI
         }
 
 
-        private void ApplyTabIRC()
+        private void ApplyTabIrc()
         {
             xIRCBotEnabled.Checked = ConfigKey.IRCBotEnabled.Enabled();
             gIRCNetwork.Enabled = xIRCBotEnabled.Checked;
@@ -426,9 +431,9 @@ namespace fCraft.ConfigGUI
             xIRCBotForwardFromServer.Checked = ConfigKey.IRCBotForwardFromServer.Enabled();
 
 
-            colorIRC = Color.ParseToIndex(ConfigKey.IRCMessageColor.GetString());
-            ApplyColor(bColorIRC, colorIRC);
-            Color.IRC = Color.Parse(colorIRC);
+            _colorIrc = Color.ParseToIndex(ConfigKey.IRCMessageColor.GetString());
+            ApplyColor(bColorIRC, _colorIrc);
+            Color.IRC = Color.Parse(_colorIrc);
 
             xIRCUseColor.Checked = ConfigKey.IRCUseColor.Enabled();
             xIRCBotAnnounceServerEvents.Checked = ConfigKey.IRCBotAnnounceServerEvents.Enabled();
@@ -436,27 +441,15 @@ namespace fCraft.ConfigGUI
 
         private void ApplyTabEcon()
         {
-            CurrencyBoxSl.Text = ConfigKey.CurrencyKeySl.GetString();
-            CurrencyBoxPl.Text = ConfigKey.CurrencyKeyPl.GetString();
-            StartAmount.Value = ConfigKey.StartAmountKey.GetInt();
-            Custom1.Text = ConfigKey.CustomKey1.GetString();
-            Custom2.Text = ConfigKey.CustomKey2.GetString();
-            Custom3.Text = ConfigKey.CustomKey3.GetString();
-            Custom4.Text = ConfigKey.CustomKey4.GetString();
-            Action1.Text = ConfigKey.ActionKey1.GetString();
-            Action2.Text = ConfigKey.ActionKey2.GetString();
-            Action3.Text = ConfigKey.ActionKey3.GetString();
-            Action4.Text = ConfigKey.ActionKey4.GetString();
-            Price1.Value = ConfigKey.PriceKey1.GetInt();
-            Price2.Value = ConfigKey.PriceKey2.GetInt();
-            Price3.Value = ConfigKey.PriceKey3.GetInt();
-            Price4.Value = ConfigKey.PriceKey4.GetInt();
-            HugPrice.Value = ConfigKey.HugKey.GetInt();
-            InsultPrice.Value = ConfigKey.InsultKey.GetInt();
-            LotteryPrice.Value = ConfigKey.LotteryKey.GetInt();
-            LottoMax.Value = ConfigKey.LottoMaxKey.GetInt();
-            LottoMin.Value = ConfigKey.LottoMinKey.GetInt();
-            LottoTime.Value = ConfigKey.LottoTimeKey.GetInt();
+            tCurrencySl.Text = ConfigKey.CurrencySl.GetString();
+            tCurrencyPl.Text = ConfigKey.CurrencyPl.GetString();
+            nStartAmount.Value = ConfigKey.StartAmount.GetInt();
+            nNickPrice.Value = ConfigKey.NickPrice.GetInt();
+            nTitlePrice.Value = ConfigKey.TitlePrice.GetInt();
+            nLotteryPrice.Value = ConfigKey.LotteryPrice.GetInt();
+            nLotteryMax.Value = ConfigKey.LotteryMax.GetInt();
+            nLotteryMin.Value = ConfigKey.LotteryMin.GetInt();
+            nLotteryTimeBetween.Value = ConfigKey.LotteryTimeBetween.GetInt();
         }
 
         private void ApplyTabAdvanced()
@@ -556,7 +549,7 @@ namespace fCraft.ConfigGUI
         {
             // General
             ConfigKey.HbSaverKey.TrySetValue(HbBox1.Checked);
-            ConfigKey.GCKey.TrySetValue(GCcheckBox.Checked);
+            ConfigKey.GlobalChat.TrySetValue(xGlobalchat.Checked);
             ConfigKey.ServerName.TrySetValue(tServerName.Text);
             ConfigKey.CustomChatName.TrySetValue(CustomName.Text);
             ConfigKey.SwearName.TrySetValue(SwearBox.Text);
@@ -598,38 +591,27 @@ namespace fCraft.ConfigGUI
             ConfigKey.ReleaseMode.TrySetValue(updaterWindow.ReleaseMode);
 
             //Econ
-            ConfigKey.CurrencyKeySl.TrySetValue(CurrencyBoxSl.Text);
-            ConfigKey.CurrencyKeyPl.TrySetValue(CurrencyBoxPl.Text);
-            ConfigKey.StartAmountKey.TrySetValue(StartAmount.Value);
-            ConfigKey.CustomKey1.TrySetValue(Custom1.Text);
-            ConfigKey.CustomKey2.TrySetValue(Custom2.Text);
-            ConfigKey.CustomKey3.TrySetValue(Custom3.Text);
-            ConfigKey.CustomKey4.TrySetValue(Custom4.Text);
-            ConfigKey.ActionKey1.TrySetValue(Action1.Text);
-            ConfigKey.ActionKey2.TrySetValue(Action2.Text);
-            ConfigKey.ActionKey3.TrySetValue(Action3.Text);
-            ConfigKey.ActionKey4.TrySetValue(Action4.Text);
-            ConfigKey.PriceKey1.TrySetValue(Price1.Value);
-            ConfigKey.PriceKey2.TrySetValue(Price2.Value);
-            ConfigKey.PriceKey3.TrySetValue(Price3.Value);
-            ConfigKey.PriceKey4.TrySetValue(Price4.Value);
-            ConfigKey.HugKey.TrySetValue(HugPrice.Value);
-            ConfigKey.InsultKey.TrySetValue(InsultPrice.Value);
-            ConfigKey.LotteryKey.TrySetValue(LotteryPrice.Value);
-            ConfigKey.LottoMaxKey.TrySetValue(LottoMax.Value);
-            ConfigKey.LottoMinKey.TrySetValue(LottoMin.Value);
-            ConfigKey.LottoTimeKey.TrySetValue(LottoTime.Value);
+            ConfigKey.CurrencySl.TrySetValue(tCurrencySl.Text);
+            ConfigKey.CurrencyPl.TrySetValue(tCurrencyPl.Text);
+            ConfigKey.StartAmount.TrySetValue(nStartAmount.Value);
+            ConfigKey.NickPrice.TrySetValue(nNickPrice.Value);
+            ConfigKey.TitlePrice.TrySetValue(nTitlePrice.Value);
+            ConfigKey.LotteryPrice.TrySetValue(nLotteryPrice.Value);
+            ConfigKey.LotteryMax.TrySetValue(nLotteryMax.Value);
+            ConfigKey.LotteryMin.TrySetValue(nLotteryMin.Value);
+            ConfigKey.LotteryTimeBetween.TrySetValue(nLotteryTimeBetween.Value);
 
 
             // Chat
-            ConfigKey.SystemMessageColor.TrySetValue(Color.GetName(colorSys));
-            ConfigKey.CustomChatColor.TrySetValue(Color.GetName(colorCustom));
-            ConfigKey.HelpColor.TrySetValue(Color.GetName(colorHelp));
-            ConfigKey.SayColor.TrySetValue(Color.GetName(colorSay));
-            ConfigKey.AnnouncementColor.TrySetValue(Color.GetName(colorAnnouncement));
-            ConfigKey.PrivateMessageColor.TrySetValue(Color.GetName(colorPM));
-            ConfigKey.WarningColor.TrySetValue(Color.GetName(colorWarning));
-            ConfigKey.MeColor.TrySetValue(Color.GetName(colorMe));
+            ConfigKey.SystemMessageColor.TrySetValue(Color.GetName(_colorSys));
+            ConfigKey.CustomChatColor.TrySetValue(Color.GetName(_colorCustom));
+            ConfigKey.HelpColor.TrySetValue(Color.GetName(_colorHelp));
+            ConfigKey.SayColor.TrySetValue(Color.GetName(_colorSay));
+            ConfigKey.AnnouncementColor.TrySetValue(Color.GetName(_colorAnnouncement));
+            ConfigKey.PrivateMessageColor.TrySetValue(Color.GetName(_colorPm));
+            ConfigKey.WarningColor.TrySetValue(Color.GetName(_colorWarning));
+            ConfigKey.MeColor.TrySetValue(Color.GetName(_colorMe));
+            ConfigKey.GlobalColor.TrySetValue(Color.GetName(_colorGlobal));
             ConfigKey.ShowJoinedWorldMessages.TrySetValue(xShowJoinedWorldMessages.Checked);
             ConfigKey.RankColorsInWorldNames.TrySetValue(xRankColorsInWorldNames.Checked);
             ConfigKey.RankColorsInChat.TrySetValue(xRankColorsInChat.Checked);
@@ -750,7 +732,7 @@ namespace fCraft.ConfigGUI
             ConfigKey.IRCBotForwardFromIRC.TrySetValue(xIRCBotForwardFromIRC.Checked);
             ConfigKey.IRCBotForwardFromServer.TrySetValue(xIRCBotForwardFromServer.Checked);
 
-            ConfigKey.IRCMessageColor.TrySetValue(Color.GetName(colorIRC));
+            ConfigKey.IRCMessageColor.TrySetValue(Color.GetName(_colorIrc));
             ConfigKey.IRCUseColor.TrySetValue(xIRCUseColor.Checked);
 
 
@@ -832,7 +814,7 @@ namespace fCraft.ConfigGUI
             if (!typeof (TEnum).IsEnum) throw new ArgumentException("Enum type required");
             try
             {
-                TEnum val = (TEnum) Enum.Parse(typeof (TEnum), box.SelectedIndex.ToString(), true);
+                TEnum val = (TEnum) Enum.Parse(typeof (TEnum), box.SelectedIndex.ToString(CultureInfo.InvariantCulture), true);
                 key.TrySetValue(val);
             }
             catch (ArgumentException)

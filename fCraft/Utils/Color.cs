@@ -41,11 +41,12 @@ namespace fCraft
             IRCDefault = Purple,
             MeDefault = Purple,
             WarningDefault = Red,
-            CustomDefault = Yellow;
+            CustomDefault = Yellow,
+            GlobalDefault = Navy;
 
-        public const string IRCReset = "\u0003\u000f";
-        public const string IRCBold = "\u0002";
-        public static string Sys, Help, Say, Announcement, PM, IRC, Me, Custom, Warning;
+        public const string IrcReset = "\u0003\u000f";
+        public const string IrcBold = "\u0002";
+        public static string Sys, Help, Say, Announcement, PM, IRC, Me, Custom, Warning, Global;
 
         public static readonly SortedList<char, string> ColorNames = new SortedList<char, string>
         {
@@ -118,10 +119,7 @@ namespace fCraft
             {
                 return ColorNames.Values[index];
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
 
@@ -175,29 +173,28 @@ namespace fCraft
             {
                 return "&" + code;
             }
-            else
+            switch (code)
             {
-                switch (code)
-                {
-                    case 's':
-                        return Sys;
-                    case 'y':
-                        return Say;
-                    case 'p':
-                        return PM;
-                    case 'r':
-                        return Announcement;
-                    case 'h':
-                        return Help;
-                    case 'w':
-                        return Warning;
-                    case 'm':
-                        return Me;
-                    case 'i':
-                        return IRC;
-                    default:
-                        return null;
-                }
+                case 's':
+                    return Sys;
+                case 'y':
+                    return Say;
+                case 'p':
+                    return PM;
+                case 'r':
+                    return Announcement;
+                case 'h':
+                    return Help;
+                case 'w':
+                    return Warning;
+                case 'm':
+                    return Me;
+                case 'i':
+                    return IRC;
+                case 'g':
+                    return Global;
+                default:
+                    return null;
             }
         }
 
@@ -215,10 +212,7 @@ namespace fCraft
             {
                 return "&" + ColorNames.Keys[index];
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
 
@@ -296,6 +290,8 @@ namespace fCraft
                             return ColorNames.IndexOfKey(Me[1]);
                         case "&i":
                             return ColorNames.IndexOfKey(IRC[1]);
+                        case "&g":
+                            return ColorNames.IndexOfKey(Global[1]);
                         default:
                             return 15;
                     }

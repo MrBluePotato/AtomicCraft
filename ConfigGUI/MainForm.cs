@@ -1342,7 +1342,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             ApplyTabSecurity();
             ApplyTabSavingAndBackup();
             ApplyTabLogging();
-            ApplyTabIRC();
+            ApplyTabIrc();
             ApplyTabAdvanced();
         }
 
@@ -1385,7 +1385,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                     break;
                 case 7: // IRC
                     Config.LoadDefaults(ConfigSection.IRC);
-                    ApplyTabIRC();
+                    ApplyTabIrc();
                     break;
                 case 8: // Advanced
                     Config.LoadDefaults(ConfigSection.Logging);
@@ -1445,19 +1445,21 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         #region Colors
 
-        private int colorAnnouncement;
+        private int _colorAnnouncement;
 
-        private int colorCustom;
-        private int colorHelp;
+        private int _colorCustom;
+        private int _colorHelp;
 
-        private int colorIRC,
-            colorMe;
+        private int _colorIrc,
+            _colorMe;
 
-        private int colorPM;
-        private int colorSay;
-        private int colorSys;
+        private int _colorPm;
+        private int _colorSay;
+        private int _colorSys;
 
-        private int colorWarning;
+        private int _colorWarning;
+
+        private int _colorGlobal;
 
         private void ApplyColor(Button button, int color)
         {
@@ -1469,74 +1471,74 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         private void bColorSys_Click(object sender, EventArgs e)
         {
-            ColorPicker picker = new ColorPicker("System message color", colorSys);
+            ColorPicker picker = new ColorPicker("System message color", _colorSys);
             picker.ShowDialog();
-            colorSys = picker.ColorIndex;
-            ApplyColor(bColorSys, colorSys);
-            Color.Sys = Color.Parse(colorSys);
+            _colorSys = picker.ColorIndex;
+            ApplyColor(bColorSys, _colorSys);
+            Color.Sys = Color.Parse(_colorSys);
         }
 
         private void bColorHelp_Click(object sender, EventArgs e)
         {
-            ColorPicker picker = new ColorPicker("Help message color", colorHelp);
+            ColorPicker picker = new ColorPicker("Help message color", _colorHelp);
             picker.ShowDialog();
-            colorHelp = picker.ColorIndex;
-            ApplyColor(bColorHelp, colorHelp);
-            Color.Help = Color.Parse(colorHelp);
+            _colorHelp = picker.ColorIndex;
+            ApplyColor(bColorHelp, _colorHelp);
+            Color.Help = Color.Parse(_colorHelp);
         }
 
         private void bColorSay_Click(object sender, EventArgs e)
         {
-            ColorPicker picker = new ColorPicker("/Say message color", colorSay);
+            ColorPicker picker = new ColorPicker("/Say message color", _colorSay);
             picker.ShowDialog();
-            colorSay = picker.ColorIndex;
-            ApplyColor(bColorSay, colorSay);
-            Color.Say = Color.Parse(colorSay);
+            _colorSay = picker.ColorIndex;
+            ApplyColor(bColorSay, _colorSay);
+            Color.Say = Color.Parse(_colorSay);
         }
 
         private void bColorAnnouncement_Click(object sender, EventArgs e)
         {
-            ColorPicker picker = new ColorPicker("Announcement color", colorAnnouncement);
+            ColorPicker picker = new ColorPicker("Announcement color", _colorAnnouncement);
             picker.ShowDialog();
-            colorAnnouncement = picker.ColorIndex;
-            ApplyColor(bColorAnnouncement, colorAnnouncement);
-            Color.Announcement = Color.Parse(colorAnnouncement);
+            _colorAnnouncement = picker.ColorIndex;
+            ApplyColor(bColorAnnouncement, _colorAnnouncement);
+            Color.Announcement = Color.Parse(_colorAnnouncement);
         }
 
         private void bColorPM_Click(object sender, EventArgs e)
         {
-            ColorPicker picker = new ColorPicker("Private / rank chat color", colorPM);
+            ColorPicker picker = new ColorPicker("Private / rank chat color", _colorPm);
             picker.ShowDialog();
-            colorPM = picker.ColorIndex;
-            ApplyColor(bColorPM, colorPM);
-            Color.PM = Color.Parse(colorPM);
+            _colorPm = picker.ColorIndex;
+            ApplyColor(bColorPM, _colorPm);
+            Color.PM = Color.Parse(_colorPm);
         }
 
         private void bColorWarning_Click(object sender, EventArgs e)
         {
-            ColorPicker picker = new ColorPicker("Warning / Error message color", colorWarning);
+            ColorPicker picker = new ColorPicker("Warning / Error message color", _colorWarning);
             picker.ShowDialog();
-            colorWarning = picker.ColorIndex;
-            ApplyColor(bColorWarning, colorWarning);
-            Color.Warning = Color.Parse(colorWarning);
+            _colorWarning = picker.ColorIndex;
+            ApplyColor(bColorWarning, _colorWarning);
+            Color.Warning = Color.Parse(_colorWarning);
         }
 
         private void bColorMe_Click(object sender, EventArgs e)
         {
-            ColorPicker picker = new ColorPicker("/Me command color", colorMe);
+            ColorPicker picker = new ColorPicker("/Me command color", _colorMe);
             picker.ShowDialog();
-            colorMe = picker.ColorIndex;
-            ApplyColor(bColorMe, colorMe);
-            Color.Me = Color.Parse(colorMe);
+            _colorMe = picker.ColorIndex;
+            ApplyColor(bColorMe, _colorMe);
+            Color.Me = Color.Parse(_colorMe);
         }
 
         private void bColorIRC_Click(object sender, EventArgs e)
         {
-            ColorPicker picker = new ColorPicker("IRC message color", colorIRC);
+            ColorPicker picker = new ColorPicker("IRC message color", _colorIrc);
             picker.ShowDialog();
-            colorIRC = picker.ColorIndex;
-            ApplyColor(bColorIRC, colorIRC);
-            Color.IRC = Color.Parse(colorIRC);
+            _colorIrc = picker.ColorIndex;
+            ApplyColor(bColorIRC, _colorIrc);
+            Color.IRC = Color.Parse(_colorIrc);
         }
 
         private void bColorRank_Click(object sender, EventArgs e)
@@ -1546,6 +1548,15 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             picker.ShowDialog();
             ApplyColor(bColorRank, picker.ColorIndex);
             selectedRank.Color = Color.Parse(picker.ColorIndex);
+        }
+
+        private void bColorGlobal_Click(object sender, EventArgs e)
+        {
+            ColorPicker picker = new ColorPicker("Global chat color", _colorGlobal);
+            picker.ShowDialog();
+            _colorGlobal = picker.ColorIndex;
+            ApplyColor(bColorGlobal, _colorGlobal);
+            Color.IRC = Color.Parse(_colorGlobal);
         }
 
 
@@ -1598,6 +1609,10 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                 lines.Add(String.Format("&W{0}{1}Notch&W was kicked by {0}{1}gamer1",
                     xRankColorsInChat.Checked ? RankManager.HighestRank.Color : "",
                     xRankPrefixesInChat.Checked ? RankManager.HighestRank.Prefix : ""));
+            }
+            if (xGlobalchat.Checked)
+            {
+                lines.Add("&G[Global] Notch&F: This is a global chat message");
             }
 
             if (xShowConnectionMessages.Checked)
@@ -1817,11 +1832,11 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         private void button1_Click(object sender, EventArgs e)
         {
-            ColorPicker picker = new ColorPicker("Custom Chat command color", colorCustom);
+            ColorPicker picker = new ColorPicker("Custom Chat command color", _colorCustom);
             picker.ShowDialog();
-            colorCustom = picker.ColorIndex;
-            ApplyColor(CustomColor, colorCustom);
-            Color.Custom = Color.Parse(colorCustom);
+            _colorCustom = picker.ColorIndex;
+            ApplyColor(CustomColor, _colorCustom);
+            Color.Custom = Color.Parse(_colorCustom);
         }
 
         private void label1_Click_1(object sender, EventArgs e)

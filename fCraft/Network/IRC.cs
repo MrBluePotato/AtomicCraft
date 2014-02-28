@@ -235,11 +235,11 @@ namespace fCraft
                 case ChatMessageType.Global:
                     if (enabled)
                     {
-                        SendChannelMessage(args.Player.ClassyName + Color.IRCReset + ": " + args.Message);
+                        SendChannelMessage(args.Player.ClassyName + Color.IrcReset + ": " + args.Message);
                     }
                     else if (args.Message.StartsWith("#"))
                     {
-                        SendChannelMessage(args.Player.ClassyName + Color.IRCReset + ": " + args.Message.Substring(1));
+                        SendChannelMessage(args.Player.ClassyName + Color.IrcReset + ": " + args.Message.Substring(1));
                     }
                     break;
 
@@ -256,7 +256,7 @@ namespace fCraft
             if (ConfigKey.IRCBotAnnounceServerJoins.Enabled() && !e.Player.Info.IsHidden)
             {
                 string message = String.Format("\u0001ACTION {0}&S* {1}&S connected.\u0001",
-                    Color.IRCBold,
+                    Color.IrcBold,
                     e.Player.ClassyName);
                 SendChannelMessage(message);
             }
@@ -269,7 +269,7 @@ namespace fCraft
                 (e.IsFake || !e.Player.Info.IsHidden))
             {
                 string message = String.Format("{0}&S* {1}&S left the server ({2})",
-                    Color.IRCBold,
+                    Color.IrcBold,
                     e.Player.ClassyName,
                     e.LeaveReason);
                 SendAction(message);
@@ -321,7 +321,7 @@ namespace fCraft
             if (action == null) throw new ArgumentNullException("action");
             if (target == null) throw new ArgumentNullException("target");
             string message = String.Format("{0}&W* {1}&W was {2} by {3}&W",
-                Color.IRCBold,
+                Color.IrcBold,
                 target.ClassyName,
                 action,
                 player.ClassyName);
