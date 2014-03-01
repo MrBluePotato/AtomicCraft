@@ -55,7 +55,7 @@ namespace fCraft
         Say,
 
         /// <summary> Ability to read /Staff chat. </summary>
-        ReadStaffChat,
+        StaffChat,
 
         /// <summary> Ability to use color codes in chat messages. </summary>
         UseColorCodes,
@@ -222,7 +222,7 @@ namespace fCraft
         HideRanks,
 
         /// <summary> Ability to read admin chat. </summary>
-        ReadAdminChat,
+        AdminChat,
 
         /// <summary> Ability to read from the custom chat channel. </summary>
         ReadCustomChat,

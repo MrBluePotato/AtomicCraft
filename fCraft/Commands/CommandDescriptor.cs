@@ -17,7 +17,7 @@ namespace fCraft
     ///     Describes a chat command. Defines properties, permission requirements, and usage information.
     ///     Specifies a handler method.
     /// </summary>
-    public sealed class CommandDescriptor : IClassy
+    public class CommandDescriptor : IClassy
     {
         /// <summary> List of aliases. May be null or empty. Default: null </summary>
         [CanBeNull]

@@ -277,7 +277,7 @@ namespace fCraft
                     break;
                 case "staff":
                     var StaffNames = PlayerDB.PlayerInfoList
-                        .Where(r => r.Rank.Can(Permission.ReadStaffChat) &&
+                        .Where(r => r.Rank.Can(Permission.StaffChat) &&
                                     r.Rank.Can(Permission.Ban) &&
                                     r.Rank.Can(Permission.Promote))
                         .OrderBy(p => p.Rank)

@@ -485,7 +485,7 @@ namespace fCraft
         {
             if (player == null) throw new ArgumentNullException("player");
             if (rawMessage == null) throw new ArgumentNullException("rawMessage");
-            var recepientList = Server.Players.Can(Permission.ReadAdminChat)
+            var recepientList = Server.Players.Can(Permission.AdminChat)
                 .NotIgnoring(player);
 
             string formattedMessage = String.Format("&9(Admin){0}&b: {1}",
@@ -671,7 +671,7 @@ namespace fCraft
         {
             if (player == null) throw new ArgumentNullException("player");
             if (rawMessage == null) throw new ArgumentNullException("rawMessage");
-            var recepientList = Server.Players.Can(Permission.ReadStaffChat)
+            var recepientList = Server.Players.Can(Permission.StaffChat)
                 .NotIgnoring(player)
                 .Union(player);
 

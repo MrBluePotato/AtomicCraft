@@ -2505,7 +2505,7 @@ namespace fCraft
 
                     if (player.World.Name == player.Name)
                     {
-                        var recepientList = Server.Players.Can(Permission.ReadStaffChat)
+                        var recepientList = Server.Players.Can(Permission.StaffChat)
                             .NotIgnoring(player)
                             .Union(player);
                         string message = String.Format("{0}&C would like staff to review their realm", player.ClassyName);

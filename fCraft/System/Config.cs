@@ -1200,7 +1200,7 @@ namespace fCraft
             owner.Add(new XElement(Permission.DeleteAdmincrete.ToString()));
 
             owner.Add(new XElement(Permission.Say.ToString()));
-            owner.Add(new XElement(Permission.ReadStaffChat.ToString()));
+            owner.Add(new XElement(Permission.StaffChat.ToString()));
             XElement temp = new XElement(Permission.Kick.ToString());
             temp.Add(new XAttribute("max", "owner"));
             owner.Add(temp);
@@ -1256,7 +1256,7 @@ namespace fCraft
             owner.Add(new XElement(Permission.BroMode.ToString()));
             owner.Add(new XElement(Permission.Troll.ToString()));
             owner.Add(new XElement(Permission.HideRanks.ToString()));
-            owner.Add(new XElement(Permission.ReadAdminChat.ToString()));
+            owner.Add(new XElement(Permission.AdminChat.ToString()));
 
             owner.Add(new XElement(Permission.ReadCustomChat.ToString()));
             owner.Add(new XElement(Permission.Realm.ToString()));
@@ -1319,7 +1319,7 @@ namespace fCraft
             op.Add(new XElement(Permission.DeleteAdmincrete.ToString()));
 
             op.Add(new XElement(Permission.Say.ToString()));
-            op.Add(new XElement(Permission.ReadStaffChat.ToString()));
+            op.Add(new XElement(Permission.StaffChat.ToString()));
             temp = new XElement(Permission.Kick.ToString());
             temp.Add(new XAttribute("max", "op"));
             op.Add(temp);

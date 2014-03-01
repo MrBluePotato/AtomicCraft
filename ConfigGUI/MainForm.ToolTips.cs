@@ -518,13 +518,13 @@ Affected commands:
 Affected command:
     /Ragequit";
 
-            vPermissions.Items[(int) Permission.ReadAdminChat].ToolTipText =
+            vPermissions.Items[(int) Permission.AdminChat].ToolTipText =
                 @"Ability to read Admin chat.";
 
             vPermissions.Items[(int) Permission.ReadCustomChat].ToolTipText =
                 @"Ability to read Custom chat.";
 
-            vPermissions.Items[(int) Permission.ReadStaffChat].ToolTipText =
+            vPermissions.Items[(int) Permission.StaffChat].ToolTipText =
                 @"Ability to read staff chat.";
 
             vPermissions.Items[(int) Permission.Realm].ToolTipText =
