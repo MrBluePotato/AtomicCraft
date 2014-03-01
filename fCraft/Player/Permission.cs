@@ -300,6 +300,9 @@ namespace fCraft
         Massrank,
 
         /// <summary>Allows the player to set custom player names. </summary>
-        CustomName
+        CustomName,
+
+        /// <summary>Enables showing the welcome message to the player when they connect to the server. </summary>
+        WelcomeMessage
     }
 }

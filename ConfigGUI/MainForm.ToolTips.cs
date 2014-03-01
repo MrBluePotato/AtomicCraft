@@ -8,9 +8,9 @@ namespace fCraft.ConfigGUI
         {
             toolTip.SetToolTip(lServerName, ConfigKey.ServerName.GetDescription());
             toolTip.SetToolTip(tServerName, ConfigKey.ServerName.GetDescription());
-            toolTip.SetToolTip(CustomName, ConfigKey.CustomChatName.GetDescription());
-            toolTip.SetToolTip(CustomAliases, ConfigKey.CustomAliasName.GetDescription());
-            toolTip.SetToolTip(SwearBox, ConfigKey.SwearName.GetDescription());
+            toolTip.SetToolTip(tCustomChatName, ConfigKey.CustomChatName.GetDescription());
+            toolTip.SetToolTip(tCustomChatAliases, ConfigKey.CustomAliasName.GetDescription());
+            toolTip.SetToolTip(tSwearReplace, ConfigKey.SwearName.GetDescription());
 
             toolTip.SetToolTip(lMOTD, ConfigKey.MOTD.GetDescription());
             toolTip.SetToolTip(tMOTD, ConfigKey.MOTD.GetDescription());
@@ -61,11 +61,11 @@ You can use any color codes, and these special variables:
     {SERVER_NAME} = server name (as defined in config)
     {RANK} = connecting player's rank");
 
-            toolTip.SetToolTip(SwearEditor,
+            toolTip.SetToolTip(bEditSwears,
                 @"Edit the list of Swearwords (swearwords.txt).
 Each swearword should be on a seperate line.");
 
-            toolTip.SetToolTip(ReqsEditor,
+            toolTip.SetToolTip(bEditRequirements,
                 @"Edit the list of requirements for the ranks
 on your server.");
         }

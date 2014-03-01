@@ -36,6 +36,11 @@ right under the server name. May be left blank.
 Note: If WoM extensions are enabled, non-WoM users will not see this.",
             MinLength = 0, MaxLength = 64)] MOTD,
 
+        [StringKey(ConfigSection.General, "Welcome to my server! Enjoy your stay!",
+    @"This message is displayed to players for 5 seconds when they first connect, 
+but only if they have the 'WelcomeMessage' permission.",
+    MinLength = 0, MaxLength = 64)] WelcomeMessage,
+
 
         [IntKey(ConfigSection.General, 21,
             @"Maximum number of players on the server. Having more players

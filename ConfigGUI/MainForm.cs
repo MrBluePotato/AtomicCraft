@@ -1835,7 +1835,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             ColorPicker picker = new ColorPicker("Custom Chat command color", _colorCustom);
             picker.ShowDialog();
             _colorCustom = picker.ColorIndex;
-            ApplyColor(CustomColor, _colorCustom);
+            ApplyColor(bCustomColor, _colorCustom);
             Color.Custom = Color.Parse(_colorCustom);
         }
 

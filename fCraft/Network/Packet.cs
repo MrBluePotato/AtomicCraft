@@ -44,7 +44,8 @@ namespace fCraft
             66, // ChangeModel
             69, // EnvMapAppearance
             2, // EnvWeatherType
-            8 // HackControl
+            8, // HackControl
+            73 // Sound thing
         };
 
         public readonly byte[] Data;

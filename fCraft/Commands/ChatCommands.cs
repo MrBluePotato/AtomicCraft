@@ -770,7 +770,7 @@ namespace fCraft
             Category = CommandCategory.Chat,
             Permissions = new[] {Permission.Chat},
             IsConsoleSafe = true,
-            Usage = "&H/Roll MinNumer MaxNumber"
+            Usage = "&H/Roll MinNumer MaxNumber",
         Help = "&SGives random number between 1 and 100.\n" +
     "&H/Roll MaxNumber\n" +
     "&S  Gives number between 1 and max.\n" +

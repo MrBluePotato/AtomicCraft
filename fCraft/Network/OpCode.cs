@@ -63,6 +63,7 @@ namespace fCraft
         ChangeModel = 29,
         EnvMapAppearance = 30,
         EnvWeatherType = 31,
-        HackControl = 32
+        HackControl = 32,
+        PlaySound = 33
     }
 }

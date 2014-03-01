@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -951,6 +952,11 @@ namespace fCraft
                         ClassyName, Info.FrozenByClassy);
                 }
             }
+            Send(Packet.MakeMessageType(100, ConfigKey.WelcomeMessage.GetString()));
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            if (stopwatch.Elapsed.Seconds > 5)
+                Send(Packet.MakeMessageType(100, ""));
 
             // Welcome message
             if (File.Exists(Paths.GreetingFileName))

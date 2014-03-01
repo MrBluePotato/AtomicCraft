@@ -47,8 +47,12 @@ namespace fCraft
         private const int SelectionBoxExtVersion = 1;
         const string HeldBlockExtName = "HeldBlock";
         const int HeldBlockExtVersion = 1;
+        private const string MessageTypesExtName = "MessageTypes";
+        private const int MessageTypesExtVersion = 1;
         const string ExtPlayerListName = "ExtPlayerList";
         const int ExtPlayerListVersion = 1;
+        private const string PlaySoundExtName = "PlaySound";
+        private const int PlaySoundExtVersion = 1;
 
 
         // Note: if more levels are added, change UsesCustomBlocks from bool to int
@@ -56,6 +60,8 @@ namespace fCraft
         public bool SupportsBlockPermissions { get; set; }
         public bool SelectionBoxExt { get; set; }
         public bool SupportsHeldBlock { get; set; }
+        public bool SupportsMessageTypes { get; set; }
+        public bool SupportsPlaySound { get; set; }
         private string ClientName { get; set; }
         public bool SupportsExtPlayerList { get; set; }
 
@@ -67,6 +73,7 @@ namespace fCraft
             writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Data);
             writer.Write(Packet.MakeExtEntry(BlockPermissionsExtName, BlockPermissionsExtVersion).Data);
             writer.Write(Packet.MakeExtEntry(HeldBlockExtName, HeldBlockExtVersion).Data);
+            writer.Write(Packet.MakeExtEntry(MessageTypesExtName, MessageTypesExtVersion).Data);
 
             Logger.Log(LogType.SystemActivity, "Sent ExtInfo and entry packets");
 
@@ -281,6 +288,28 @@ namespace fCraft
             Packet packet = new Packet(OpCode.ExtRemovePlayerName);
             ToNetOrder(nameId, packet.Data, 1);
             return packet;
+        }
+
+        public static Packet MakeMessageType(byte messageType, [NotNull] string message)
+         {
+             if (message == null) throw new ArgumentNullException("message");
+ 
+             Packet packet = new Packet(OpCode.Message);
+             packet.Data[1] = messageType;
+             Encoding.ASCII.GetBytes(message.PadRight(64), 0, 64, packet.Data, 2);
+             return packet;
+         }
+
+        public static Packet PlaySound(string sound, short x, short y, short z, byte volume)
+        {
+            Packet packet = new Packet(fCraft.OpCode.PlaySound);
+            Encoding.ASCII.GetBytes(sound.PadRight(64), 0, 64, packet.Data, 1);
+            ToNetOrder(x, packet.Data, 66);
+            ToNetOrder(y, packet.Data, 68);
+            ToNetOrder(z, packet.Data, 70);
+            packet.Data[72] = volume;
+            return packet;
+
         }
 
         private static void ToNetOrder(short number, [NotNull] byte[] arr, int offset)
