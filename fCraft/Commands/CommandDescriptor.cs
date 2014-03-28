@@ -144,7 +144,7 @@ namespace fCraft
 
 
         /// <summary> Prints command usage syntax to the given player. </summary>
-        public void PrintUsage([NotNull] Player player)
+        public virtual void PrintUsage([NotNull] Player player)
         {
             if (player == null) throw new ArgumentNullException("player");
             if (Usage != null)
@@ -161,7 +161,7 @@ namespace fCraft
         ///     Prints a command HelpSection syntax to the given player.
         ///     If that fails, it will print the usage instead
         /// </summary>
-        public void PrintHelpSection(Player player, string sectionName)
+        public virtual void PrintHelpSection(Player player, string sectionName)
         {
             string sectionHelp;
             if (HelpSections != null && HelpSections.TryGetValue(sectionName.ToLower(), out sectionHelp))

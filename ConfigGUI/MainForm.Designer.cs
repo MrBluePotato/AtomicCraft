@@ -25,8 +25,8 @@
         /// </summary>
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.tabSavingAndBackup = new System.Windows.Forms.TabPage();
             this.gDataBackup = new System.Windows.Forms.GroupBox();
@@ -145,7 +145,6 @@
             this.xRankPrefixesInList = new System.Windows.Forms.CheckBox();
             this.xRankPrefixesInChat = new System.Windows.Forms.CheckBox();
             this.xRankColorsInChat = new System.Windows.Forms.CheckBox();
-            this.chatPreview = new fCraft.ConfigGUI.ChatPreview();
             this.tabs = new System.Windows.Forms.TabControl();
             this.tabGeneral = new System.Windows.Forms.TabPage();
             this.gStartMode = new System.Windows.Forms.GroupBox();
@@ -336,6 +335,7 @@
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.bApply = new System.Windows.Forms.Button();
             this.lLotteryTimeMinutes = new System.Windows.Forms.Label();
+            this.chatPreview = new fCraft.ConfigGUI.ChatPreview();
             this.tabSavingAndBackup.SuspendLayout();
             this.gDataBackup.SuspendLayout();
             this.gSaving.SuspendLayout();
@@ -1750,13 +1750,6 @@
             this.xRankColorsInChat.Text = "Show rank colors.";
             this.xRankColorsInChat.UseVisualStyleBackColor = true;
             // 
-            // chatPreview
-            // 
-            this.chatPreview.Location = new System.Drawing.Point(7, 256);
-            this.chatPreview.Name = "chatPreview";
-            this.chatPreview.Size = new System.Drawing.Size(637, 241);
-            this.chatPreview.TabIndex = 2;
-            // 
             // tabs
             // 
             this.tabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -2389,8 +2382,8 @@
             this.dgvWorlds.MultiSelect = false;
             this.dgvWorlds.Name = "dgvWorlds";
             this.dgvWorlds.RowHeadersVisible = false;
-            dataGridViewCellStyle4.Padding = new System.Windows.Forms.Padding(0, 1, 0, 1);
-            this.dgvWorlds.RowsDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(0, 1, 0, 1);
+            this.dgvWorlds.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dgvWorlds.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvWorlds.Size = new System.Drawing.Size(636, 362);
             this.dgvWorlds.TabIndex = 23;
@@ -2437,8 +2430,8 @@
             // dgvcBlockDB
             // 
             this.dgvcBlockDB.DataPropertyName = "BlockDBEnabled";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.dgvcBlockDB.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.dgvcBlockDB.DefaultCellStyle = dataGridViewCellStyle1;
             this.dgvcBlockDB.HeaderText = "BlockDB";
             this.dgvcBlockDB.Name = "dgvcBlockDB";
             this.dgvcBlockDB.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
@@ -4115,6 +4108,13 @@
             this.lLotteryTimeMinutes.Size = new System.Drawing.Size(51, 15);
             this.lLotteryTimeMinutes.TabIndex = 54;
             this.lLotteryTimeMinutes.Text = "minutes";
+            // 
+            // chatPreview
+            // 
+            this.chatPreview.Location = new System.Drawing.Point(7, 256);
+            this.chatPreview.Name = "chatPreview";
+            this.chatPreview.Size = new System.Drawing.Size(637, 241);
+            this.chatPreview.TabIndex = 2;
             // 
             // MainForm
             // 

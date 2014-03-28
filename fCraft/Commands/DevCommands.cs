@@ -24,6 +24,7 @@ namespace fCraft
 {
     internal static class DevCommands
     {
+#if DEBUG
         public static void Init()
         {
             /*
@@ -32,14 +33,16 @@ namespace fCraft
              * stability.
              * */
 
-            //CommandManager.RegisterCommand(CdBot);
+            CommandManager.RegisterCommand(CdBot);
+            CommandManager.RegisterCommand(CdRandomTestCommand);
         }
 
 
-        /*static readonly CommandDescriptor CdBot = new CommandDescriptor {
+        private static readonly CommandDescriptor CdBot = new CommandDescriptor
+        {
             Name = "Bot",
             Category = CommandCategory.Fun,
-            Permissions = new[] { Permission.Chat },
+            Permissions = new[] {Permission.Chat},
             IsConsoleSafe = false,
             NotRepeatable = true,
             Usage = "/Spell",
@@ -47,14 +50,45 @@ namespace fCraft
             UsableByFrozenPlayers = false,
             Handler = BotHandler,
         };
-        internal static void BotHandler ( Player player, Command cmd ) {
-            Bot bot = player.Bot;
+
+        internal static void BotHandler(Player player, Command cmd)
+        {
+            //Bot bot = player.Bot;
             string yes = cmd.Next();
-            if ( yes.ToLower() == "create" ) {
+            if (yes.ToLower() == "create")
+            {
                 string Name = cmd.Next();
-                Position Pos = new Position( player.Position.X, player.Position.Y, player.Position.Z, player.Position.R, player.Position.L );
-                player.Bot = new Bot( Name, Pos, 1, player.World );
+                Position Pos = new Position(player.Position.X, player.Position.Y, player.Position.Z, player.Position.R,
+                    player.Position.L);
+                //player.Bot = new Bot(Name, Pos, 1, player.World);
                 //player.Bot.SetBot();
-    }*/
+            }
+        }
+
+                #region CheckBlock (Debug Only)
+#if DEBUG
+        private static readonly CommandDescriptor CdRandomTestCommand = new CommandDescriptor
+        {
+            Name = "TestCommand",
+            Category = CommandCategory.Fun,
+            Permissions = new[] { Permission.Chat },
+            Usage = "/Yolo",
+            Help = "Smd",
+            Handler = TestCommandHandler
+        };
+
+        private static void TestCommandHandler(Player player, Command cmd)
+        {
+            //player.Message(player.HeldBlock.ToString());
+            //player.Send(Packet.MakeHoldThis(49, 0));
+            //string label = "label";
+            //player.Send(Packet.MakeAddSelectionBox(0, label, 67, 55, 32, 75, 54, 32, 50, 100, 0, 75));
+            //player.Send(Packet.PlaySound("random.explode", 71, 33, 56, 2));
+            player.Send(Packet.MakeMessageType(100, ""));
+        }
+#endif
+
+        #endregion
     }
-}
+#endif
+    }

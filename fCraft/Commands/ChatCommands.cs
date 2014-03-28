@@ -48,18 +48,6 @@ namespace fCraft
             Player.Moved += Player_IsBack;
         }
 
-        private class GlobalChatDescriptor : CommandDescriptor
-        {
-            public override void PrintUsage(Player player)
-            {
-                base.PrintUsage(player);
-                if (player.Can(Permission.ManageGlobalChat))
-                {
-                    player.Message("&H/Global Message | Help | Accept | Rules | Ignore | Reconnect");
-                }
-            }
-        }
-
         #region GlobalChat
 
         private static readonly CommandDescriptor CdGlobal = new GlobalChatDescriptor
@@ -771,11 +759,11 @@ namespace fCraft
             Permissions = new[] {Permission.Chat},
             IsConsoleSafe = true,
             Usage = "&H/Roll MinNumer MaxNumber",
-        Help = "&SGives random number between 1 and 100.\n" +
-    "&H/Roll MaxNumber\n" +
-    "&S  Gives number between 1 and max.\n" +
-    "&H/Roll MinNumber MaxNumber\n" +
-    "&S  Gives number between min and max.",
+            Help = "&SGives random number between 1 and 100.\n" +
+                   "&H/Roll MaxNumber\n" +
+                   "&S  Gives number between 1 and max.\n" +
+                   "&H/Roll MinNumber MaxNumber\n" +
+                   "&S  Gives number between min and max.",
             Handler = RollHandler
         };
 
@@ -903,7 +891,7 @@ namespace fCraft
                     "abort", "&H/Timer Abort <TimerID>\n&S" +
                              "Aborts a timer with the given ID number. " +
                              "To see a list of timers and their IDs, type &H/Timer&S (without any parameters)."
-                }
+                },
             },
             Handler = TimerHandler
         };
@@ -1002,5 +990,17 @@ namespace fCraft
         }
 
         #endregion
+
+        private class GlobalChatDescriptor : CommandDescriptor
+        {
+            public override void PrintUsage(Player player)
+            {
+                base.PrintUsage(player);
+                if (player.Can(Permission.ManageGlobalChat))
+                {
+                    player.Message("&H/Global Message | Help | Accept | Rules | Ignore | Reconnect");
+                }
+            }
+        }
     }
 }

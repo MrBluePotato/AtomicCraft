@@ -34,9 +34,6 @@ namespace fCraft
             CommandManager.RegisterCommand(CdUnpossess);
             CommandManager.RegisterCommand(CdChangeModel);
             CommandManager.RegisterCommand(CdChangeWeather);
-#if DEBUG
-            CommandManager.RegisterCommand(CdCheckBlock);
-#endif
         }
 
         #region Possess
@@ -399,31 +396,6 @@ namespace fCraft
             Rain = 1,
             Snow = 2
         }
-
-        #endregion
-
-        #region CheckBlock (Debug Only)
-#if DEBUG
-        private static readonly CommandDescriptor CdCheckBlock = new CommandDescriptor
-        {
-            Name = "CheckBlock",
-            Category = CommandCategory.Moderation,
-            Permissions = new[] { Permission.Bring },
-            Usage = "&1/Weather [Type] [World]",
-            Help = "&1Change the weather of a world.\n" +
-                   "&1Valid weather: &esun, rain, snow",
-            Handler = CheckBlockHandler
-        };
-
-        private static void CheckBlockHandler(Player player, Command cmd)
-        {
-            //player.Message(player.HeldBlock.ToString());
-            //player.Send(Packet.MakeHoldThis(49, 0));
-            string label = "label";
-            player.Send(Packet.MakeAddSelectionBox(0, label, 67, 55, 32, 75, 54, 32, 50, 100, 0, 75));
-            player.Send(Packet.PlaySound("random.explode", 71, 33, 56, 2));
-        }
-#endif
 
         #endregion
     }

@@ -25,8 +25,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 using JetBrains.Annotations;
 using System.Threading;
 
@@ -354,7 +356,8 @@ namespace fCraft
         public void VoteCheck()
         {
             if (!VoteIsOn) return;
-            if (!PropHunt.Voted.Any())
+            bool any = Voted.Any();
+            if (!any)
             {
                 Logger.Log(LogType.Warning, "There we no votes. Voting will restart.");
                 Server.Message("&cThere were no votes. Voting will restart.");
@@ -373,6 +376,10 @@ namespace fCraft
             else if (Voted3 > Voted1 || Voted3 > Voted2)
             {
                 _winningWorld = World3;
+            }
+            else
+            {
+                _winningWorld = World1;
             }
             Server.Players.Message("&S--------------------------------------------------------------");
             Server.Players.Message("&SVoting results are in! &A{0}&S:&C {1}, &A{2}&S:&C {3}, &A{4}&S:&C {5}",
@@ -393,6 +400,9 @@ namespace fCraft
                 p.JoinWorld(_winningWorld);
             }
             var game = new PropHunt(_winningWorld);
+            Voted1 = 0;
+            Voted2 = 0;
+            Voted3 = 0;
             game.Start();
         }
 

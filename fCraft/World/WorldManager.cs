@@ -158,7 +158,7 @@ namespace fCraft
             return true;
         }
 
-        private static void LoadWorldListEntry([NotNull] XElement el)
+        public static void LoadWorldListEntry([NotNull] XElement el)
         {
             if (el == null) throw new ArgumentNullException("el");
             XAttribute tempAttr;
@@ -199,13 +199,13 @@ namespace fCraft
                 }
             }
 
-            if ((tempAttr = el.Attribute("prop-hunt")) != null)
+            if ((tempAttr = el.Attribute("prophunt")) != null)
             {
                 bool isPropHunt;
                 if (Boolean.TryParse(tempAttr.Value, out isPropHunt))
                 {
+                    //PropHunt.PropHuntWorlds.Add(world);
                     world.IsPropHunt = isPropHunt;
-                    PropHunt.PropHuntWorlds.Add(world);
                 }
                 else
                 {

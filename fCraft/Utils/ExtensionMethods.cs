@@ -175,7 +175,9 @@ namespace fCraft
             {
                 if (!DateTime.TryParse(dateString, cultureInfo, DateTimeStyles.None, out date))
                 {
+#pragma warning disable 618
                     CultureInfo[] cultureList = CultureInfo.GetCultures(CultureTypes.FrameworkCultures);
+#pragma warning restore 618
                     foreach (CultureInfo otherCultureInfo in cultureList)
                     {
                         cultureInfo = otherCultureInfo;

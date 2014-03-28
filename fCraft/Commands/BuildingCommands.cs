@@ -40,7 +40,6 @@ namespace fCraft
 
         internal static void Init()
         {
-            CommandManager.RegisterCommand(CdBind);
             CommandManager.RegisterCommand(CdPaint);
             CommandManager.RegisterCommand(CdSolid);
 
@@ -126,100 +125,18 @@ namespace fCraft
             CommandManager.RegisterCommand(CdDrawImage);
         }
 
-        #region Bind
-
-        private static readonly CommandDescriptor CdBind = new CommandDescriptor
-        {
-            Name = "Bind",
-            Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Build },
-            Help = "&HAssigns one blocktype to another. " +
-                   "Allows to build blocktypes that are not normally buildable directly: admincrete, lava, water, grass, double step. " +
-                   "Calling &H/Bind BlockType&S without second parameter resets the binding. If used with no params, ALL bindings are reset.",
-            Usage = "/Bind OriginalBlockType ReplacementBlockType",
-            Handler = BindHandler
-        };
-
-        private static void BindHandler(Player player, Command cmd)
-        {
-            string originalBlockName = cmd.Next();
-            if (originalBlockName == null)
-            {
-                player.Message("All bindings have been reset.");
-                player.ResetAllBinds();
-                return;
-            }
-            Block originalBlock = Map.GetBlockByName(originalBlockName);
-            if (originalBlock == Block.Undefined)
-            {
-                player.Message("Bind: Unrecognized block name: {0}", originalBlockName);
-                return;
-            }
-
-            string replacementBlockName = cmd.Next();
-            if (replacementBlockName == null)
-            {
-                if (player.GetBind(originalBlock) != originalBlock)
-                {
-                    player.Message("{0} is no longer bound to {1}",
-                        originalBlock,
-                        player.GetBind(originalBlock));
-                    player.ResetBind(originalBlock);
-                }
-                else
-                {
-                    player.Message("{0} is not bound to anything.",
-                        originalBlock);
-                }
-                return;
-            }
-
-            if (cmd.HasNext)
-            {
-                CdBind.PrintUsage(player);
-                return;
-            }
-
-            Block replacementBlock = Map.GetBlockByName(replacementBlockName);
-            if (replacementBlock == Block.Undefined)
-            {
-                player.Message("Bind: Unrecognized block name: {0}", replacementBlockName);
-            }
-            else
-            {
-                Permission permission = Permission.Build;
-                switch (replacementBlock)
-                {
-                    case Block.Bedrock:
-                        permission = Permission.PlaceAdmincrete;
-                        break;
-                }
-                if (player.Can(permission))
-                {
-                    player.Bind(originalBlock, replacementBlock);
-                    player.Message("{0} is now replaced with {1}", originalBlock, replacementBlock);
-                }
-                else
-                {
-                    player.Message("&WYou do not have {0} permission.", permission);
-                }
-            }
-        }
-
-        #endregion
-
         #region Center
 
         private static readonly CommandDescriptor CdCenter = new CommandDescriptor
         {
             Name = "Center",
-            Aliases = new[] { "Centre" },
+            Aliases = new[] {"Centre"},
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Build },
+            Permissions = new[] {Permission.Build},
             IsConsoleSafe = false,
             NotRepeatable = false,
-            Usage = "/Center",
-            Help = "Places a block at the center for a chosen cuboided area",
+            Usage = "&H/Center",
+            Help = "&SPlaces a block at the center for a chosen cuboided area",
             UsableByFrozenPlayers = false,
             Handler = CenterHandler
         };
@@ -229,13 +146,13 @@ namespace fCraft
             player.SelectionStart(2, CenterCallback, null, CdCenter.Permissions);
             player.DrawOpBlock = player.HeldBlock;
             string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
-            player.Message("Center: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to make a selection.",
+            player.Message("&SCenter: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to make a selection.",
                 drawOpBlockName);
         }
 
         private static void CenterCallback(Player player, Vector3I[] marks, object tag)
         {
-            if (player.LastUsedBlockType != Block.Undefined)
+            if (player.HeldBlock != Block.Undefined)
             {
                 int sx = Math.Min(marks[0].X, marks[1].X),
                     ex = Math.Max(marks[0].X, marks[1].X),
@@ -245,9 +162,9 @@ namespace fCraft
                     ez = Math.Max(marks[0].Z, marks[1].Z);
 
                 BoundingBox bounds = new BoundingBox(sx, sy, sz, ex, ey, ez);
-                Vector3I cPos = new Vector3I((bounds.XMin + bounds.XMax) / 2,
-                    (bounds.YMin + bounds.YMax) / 2,
-                    (bounds.ZMin + bounds.ZMax) / 2);
+                Vector3I cPos = new Vector3I((bounds.XMin + bounds.XMax)/2,
+                    (bounds.YMin + bounds.YMax)/2,
+                    (bounds.ZMin + bounds.ZMax)/2);
                 int blocksDrawn = 0,
                     blocksSkipped = 0;
                 UndoState undoState = player.DrawBegin(null);
@@ -262,7 +179,7 @@ namespace fCraft
             }
             else
             {
-                player.Message("&WCannot deduce desired block. Click a block or type out the block name.");
+                player.Message("Are you holding a block or what ...?");
             }
         }
 
@@ -276,22 +193,22 @@ namespace fCraft
             Category = CommandCategory.Building,
             Permissions = new[] {Permission.Build},
             IsConsoleSafe = false,
-            Usage = "/Door [remove | info | list]",
-            Help = "Controls doors, options are: remove, list, info\n&S" +
+            Usage = "&H/Door Remove | Info | List",
+            Help = "Controls doors, options are: remove, list, and info\n&S" +
                    "See &H/Help Door <option>&S for details about each option.",
             HelpSections = new Dictionary<string, string>
             {
                 {
-                    "remove", "&H/Door remove Door1\n&S" +
-                              "Removes Door with name 'Door1'."
+                    "remove", "&H/Door remove Doorname\n&S" +
+                              "Removes Door with the given name."
                 },
                 {
                     "list", "&H/Door list\n&S" +
                             "Gives you a list of doors in the current world."
                 },
                 {
-                    "info", "&H/Door info Door1\n&S" +
-                            "Gives you information of door with name 'Door1'."
+                    "info", "&H/Door info Doorname\n&S" +
+                            "Gives you information about the given door."
                 },
             },
             Handler = Door
@@ -300,140 +217,151 @@ namespace fCraft
         private static void Door(Player player, Command cmd)
         {
             string option = cmd.Next();
-            if (option == null)
-            {
-                Door door = new Door();
-                player.SelectionStart(2, DoorAdd, door, CdDoor.Permissions);
-                player.DrawOpBlock = player.HeldBlock;
-                string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
-                player.Message("Door: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to make a selection.",
-                    drawOpBlockName);
-            }
-            else if (option.ToLower().Equals("remove") || option.ToLower().Equals("rd"))
-            {
-                string doorName = cmd.Next();
-
-                if (doorName == null)
+            string doorName;
+            string drawOpBlockName;
+            if (option != null)
+                switch (option.ToLower())
                 {
-                    player.Message("No door name specified.");
-                }
-                else
-                {
-                    if (player.World != null && (player.World.Map != null && (player.World != null && (player.World.Map.Doors != null && player.World.Map.Doors.Count > 0))))
-                    {
-                        bool found = false;
-                        Door doorFound = null;
+                    case null:
+                        Door door = new Door();
+                        player.SelectionStart(2, DoorAdd, door, CdDoor.Permissions);
+                        player.DrawOpBlock = player.HeldBlock;
+                        drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
+                        player.Message("&SDoor: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to make a selection.",
+                            drawOpBlockName);
+                        break;
+                    case "remove":
+                        doorName = cmd.Next();
 
-                        lock (player.World.Map.Doors.SyncRoot)
+                        if (doorName == null)
                         {
-                            foreach (Door door in player.World.Map.Doors)
-                            {
-                                if (door.Name.ToLower().Equals(doorName.ToLower()))
-                                {
-                                    doorFound = door;
-                                    found = true;
-                                    break;
-                                }
-                            }
-
-                            if (!found)
-                            {
-                                player.Message("Could not find a door named {0}.", doorName);
-                            }
-                            else
-                            {
-                                doorFound.Remove(player);
-                                player.Message("door was removed.");
-                            }
+                            player.Message("&WNo door name specified.");
                         }
-                    }
-                    else
-                    {
-                        player.Message("Could not find door as this world doesn't contain a door.");
-                    }
-                }
-            }
-            else if (option.ToLower().Equals("info"))
-            {
-                string doorName = cmd.Next();
+                        else
+                        {
+                            if (player.World != null &&
+                                (player.World.Map != null &&
+                                 (player.World != null &&
+                                  (player.World.Map.Doors != null && player.World.Map.Doors.Count > 0))))
+                            {
+                                bool found = false;
+                                Door doorFound = null;
 
-                if (doorName == null)
-                {
-                    player.Message("No door name specified.");
-                }
-                else
-                {
-                    //Wow much null checking
-                    if (player.World != null && (player.World.Map != null && (player.World.Map.Doors != null && player.World.Map.Doors.Count > 0)))
-                    {
-                        bool found = false;
-
-                        if (player.World != null)
-                            if (player.World.Map != null)
-                                if (player.World.Map.Doors != null)
-                                    lock (player.World.Map.Doors.SyncRoot)
+                                lock (player.World.Map.Doors.SyncRoot)
+                                {
+                                    foreach (Door d in player.World.Map.Doors)
                                     {
-                                        foreach (Door door in player.World.Map.Doors.Cast<Door>().Where(door => door.Name.ToLower().Equals(doorName.ToLower())))
+                                        if (d.Name.ToLower().Equals(doorName.ToLower()))
                                         {
-                                            WorldManager.FindWorldExact(door.World);
-                                            player.Message("Door '{0}&S' was created by {1}&S at {2}",
-                                                door.Name, door.Creator, door.Created);
+                                            doorFound = d;
                                             found = true;
+                                            break;
                                         }
                                     }
 
-                        if (!found)
-                        {
-                            player.Message("Could not find door by name {0}.", doorName);
-                        }
-                    }
-                    else
-                    {
-                        player.Message("Could not find door as this world doesn't contain a door.");
-                    }
-                }
-            }
-            else if (option.ToLower().Equals("list"))
-            {
-                if (player.World != null && (player.World.Map != null && (player.World != null && (player.World.Map.Doors == null || player.World.Map.Doors.Count == 0))))
-                {
-                    player.Message("There are no doors in {0}&S.", player.World.ClassyName);
-                }
-                else
-                {
-                    if (player.World != null && player.World.Map == null) return;
-                    if (player.World != null)
-                    {
-                        if (player.World.Map != null)
-                        {
-                            String[] doorNames = new String[player.World.Map.Doors.Count];
-                            var output =
-                                new System.Text.StringBuilder("There are " + player.World.Map.Doors.Count + " doors in " +
-                                                              player.World.ClassyName + "&S: ");
-
-                            for (int i = 0; i < player.World.Map.Doors.Count; i++)
-                            {
-                                doorNames[i] = ((Door) player.World.Map.Doors[i]).Name;
+                                    if (!found)
+                                    {
+                                        player.Message("&WCould not find a door named {0}.", doorName);
+                                    }
+                                    else
+                                    {
+                                        doorFound.Remove(player);
+                                        player.Message("&W{0} was removed.", doorName);
+                                    }
+                                }
                             }
-                            output.Append(doorNames.JoinToString(", "));
-                            player.Message(output.ToString());
+                            else
+                            {
+                                player.Message("&SThere are no doors in this world.");
+                            }
                         }
-                    }
+                        break;
+                    case "info":
+                        doorName = cmd.Next();
+
+                        if (doorName == null)
+                        {
+                            player.Message("&WA door name was specified.");
+                        }
+                        else
+                        {
+                            //Wow much null checking
+                            if (player.World != null &&
+                                (player.World.Map != null &&
+                                 (player.World.Map.Doors != null && player.World.Map.Doors.Count > 0)))
+                            {
+                                bool found = false;
+
+                                if (player.World != null)
+                                    if (player.World.Map != null)
+                                        if (player.World.Map.Doors != null)
+                                            lock (player.World.Map.Doors.SyncRoot)
+                                            {
+                                                foreach (
+                                                    Door d in
+                                                        player.World.Map.Doors.Cast<Door>()
+                                                            .Where(d => d.Name.ToLower().Equals(doorName.ToLower())))
+                                                {
+                                                    WorldManager.FindWorldExact(d.World);
+                                                    player.Message("&SDoor '{0}&S' was created by {1}&S at {2}",
+                                                        d.Name, d.Creator, d.Created);
+                                                    found = true;
+                                                }
+                                            }
+
+                                if (!found)
+                                {
+                                    player.Message("&WCould not find door by name {0}&W.", doorName);
+                                }
+                            }
+                            else
+                            {
+                                player.Message("&WThere are no doors in this world.");
+                            }
+                        }
+                        break;
+                    case "list":
+                        if (player.World != null &&
+                            (player.World.Map != null &&
+                             (player.World != null && (player.World.Map.Doors == null || player.World.Map.Doors.Count == 0))))
+                        {
+                            player.Message("There are no doors in {0}&S.", player.World.ClassyName);
+                        }
+                        else
+                        {
+                            if (player.World != null && player.World.Map == null) return;
+                            if (player.World != null)
+                            {
+                                if (player.World.Map != null)
+                                {
+                                    String[] doorNames = new String[player.World.Map.Doors.Count];
+                                    var output =
+                                        new System.Text.StringBuilder("There are " + player.World.Map.Doors.Count +
+                                                                      " doors in " +
+                                                                      player.World.ClassyName + "&S: ");
+
+                                    for (int i = 0; i < player.World.Map.Doors.Count; i++)
+                                    {
+                                        doorNames[i] = ((Door) player.World.Map.Doors[i]).Name;
+                                    }
+                                    output.Append(doorNames.JoinToString(", "));
+                                    player.Message(output.ToString());
+                                }
+                            }
+                        }
+                        break;
+                    case "check":
+                        player.SelectionStart(1, DoorCheckCallback, null, CdDoor.Permissions);
+                        player.DrawOpBlock = player.HeldBlock;
+                        drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
+                        player.Message(
+                            "DoorCheck: Click 1 block while holding &H{0}&S or use &H/Mark&S to make a selection.",
+                            drawOpBlockName);
+                        break;
                 }
-            }
-            else if (option.ToLower() == "check")
-            {
-                player.SelectionStart(1, DoorCheckCallback, null, CdDoor.Permissions);
-                player.DrawOpBlock = player.HeldBlock;
-                string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
-                player.Message("DoorCheck: Click 1 block while holding &H{0}&S or use &H/Mark&S to make a selection.",
-                    drawOpBlockName);
-            }
-            else
-            {
-                CdDoor.PrintUsage(player);
-            }
+            CdDoor.PrintUsage(player);
         }
+
 
         private static void DoorCheckCallback(Player player, Vector3I[] marks, object tag)
         {
@@ -445,12 +373,12 @@ namespace fCraft
                     Door door = DoorHandler.GetDoor(pos, player);
                     if (door == null)
                     {
-                        player.Message("DoorCheck: There is no door at this position.");
+                        player.Message("&SDoorCheck: There is no door at this position.");
                     }
                     else
                     {
-                        player.Message("&aDoorCheck: This position contains '" + door.Name + "' &acreated on " +
-                                       door.Created + " &aby " + door.Creator + "&a.");
+                        player.Message("&SDoorCheck: This position contains '" + door.Name + "' &Screated on " +
+                                       door.Created + " &Sby " + door.Creator + "&S.");
                     }
                 }
             }
@@ -479,11 +407,11 @@ namespace fCraft
                     switch (buildCheck)
                     {
                         case SecurityCheckResult.BlackListed:
-                            player.Message("Cannot add a door to world {0}&S: You are barred from building here.",
+                            player.Message("&SCannot add a door to world {0}&S: You are barred from building here.",
                                 player.World.ClassyName);
                             return;
                         case SecurityCheckResult.RankTooLow:
-                            player.Message("Cannot add a door to world {0}&S: You are not allowed to build here.",
+                            player.Message("&SCannot add a door to world {0}&S: You are not allowed to build here.",
                                 player.World.ClassyName);
                             return;
                             //case SecurityCheckResult.RankTooHigh:
@@ -498,12 +426,13 @@ namespace fCraft
                     for (int z = sh; z < eh; z++)
                     {
                         if (
-                            player.World != null && player.CanPlace(player.World.Map, new Vector3I(x, y, z), Block.Plank,
+                            player.World != null &&
+                            player.CanPlace(player.World.Map, new Vector3I(x, y, z), Block.Plank,
                                 BlockChangeContext.Manual) != CanPlaceResult.Allowed)
                         {
                             if (player.World != null)
                                 player.Message(
-                                    "Cannot add a door to world {0}&S: Build permissions in this area replied with 'denied'.",
+                                    "&SCannot add a door to world {0}&S: Build permissions in this area replied with '&Wdenied&S'.",
                                     player.World.ClassyName);
                             return;
                         }
@@ -522,10 +451,10 @@ namespace fCraft
             DoorHandler.CreateDoor(door, player.World);
             Logger.Log(LogType.UserActivity, "{0} created door {1} (on world {2})", player.Name, door.Name,
                 player.World.Name);
-            player.Message("Door created on world {0}&S with name {1}", player.World.ClassyName, door.Name);
+            player.Message("&SDoor created on world {0}&S with name {1}", player.World.ClassyName, door.Name);
         }
 
-        #endregion
+    #endregion
 
         #region DrawImage
 
@@ -536,8 +465,8 @@ namespace fCraft
             Category = CommandCategory.Building,
             Permissions = new[] {Permission.DrawAdvanced},
             IsConsoleSafe = false,
-            Usage = "/DrawImage WebsiteUrl.com/picture.jpg",
-            Help = "Draws an image file from a website in minecraft blocks. " +
+            Usage = "&H/DrawImage WebsiteUrl.com/picture.jpg",
+            Help = "&SDraws an image file from a website in minecraft blocks. " +
                    "If your url is from imgur.com, you can type '++' followed by the image code. Example: ++kbFRo.png",
             Handler = DrawImageHandler
         };
@@ -554,7 +483,7 @@ namespace fCraft
                 player.SelectionStart(2, DrawImgCallback, url, Permission.DrawAdvanced);
                 player.DrawOpBlock = player.HeldBlock;
                 string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
-                player.Message("DrawImage: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to make set the direction.",
+                player.Message("&SDrawImage: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to make set the direction.",
                     drawOpBlockName);
             }
         }
@@ -565,19 +494,19 @@ namespace fCraft
             if (url.StartsWith("++")) url = url.Replace("++", "i.imgur.com/");
             if (!url.ToLower().StartsWith("http://")) url = "http://" + url;
 
-            player.MessageNow("&HDrawImg: Downloading image from {0}", url);
+            player.MessageNow("&SDrawImg: Downloading image from {0}", url);
 
             Direction direction = DirectionFinder.GetDirection(marks);
             if (direction == Direction.Null)
             {
-                player.Message("&WNo direction was set");
+                player.Message("&SDrawImg: &WNo direction was set.");
                 return;
             }
             try
             {
                 DrawImageOperation op = new DrawImageOperation();
                 op.DrawImage(1, direction, marks[0], player, url);
-                player.Message("DrawImg: Drawing {0}",
+                player.Message("&SDrawImg: Drawing {0}",
                     url);
             }
             catch (Exception e)
@@ -597,9 +526,9 @@ namespace fCraft
             Category = CommandCategory.Building,
             Permissions = new[] {Permission.DrawAdvanced},
             IsConsoleSafe = false,
-            Help = "Sets the properties for /Write, such as: font and size",
+            Help = "&SSets the properties for /Write, such as: font and size",
             Handler = SetFontHandler,
-            Usage = "/SetFont < Font | Size | Reset > <Variable>"
+            Usage = "&H/SetFont Font | Size | Reset  Variable"
         };
 
         private static void SetFontHandler(Player player, Command cmd)
@@ -610,98 +539,98 @@ namespace fCraft
                 CdSetFont.PrintUsage(player);
                 return;
             }
-            if (param.ToLower() == "reset")
+            switch (param.ToLower())
             {
-                player.font = new Font("Times New Roman", 20, FontStyle.Regular);
-                player.Message("SetFont: Font reverted back to default ({0} size {1})",
-                    player.font.FontFamily.Name, player.font.Size);
-                return;
-            }
-            if (param.ToLower() == "font")
-            {
-                string sectionName = cmd.NextAll();
-                if (!Directory.Exists(Paths.FontsPath))
-                {
-                    Directory.CreateDirectory(Paths.FontsPath);
-                    player.Message("There are no fonts available for this server. Font is set to default: {0}",
-                        player.font.FontFamily.Name);
+                case "reset":
+                    player.font = new Font("Times New Roman", 20, FontStyle.Regular);
+                    player.Message("&SSetFont: Font reverted back to default ({0} size {1})",
+                        player.font.FontFamily.Name, player.font.Size);
                     return;
-                }
-                string fontFileName = null;
-                string[] sectionFiles = Directory.GetFiles(Paths.FontsPath, "*.ttf", SearchOption.TopDirectoryOnly);
-                string[] sectionList;
-                if (sectionName.Length < 1)
-                {
-                    sectionList = GetFontSectionList();
-                    player.Message("{0} fonts Available: {1}", sectionList.Length, sectionList.JoinToString());
-                        //print the folder contents
-                    return;
-                }
-                foreach (string t in sectionFiles)
-                {
-                    string sectionFullName = Path.GetFileNameWithoutExtension(t);
-                    if (sectionFullName == null) continue;
-                    if (!sectionFullName.StartsWith(sectionName, StringComparison.OrdinalIgnoreCase)) continue;
-                    if (sectionFullName.Equals(sectionName, StringComparison.OrdinalIgnoreCase))
+
+                case "font":
+                    string sectionName = cmd.NextAll();
+                    if (!Directory.Exists(Paths.FontsPath))
                     {
-                        fontFileName = t;
-                        break;
+                        Directory.CreateDirectory(Paths.FontsPath);
+                        player.Message("&WThere are no fonts available for this server. Font is set to default: {0}",
+                            player.font.FontFamily.Name);
+                        return;
                     }
-                    if (fontFileName == null)
+                    string fontFileName = null;
+                    string[] sectionFiles = Directory.GetFiles(Paths.FontsPath, "*.ttf", SearchOption.TopDirectoryOnly);
+                    string[] sectionList;
+                    if (sectionName.Length < 1)
                     {
-                        fontFileName = t;
+                        sectionList = GetFontSectionList();
+                        player.Message("&S{0} fonts Available: {1}", sectionList.Length, sectionList.JoinToString());
+                        //print the folder contents
+                        return;
+                    }
+                    foreach (string t in sectionFiles)
+                    {
+                        string sectionFullName = Path.GetFileNameWithoutExtension(t);
+                        if (sectionFullName == null) continue;
+                        if (!sectionFullName.StartsWith(sectionName, StringComparison.OrdinalIgnoreCase)) continue;
+                        if (sectionFullName.Equals(sectionName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            fontFileName = t;
+                            break;
+                        }
+                        if (fontFileName == null)
+                        {
+                            fontFileName = t;
+                        }
+                        else
+                        {
+                            var matches = sectionFiles.Select(Path.GetFileNameWithoutExtension)
+                                .Where(
+                                    sn => sn != null && sn.StartsWith(sectionName, StringComparison.OrdinalIgnoreCase));
+                            player.Message("&SMultiple font files matched \"{0}\": {1}",
+                                sectionName, matches.JoinToString());
+                            return;
+                        }
+                    }
+                    if (fontFileName != null)
+                    {
+                        string sectionFullName = Path.GetFileNameWithoutExtension(fontFileName);
+                        player.Message("&SYour font has changed to \"{0}\":", sectionFullName);
+                        //change font here
+                        player.font = new Font(player.LoadFontFamily(fontFileName), player.font.Size);
+                        return;
+                    }
+                    sectionList = GetFontSectionList();
+                    if (sectionList == null)
+                    {
+                        player.Message("&WNo fonts have been found.");
                     }
                     else
                     {
-                        var matches = sectionFiles.Select(Path.GetFileNameWithoutExtension)
-                            .Where(
-                                sn => sn != null && sn.StartsWith(sectionName, StringComparison.OrdinalIgnoreCase));
-                        player.Message("Multiple font files matched \"{0}\": {1}",
-                            sectionName, matches.JoinToString());
-                        return;
+                        player.Message("&WNo fonts found for \"{0}\". Available fonts: {1}",
+                            sectionName, sectionList.JoinToString());
                     }
-                }
-                if (fontFileName != null)
+                    break;
+            
+                case "size":
+                    int size;
+            if (cmd.NextInt(out size))
+            {
+                if (size > 48 || size < 10)
                 {
-                    string sectionFullName = Path.GetFileNameWithoutExtension(fontFileName);
-                    player.Message("Your font has changed to \"{0}\":", sectionFullName);
-                    //change font here
-                    player.font = new Font(player.LoadFontFamily(fontFileName), player.font.Size);
+                    player.Message("&WIncorrect font size ({0}): Size needs to be between 10 and 48", size);
                     return;
                 }
-                sectionList = GetFontSectionList();
-                if (sectionList == null)
-                {
-                    player.Message("No fonts have been found.");
-                }
-                else
-                {
-                    player.Message("No fonts found for \"{0}\". Available fonts: {1}",
-                        sectionName, sectionList.JoinToString());
-                }
-            }
-            if (param.ToLower() == "size")
-            {
-                int size;
-                if (cmd.NextInt(out size))
-                {
-                    if (size > 48 || size < 10)
-                    {
-                        player.Message("&WIncorrect font size ({0}): Size needs to be between 10 and 48", size);
-                        return;
-                    }
-                    player.Message("SetFont: Size changed from {0} to {1} ({2})", player.font.Size, size,
-                        player.font.FontFamily.Name);
-                    player.font = new Font(player.font.FontFamily, size);
-                }
-                else
-                {
-                    player.Message("&WInvalid size, use /SetFont Size FontSize. Example: /SetFont Size 14");
-                }
+                player.Message("&SSetFont: Size changed from {0} to {1} ({2})", player.font.Size, size,
+                    player.font.FontFamily.Name);
+                player.font = new Font(player.font.FontFamily, size);
             }
             else
             {
-                CdSetFont.PrintUsage(player);
+                player.Message("&WInvalid size, use /SetFont Size FontSize. Example: /SetFont Size 14");
+            }
+            break;
+                default:
+                    CdSetFont.PrintUsage(player);
+                    break;
             }
         }
 
@@ -717,11 +646,11 @@ namespace fCraft
             Permissions = new[] {Permission.DrawAdvanced},
             RepeatableSelection = true,
             IsConsoleSafe = true,
-            Help = "/Draw2D, then select a shape (Polygon, spiral, star). You can then choose a size in blocks " +
+            Help = "&H/Draw2D, &Sthen select a shape (Polygon, spiral, star). You can then choose a size in blocks " +
                    " for the shape before selecting two points." +
-                   "Example: /Draw2d Polygon 50. Polygon and triangle can be used with any number of points " +
+                   "Example: &H/Draw2d Polygon 50&S. Polygon and triangle can be used with any number of points " +
                    "exceeding 3, which should follow the 'Size' argument",
-            Usage = "/Draw2D <Shape> <Size> <Points> <Fill: true/false>",
+            Usage = "&H/Draw2D <Shape> <Size> <Points> <Fill: true/false>",
             Handler = Draw2DHandler,
         };
 
@@ -765,7 +694,7 @@ namespace fCraft
             player.SelectionStart(2, Draw2DCallback, tag, Permission.DrawAdvanced);
             player.DrawOpBlock = player.HeldBlock;
             string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
-            player.Message("Draw2D({0}): Click 2 blocks while holding &H{1}&S or use &H/Mark&S to set the direction.",
+            player.Message("&SDraw2D({0}): Click 2 blocks while holding &H{1}&S or use &H/Mark&S to set the direction.",
                 shape,  drawOpBlockName);
         }
 
@@ -794,14 +723,14 @@ namespace fCraft
                         lib.DrawSpiral();
                         break;
                     default:
-                        player.Message("&WUnknown shape");
+                        player.Message("&WUnknown shape.");
                         CdDraw2D.PrintUsage(player);
                         return;
                 }
 
                 if (lib.blockCount > 0)
                 {
-                    player.Message("/Draw2D: Drawing {0} with a size of '{1}' using {2} blocks of {3}",
+                    player.Message("&SDraw2D: Drawing {0} with a size of '{1}' using {2} blocks of {3}.",
                         shape,
                         radius,
                         lib.blockCount,
@@ -809,7 +738,7 @@ namespace fCraft
                 }
                 else
                 {
-                    player.Message("&WNo direction was set");
+                    player.Message("&WDraw2D: No direction was set.");
                 }
             }
             catch (Exception e)
@@ -838,8 +767,8 @@ namespace fCraft
             Permissions = new[] {Permission.DrawAdvanced},
             RepeatableSelection = true,
             IsConsoleSafe = false,
-            Help = "/Write Sentence, then click 2 blocks. The first is the starting point, the second is the direction",
-            Usage = "/Write Sentence",
+            Help = "&H/Write Sentence&S, then click 2 blocks. The first is the starting point, the second is the direction.",
+            Usage = "&H/Write Sentence",
             Handler = WriteHandler,
         };
 
@@ -855,7 +784,7 @@ namespace fCraft
                 player.SelectionStart(2, WriteCallback, sentence, Permission.DrawAdvanced);
                 player.DrawOpBlock = player.HeldBlock;
                 string drawOpBlockName = Map.GetBlockByName(player.DrawOpBlock.ToString()).ToString();
-                player.Message("Write: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to set the direction.",
+                player.Message("&SWrite: Click 2 blocks while holding &H{0}&S or use &H/Mark&S to set the direction.",
                     drawOpBlockName);
             }
         }
@@ -873,11 +802,11 @@ namespace fCraft
                 render.CreateGraphicsAndDraw(sentence); //render the sentence
                 if (render.blockCount > 0)
                 {
-                    player.Message("/Write (Size {0}, {1}: Writing '{2}' using {3} blocks of {4}",
-                        player.font.Size,
-                        player.font.FontFamily.Name,
+                    player.Message("&SWrite: Writing '{0}' using {1} blocks of {2}  (Size {3}, {4}).",
                         sentence, render.blockCount,
-                        block.ToString());
+                        block.ToString(),
+                        player.font.Size,
+                        player.font.FontFamily.Name);
                 }
                 else
                 {
