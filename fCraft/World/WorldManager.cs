@@ -206,6 +206,10 @@ namespace fCraft
                 {
                     //PropHunt.PropHuntWorlds.Add(world);
                     world.IsPropHunt = isPropHunt;
+                    if (!PropHunt.PropHuntWorlds.Contains(world))
+                    {
+                        PropHunt.PropHuntWorlds.Add(world);
+                    }
                 }
                 else
                 {
@@ -502,7 +506,7 @@ namespace fCraft
                     }
                     if (world.IsPropHunt)
                     {
-                        temp.Add(new XAttribute("prop-hunt", true));
+                        temp.Add(new XAttribute("prophunt", true));
                     }
                     temp.Add(world.BlockDB.SaveSettings());
 

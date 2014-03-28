@@ -74,6 +74,7 @@ namespace fCraft
             Permissions = new[] { Permission.Chat },
             Usage = "/Yolo",
             Help = "Smd",
+            IsConsoleSafe = true,
             Handler = TestCommandHandler
         };
 
@@ -84,7 +85,25 @@ namespace fCraft
             //string label = "label";
             //player.Send(Packet.MakeAddSelectionBox(0, label, 67, 55, 32, 75, 54, 32, 50, 100, 0, 75));
             //player.Send(Packet.PlaySound("random.explode", 71, 33, 56, 2));
-            player.Send(Packet.MakeMessageType(100, ""));
+            //player.Send(Packet.MakeMessageType(100, ""));
+            /*lock (WorldManager.SyncRoot)
+            {
+                foreach (World w in WorldManager.Worlds)
+                {
+                    if (w.IsPropHunt)
+                    {
+                        PropHunt.PropHuntWorlds.Add(w);
+                    }
+                }
+            }*/
+            foreach (World w in PropHunt.PropHuntWorlds)
+            {
+                Logger.Log(LogType.Error, w.ToString());
+            }
+            if (!PropHunt.PropHuntWorlds.Any())
+            {
+                Logger.Log(LogType.Error, "swag");
+            }
         }
 #endif
 

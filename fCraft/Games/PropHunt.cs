@@ -99,16 +99,6 @@ namespace fCraft
         //Used if the server starts in prophunt
         public PropHunt()
         {
-            lock (WorldManager.SyncRoot)
-            {
-                foreach (World w in WorldManager.Worlds)
-                {
-                    if (w.IsPropHunt)
-                    {
-                        PropHuntWorlds.Add(w);
-                    }
-                }
-            }
             if (PropHuntWorlds.Count <= 3)
             {
                 Logger.Log(LogType.Error,
