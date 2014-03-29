@@ -25,12 +25,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Xml.Linq;
-using JetBrains.Annotations;
-using System.Threading;
 
 namespace fCraft
 {
@@ -122,18 +117,22 @@ namespace fCraft
         public void Start()
         {
 #if !(DEBUG)
-            if (_world.Players.Count() < 4) //in case players leave the world or disconnect during the start delay
+            if (_world.Players.Count() < 2) //in case players leave the world or disconnect during the start delay
             {
-                _world.Players.Message("&WPropHunt&s requires at least 4 people to play.");
+                _world.Players.Message("&WPropHunt&s requires at least 2 people to play.");
                 return;
             }
 #endif
             _world.gameMode = GameMode.PropHunt;
             _startTime = DateTime.Now;
             _task = new SchedulerTask(Interval, true).RunForever(TimeSpan.FromMilliseconds(250));
-            Logger.Log(LogType.SystemActivity, "&WPropHunt &S is starting in {0} seconds in world {1}", TimeDelay,
+            Logger.Log(LogType.SystemActivity, "&WPropHunt &S is starting in {0} seconds on world {1}.", TimeDelay,
                 _world.ClassyName);
-            _world.Players.Message("&WPropHunt &S is starting in {0} seconds in world {1}", TimeDelay, _world.ClassyName);
+            if (StartMode != Game.StartMode.PropHunt)
+            {
+                _world.Players.Message("&WPropHunt &S is starting in {0} seconds on world {1}.", TimeDelay,
+                    _world.ClassyName);
+            }
             foreach (Player p in _world.Players)
                 PropHuntPlayers.Add(p);
         }
@@ -166,7 +165,23 @@ namespace fCraft
                         {
                             p.Model = blockId[randBlock.Next(0, blockId.Length)];
                             string blockName = Map.GetBlockByName(p.Model).ToString();
-                            p.Message("You are disgused as {0}", blockName);
+                            p.Message("You are disgused as {0}.", blockName);
+                            p.iName = " ";
+                        }
+                        p.IsPlayingPropHunt = true;
+                    }
+                }
+                if (StartMode == Game.StartMode.PropHunt)
+                {
+                    foreach (Player p in PropHuntPlayers)
+                    {
+                        BeginGame(p);
+                        ChooseSeeker();
+                        if (!p.IsPropHuntSeeker)
+                        {
+                            p.Model = blockId[randBlock.Next(0, blockId.Length)];
+                            string blockName = Map.GetBlockByName(p.Model).ToString();
+                            p.Message("You are disgused as {0}.", blockName);
                             p.iName = " ";
                         }
                         p.IsPlayingPropHunt = true;
@@ -235,7 +250,6 @@ namespace fCraft
         {
             player.IsPlayingPropHunt = true;
             PropHuntPlayers.Add(player);
-            Server.Message("&WPropHunt is starting!");
             RoundStarted = true;
 #if DEBUG
             Server.Message("Beginning game....");
@@ -246,7 +260,7 @@ namespace fCraft
         public static void ChooseSeeker()
         {
             if (PropHuntPlayers.Count(player => player.IsPropHuntSeeker) != 0) return;
-            Random randNumber = new Random();
+            var randNumber = new Random();
             int randSeeker = randNumber.Next(0, PropHuntPlayers.Count);
             Player seeker = PropHuntPlayers[randSeeker];
 
@@ -339,7 +353,7 @@ namespace fCraft
             Server.Players.Message("&S--------------------------------------------------------------");
             VoteIsOn = true;
 
-            Scheduler.NewTask((task) => VoteCheck())
+            Scheduler.NewTask(task => VoteCheck())
                 .RunOnce(TimeSpan.FromSeconds(60));
         }
 
@@ -397,8 +411,7 @@ namespace fCraft
         }
 
         // Avoid re-defining the list every time your handler is called. Make it static!
-
-        public static void PlayerClickingHandler(object sender, fCraft.Events.PlayerClickingEventArgs e)
+        public static void PlayerClickingHandler(object sender, Events.PlayerClickingEventArgs e)
         {
             // if player clicked a non-air block
             if (e.Action != ClickAction.Delete) return;
@@ -409,7 +422,7 @@ namespace fCraft
             {
                 if (p.prophuntSolidPos != e.Coords || !p.IsSolidBlock) continue;
                 //Remove the players block
-                Block airBlock = Block.Air;
+                const Block airBlock = Block.Air;
                 var blockUpdate = new BlockUpdate(null, p.prophuntSolidPos, airBlock);
                 if (p.World != null) if (p.World.Map != null) p.World.Map.QueueUpdate(blockUpdate);
 
@@ -425,13 +438,13 @@ namespace fCraft
         }
 
         // Checks if the seeker tagged a player, after they broke the block form
-        public static void PlayerMovingHandler(object sender, fCraft.Events.PlayerMovingEventArgs e)
+        public static void PlayerMovingHandler(object sender, Events.PlayerMovingEventArgs e)
         {
             if (e.Player.IsPropHuntSeeker)
             {
-                Vector3I oldPos = new Vector3I(e.OldPosition.X/32, e.OldPosition.Y/32, e.OldPosition.Z/32);
+                var oldPos = new Vector3I(e.OldPosition.X/32, e.OldPosition.Y/32, e.OldPosition.Z/32);
                     // Get the position of the player
-                Vector3I newPos = new Vector3I(e.NewPosition.X/32, e.NewPosition.Y/32, e.NewPosition.Z/32);
+                var newPos = new Vector3I(e.NewPosition.X/32, e.NewPosition.Y/32, e.NewPosition.Z/32);
 
                 if (oldPos.X != newPos.X || oldPos.Y != newPos.Y || oldPos.Z != newPos.Z)
                     // Check if the positions are not the same (player moved)
@@ -452,11 +465,11 @@ namespace fCraft
         }
 
         //Used if the server starts prophunt on launch. This brings the player to the world that the game is in.
-        public static void PlayerConnectedHandler(object sender, fCraft.Events.PlayerConnectedEventArgs e)
+        public static void PlayerConnectedHandler(object sender, Events.PlayerConnectedEventArgs e)
         {
             PropHuntPlayers.Add(e.Player);
             e.StartingWorld = _world;
-            if (PropHunt.StartMode != Game.StartMode.PropHunt) return;
+            if (StartMode != Game.StartMode.PropHunt) return;
             BeginGame(e.Player);
             if (PropHuntPlayers.TakeWhile(p => !p.IsPropHuntSeeker).Any())
             {
