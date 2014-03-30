@@ -48,7 +48,7 @@ namespace fCraft
         public static bool VoteIsOn = false;
         public static bool RoundStarted = false;
         private static bool _votingRestarting;
-        private static bool restartGame = false;
+        private static bool _restartGame;
 
         //Stuff
         public static PropHunt Instance;
@@ -121,7 +121,6 @@ namespace fCraft
                 Logger.Log(LogType.Error,
                     "You must have at least 3 PropHunt maps. Please add some with /PropHunt add [mapname].");
                 return;
-
             }
             _world = PropHuntWorlds[RandWorld.Next(0, PropHuntWorlds.Count)];
             _world.gameMode = GameMode.PropHunt;
@@ -198,6 +197,7 @@ namespace fCraft
                 Player.Moving += PlayerMovingHandler;
                 Player.Clicking += PlayerClickingHandler;
                 Player.Connected += PlayerConnectedHandler;
+                Player.Disconnected += PlayerDisconnectedHandler;
 
                 _checkIdlesTask = Scheduler.NewTask(CheckIdles).RunForever(CheckIdlesInterval);
 
@@ -209,46 +209,8 @@ namespace fCraft
 #endif
             }
 
-            TimeLeft = Convert.ToInt16(((TimeDelay + TimeLimit) - (DateTime.Now - _startTime).TotalSeconds));
-            if (IsOn)
-            {
-                //If all of the blocks were tagged before the time was up
-                if (PropHuntPlayers.Count(player => (!(player.IsPropHuntSeeker))) == 0)
-                {
-                    Server.Message("&cThe seekers won!");
-                    RoundEnd = DateTime.Now;
-                    RoundStarted = false;
-                }
-                if (TimeLeft == 0)
-                {
-                    if (PropHuntPlayers.Count(player => player.IsPropHuntSeeker) ==
-                        PropHuntPlayers.Count(player => (!(player.IsPropHuntSeeker))))
-                    {
-                        Server.Message("&cIt's a tie!");
-                        RoundEnd = DateTime.Now;
-                        RoundStarted = false;
-                    }
-                    else if (PropHuntPlayers.Count(player => player.IsPropHuntSeeker) <
-                             PropHuntPlayers.Count(player => (!(player.IsPropHuntSeeker))))
-                    {
-                        Server.Message("&cThe blocks won!");
-                        RoundEnd = DateTime.Now;
-                        RoundStarted = false;
-                    }
-                    else if (PropHuntPlayers.Count(player => player.IsPropHuntSeeker) >
-                             PropHuntPlayers.Count(player => (!(player.IsPropHuntSeeker))))
-                    {
-                        Server.Message("&cThe seekers won!");
-                        RoundEnd = DateTime.Now;
-                        RoundStarted = false;
+            CheckScore();
 
-                    }
-                }
-                //Take a vote if the server is in that mode
-                if (StartMode == Game.StartMode.PropHunt) TakeVote();
-                    //Dont take a vote if on-demand game
-                else return;
-            }
             if (LastChecked != null && (DateTime.Now - LastChecked).TotalSeconds > 29.9 && TimeLeft < TimeLimit)
             {
                 _world.Players.Message("&WThere are currently {0} block(s) and  {1} seeker(s) left on {2}.",
@@ -320,23 +282,60 @@ namespace fCraft
             _task.Stop();
         }
 
-        public static void RevertPlayers()
+        public static void RevertPlayer(Player p)
         {
-            lock (PropHuntPlayers)
+            if (!p.IsPropHuntSeeker)
             {
-                foreach (Player p in PropHuntPlayers)
+                p.IsSolidBlock = false;
+                p.Model = "steve";
+            }
+            if (p.IsPropHuntTagged)
+            {
+                p.IsPropHuntTagged = false;
+            }
+            p.IsPropHuntSeeker = false;
+        }
+
+        public void CheckScore()
+        {
+            TimeLeft = Convert.ToInt16(((TimeDelay + TimeLimit) - (DateTime.Now - _startTime).TotalSeconds));
+            if (IsOn)
+            {
+                //If all of the blocks were tagged before the time was up
+                if (PropHuntPlayers.Count(player => (!(player.IsPropHuntSeeker))) == 0)
                 {
-                    if (!p.IsPropHuntSeeker)
-                    {
-                        p.IsSolidBlock = false;
-                        p.Model = "steve";
-                    }
-                    if (p.IsPropHuntTagged)
-                    {
-                        p.IsPropHuntTagged = false;
-                    }
-                    p.IsPropHuntSeeker = false;
+                    Server.Message("&cThe seekers won!");
+                    RoundEnd = DateTime.Now;
+                    RoundStarted = false;
                 }
+                if (TimeLeft == 0)
+                {
+                    if (PropHuntPlayers.Count(player => player.IsPropHuntSeeker) ==
+                        PropHuntPlayers.Count(player => (!(player.IsPropHuntSeeker))))
+                    {
+                        Server.Message("&cIt's a tie!");
+                        RoundEnd = DateTime.Now;
+                        RoundStarted = false;
+                    }
+                    else if (PropHuntPlayers.Count(player => player.IsPropHuntSeeker) <
+                             PropHuntPlayers.Count(player => (!(player.IsPropHuntSeeker))))
+                    {
+                        Server.Message("&cThe blocks won!");
+                        RoundEnd = DateTime.Now;
+                        RoundStarted = false;
+                    }
+                    else if (PropHuntPlayers.Count(player => player.IsPropHuntSeeker) >
+                             PropHuntPlayers.Count(player => (!(player.IsPropHuntSeeker))))
+                    {
+                        Server.Message("&cThe seekers won!");
+                        RoundEnd = DateTime.Now;
+                        RoundStarted = false;
+                    }
+                }
+                //Take a vote if the server is in that mode
+                if (StartMode == Game.StartMode.PropHunt) TakeVote();
+                    //Dont take a vote if on-demand game
+                else return;
             }
         }
 
@@ -347,8 +346,13 @@ namespace fCraft
             _task.Stop();
             _checkIdlesTask.Stop();
             Player.Moving -= PlayerMovingHandler;
-            RevertPlayers();
-
+            foreach (Player p in PropHuntPlayers)
+            {
+                lock (PropHuntPlayers)
+                {
+                    RevertPlayer(p);
+                }
+            }
 
             //Actual voting
             if (!_votingRestarting)
@@ -422,7 +426,7 @@ namespace fCraft
             Voted2 = 0;
             Voted3 = 0;
             game.Start();
-            restartGame = true;
+            _restartGame = true;
         }
 
         // Avoid re-defining the list every time your handler is called. Make it static!
@@ -458,7 +462,7 @@ namespace fCraft
             if (e.Player.IsPropHuntSeeker)
             {
                 var oldPos = new Vector3I(e.OldPosition.X/32, e.OldPosition.Y/32, e.OldPosition.Z/32);
-                    // Get the position of the player
+                // Get the position of the player
                 var newPos = new Vector3I(e.NewPosition.X/32, e.NewPosition.Y/32, e.NewPosition.Z/32);
 
                 if (oldPos.X != newPos.X || oldPos.Y != newPos.Y || oldPos.Z != newPos.Z)
@@ -515,8 +519,24 @@ namespace fCraft
             e.Player.IsPlayingPropHunt = true;
         }
 
-        // checks for idle players
+        public void PlayerDisconnectedHandler(object sender, Events.PlayerDisconnectedEventArgs e)
+        {
+            if (!IsOn) return;
+            if (e.Player.IsPropHuntSeeker)
+            {
+                if (PropHuntPlayers.Contains(e.Player)) PropHuntPlayers.Remove(e.Player);
+                if (PropHuntPlayers.Count > 1)
+                {
+                    Server.Message("&WThe seeker left the server. A new seeker will be chosen.");
+                    ChooseSeeker();
+                }
+                Server.Message("&WThere are not enough players to continue the game.");
+                CheckScore();
+            }
+            RevertPlayer(e.Player);
+        }
 
+        // checks for idle players
         public static void CheckIdles(SchedulerTask task)
         {
             foreach (Player p in PropHuntPlayers)
