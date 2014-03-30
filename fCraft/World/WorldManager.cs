@@ -206,15 +206,12 @@ namespace fCraft
                 {
                     //PropHunt.PropHuntWorlds.Add(world);
                     world.IsPropHunt = isPropHunt;
-                    if (!PropHunt.PropHuntWorlds.Contains(world))
-                    {
                         PropHunt.PropHuntWorlds.Add(world);
-                    }
                 }
                 else
                 {
                     Logger.Log(LogType.Warning,
-                        "WorldManager: Could not parse \"prop-hunt\" attribute of world \"{0}\", assuming NOT playable for PropHunt.",
+                        "WorldManager: Could not parse \"prophunt\" attribute of world \"{0}\", assuming NOT useable for PropHunt.",
                         worldName);
                 }
             }
