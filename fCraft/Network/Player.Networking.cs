@@ -393,10 +393,10 @@ namespace fCraft
             // only reset the timer if player rotated
             // if player is just pushed around, rotation does not change (and timer should not reset)
             //If the player is playing prophunt, rotating will not reset the timer
-            if (rotChanged && !this.IsPlayingPropHunt) ResetIdleTimer();
+            if (rotChanged && !IsPlayingPropHunt) ResetIdleTimer();
 
             //If the player is a solid block and they moved, the timer will reset
-            if (posChanged && this.IsSolidBlock) ResetIdleTimer();
+            if (posChanged && IsSolidBlock) ResetIdleTimer();
 
             if (Info.IsFrozen)
             {

@@ -133,7 +133,6 @@ namespace fCraft
                 {
                     PropHunt game = new PropHunt(player.World); //move to world
                     game.Start();
-                    return;
                 }
             }
             else
