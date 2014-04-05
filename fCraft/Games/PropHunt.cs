@@ -136,7 +136,7 @@ namespace fCraft
                     }
                 }
                 Player.Moving += PlayerMovingHandler;
-
+                LastChecked = DateTime.Now; //used for intervals
                 _checkIdlesTask = Scheduler.NewTask(CheckIdles).RunForever(TimeSpan.FromMilliseconds(100));
 
 #if DEBUG
@@ -168,8 +168,6 @@ namespace fCraft
                 task.Stop();
                 return;
             }
-
-            LastChecked = DateTime.Now; //used for intervals
             if ((DateTime.Now - LastChecked).TotalSeconds > 29.9 && TimeLeft < TimeLimit)
             {
                 _world.Players.Message("&WThere are currently {0} block(s) and  {1} seeker(s) left on {2}.",
@@ -305,6 +303,23 @@ namespace fCraft
             }
         }
 
+        public static void RemoveSolid(Player p)
+        {
+            if (p.IsSolidBlock && !p.IsPropHuntTagged)
+            {
+                //Remove the players block
+                Block airBlock = Block.Air;
+                BlockUpdate blockUpdate = new BlockUpdate(null, p.prophuntSolidPos, airBlock);
+                p.World.Map.QueueUpdate(blockUpdate);
+
+                //Do the other stuff
+                p.Message("You are no longer a solid block!");
+                p.IsSolidBlock = false;
+                p.Info.IsHidden = false;
+                Player.RaisePlayerHideChangedEvent(p);
+            }
+        }
+
         //Voting
         public void TakeVote()
         {
@@ -397,14 +412,14 @@ namespace fCraft
         // Avoid re-defining the list every time your handler is called. Make it static!
         public static void PlayerClickingHandler(object sender, Events.PlayerClickingEventArgs e)
         {
+            if (!e.Player.IsPropHuntSeeker) return;
             // if player clicked a non-air block
             if (e.Action != ClickAction.Delete) return;
             Block currentBlock = e.Player.WorldMap.GetBlock(e.Coords); // Gets the blocks coords
             // Check if currentBlock is on the list
             if (!clickableBlocks.Contains(currentBlock)) return;
-            foreach (Player p in PropHuntPlayers)
+            foreach (Player p in PropHuntPlayers.Where(p => p.prophuntSolidPos == e.Coords && p.IsSolidBlock))
             {
-                if (p.prophuntSolidPos != e.Coords || !p.IsSolidBlock) continue;
                 //Remove the players block
                 const Block airBlock = Block.Air;
                 var blockUpdate = new BlockUpdate(null, p.prophuntSolidPos, airBlock);
@@ -418,7 +433,6 @@ namespace fCraft
                 p.Info.IsHidden = false;
                 Player.RaisePlayerHideChangedEvent(p);
             }
-            e.Cancel = true;
         }
 
         // Checks if the seeker tagged a player, after they broke the block form
@@ -457,7 +471,7 @@ namespace fCraft
             if (StartMode != Game.StartMode.PropHunt) return;
             if (PropHuntPlayers.Count() < 2)
             {
-                Server.Message("&WThere are not enough players online to being PropHunt. Please try again later.");
+                e.Player.Message("&WThere are not enough players online to being PropHunt. Please try again later.");
                 Logger.Log(LogType.Warning,
                     "There are not enough players online to being PropHunt. Please try again later.");
             }
@@ -471,6 +485,8 @@ namespace fCraft
                 if (RoundStarted && TimeDelay == 0)
                 {
                     e.Player.Message("&cYou connected while a round was in progress. You have been made a seeker.");
+                    Logger.Log(LogType.SystemActivity,
+                    "{0} connected while a round was in progress. They have been made a seeker.", e.Player);
                     e.Player.IsPropHuntSeeker = true;
                 }
                 foreach (Player p in PropHuntPlayers)
@@ -507,6 +523,10 @@ namespace fCraft
                 }
                 Server.Message("&WThere are not enough players to continue the game.");
                 CheckScore();
+            }
+            if (e.Player.IsSolidBlock)
+            {
+                RemoveSolid(e.Player);
             }
             RevertPlayer(e.Player);
         }

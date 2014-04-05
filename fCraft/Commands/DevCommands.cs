@@ -96,13 +96,27 @@ namespace fCraft
                     }
                 }
             }*/
-            foreach (World w in PropHunt.PropHuntWorlds)
+            /*foreach (World w in PropHunt.PropHuntWorlds)
             {
                 Logger.Log(LogType.Error, w.ToString());
             }
             if (!PropHunt.PropHuntWorlds.Any())
             {
                 Logger.Log(LogType.Error, "swag");
+            }*/
+            foreach (Player p in PropHunt.PropHuntPlayers)
+            {
+                if (!p.IsPropHuntSeeker)
+                {
+                    player.Message("&CNot seekers");
+                    player.Message(p.ToString());
+
+                }
+                if (p.IsPropHuntSeeker)
+                {
+                    player.Message("&CSeekers");
+                    player.Message(p.ToString());
+                }
             }
         }
 #endif

@@ -567,20 +567,10 @@ namespace fCraft
         /// <summary> Resets the IdleTimer to 0. </summary>
         public void ResetIdleTimer()
         {
-            if (this.IsSolidBlock && !this.IsPropHuntTagged)
+            if (IsSolidBlock && !IsPropHuntTagged)
             {
-                //Remove the players block
-                Block airBlock = Block.Air;
-                BlockUpdate blockUpdate = new BlockUpdate(null, this.prophuntSolidPos, airBlock);
-                this.World.Map.QueueUpdate(blockUpdate);
-
-                //Do the other stuff
-                this.Message("You are no longer a solid block!");
-                this.IsSolidBlock = false;
-                this.Info.IsHidden = false;
-                RaisePlayerHideChangedEvent(this);
+                PropHunt.RemoveSolid(this);
             }
-            LastActiveTime = DateTime.UtcNow;
         }
 
 
@@ -1507,6 +1497,12 @@ namespace fCraft
                 return false;
             }
 
+            if (IsPlayingPropHunt)
+            {
+                RevertBlockNow(coord);
+                return false;
+            }
+
             if (CheckBlockSpam()) return true;
 
             BlockChangeContext context = BlockChangeContext.Manual;
@@ -1649,7 +1645,7 @@ namespace fCraft
         ///     Used to undo player's attempted block placement/deletion.
         ///     To avoid threading issues, only use this from this player's IoThread.
         /// </summary>
-        private void RevertBlockNow(Vector3I coords)
+        public void RevertBlockNow(Vector3I coords)
         {
             SendNow(PacketWriter.MakeSetBlock(coords, WorldMap.GetBlock(coords)));
         }
