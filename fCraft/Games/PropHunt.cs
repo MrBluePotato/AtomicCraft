@@ -114,11 +114,11 @@ namespace fCraft
             _world = PropHuntWorlds[RandWorld.Next(0, PropHuntWorlds.Count)];
             _world.gameMode = GameMode.PropHunt;
             _startTime = DateTime.Now;
-            _task = new SchedulerTask(Interval, true).RunForever(TimeSpan.FromMilliseconds(500));
             Logger.Log(LogType.SystemActivity, "&WPropHunt &S is starting in {0} seconds on world {1}.", TimeDelay,
                 _world.ClassyName);
             if (StartMode != Game.StartMode.PropHunt)
             {
+                _task = new SchedulerTask(Interval, true).RunForever(TimeSpan.FromMilliseconds(500));
                 _world.Players.Message("&WPropHunt &S is starting in {0} seconds on world {1}.", TimeDelay,
                     _world.ClassyName);
                 //Time delay if it is the on-demand instance of the game
@@ -138,7 +138,7 @@ namespace fCraft
                 Player.Moving += PlayerMovingHandler;
                 LastChecked = DateTime.Now; //used for intervals
                 _checkIdlesTask = Scheduler.NewTask(CheckIdles).RunForever(TimeSpan.FromMilliseconds(100));
-
+                IsOn = true;
 #if DEBUG
                 Logger.Log(LogType.Warning, "It is on and stuff...");
 #endif
@@ -273,33 +273,31 @@ namespace fCraft
                     if (StartMode != Game.StartMode.PropHunt) return;
                     TakeVote();
                 }
-                if (TimeLeft == 0)
+                if (TimeLeft != 0) return;
+                if (PropHuntPlayers.Count(player => player.IsPropHuntSeeker) ==
+                    PropHuntPlayers.Count(player => (!player.IsPropHuntSeeker)))
                 {
-                    if (PropHuntPlayers.Count(player => player.IsPropHuntSeeker) ==
-                        PropHuntPlayers.Count(player => (!player.IsPropHuntSeeker)))
-                    {
-                        Server.Message("&cIt's a tie!");
-                        RoundEnd = DateTime.Now;
-                        RoundStarted = false;
-                    }
-                    else if (PropHuntPlayers.Count(player => player.IsPropHuntSeeker) <
-                             PropHuntPlayers.Count(player => (!player.IsPropHuntSeeker)))
-                    {
-                        Server.Message("&cThe blocks won!");
-                        RoundEnd = DateTime.Now;
-                        RoundStarted = false;
-                    }
-                    else if (PropHuntPlayers.Count(player => player.IsPropHuntSeeker) >
-                             PropHuntPlayers.Count(player => (!player.IsPropHuntSeeker)))
-                    {
-                        Server.Message("&cThe seekers won!");
-                        RoundEnd = DateTime.Now;
-                        RoundStarted = false;
-                    }
-                    //Take a vote if the server is in that mode
-                    if (StartMode != Game.StartMode.PropHunt) return;
-                    TakeVote();
+                    Server.Message("&cIt's a tie!");
+                    RoundEnd = DateTime.Now;
+                    RoundStarted = false;
                 }
+                else if (PropHuntPlayers.Count(player => player.IsPropHuntSeeker) <
+                         PropHuntPlayers.Count(player => (!player.IsPropHuntSeeker)))
+                {
+                    Server.Message("&cThe blocks won!");
+                    RoundEnd = DateTime.Now;
+                    RoundStarted = false;
+                }
+                else if (PropHuntPlayers.Count(player => player.IsPropHuntSeeker) >
+                         PropHuntPlayers.Count(player => (!player.IsPropHuntSeeker)))
+                {
+                    Server.Message("&cThe seekers won!");
+                    RoundEnd = DateTime.Now;
+                    RoundStarted = false;
+                }
+                //Take a vote if the server is in that mode
+                if (StartMode != Game.StartMode.PropHunt) return;
+                TakeVote();
             }
         }
 
@@ -450,7 +448,7 @@ namespace fCraft
                     foreach (Player p in PropHuntPlayers.ToList())
                     {
                         Vector3I pos = p.Position.ToBlockCoords(); // Converts to block coords
-                        if (e.NewPosition.DistanceSquaredTo(pos.ToPlayerCoords()) <= 48*48 && p != e.Player)
+                        if (e.NewPosition.DistanceSquaredTo(pos.ToPlayerCoords()) <= 48*48 && p != e.Player && !p.IsSolidBlock)
                         {
                             if (!p.IsPropHuntSeeker && !p.IsSolidBlock)
                             {
@@ -464,7 +462,7 @@ namespace fCraft
         }
 
         //Used if the server starts prophunt on launch. This brings the player to the world that the game is in.
-        public static void PlayerConnectedHandler(object sender, Events.PlayerConnectedEventArgs e)
+        public void PlayerConnectedHandler(object sender, Events.PlayerConnectedEventArgs e)
         {
             PropHuntPlayers.Add(e.Player);
             e.StartingWorld = _world;
@@ -503,6 +501,7 @@ namespace fCraft
                 Player.Moving += PlayerMovingHandler;
 
                 _checkIdlesTask = Scheduler.NewTask(CheckIdles).RunForever(TimeSpan.FromMilliseconds(100));
+                _task = new SchedulerTask(Interval, true).RunForever(TimeSpan.FromMilliseconds(500));
 
 #if DEBUG
                 Logger.Log(LogType.Warning, "It is on and stuff...");

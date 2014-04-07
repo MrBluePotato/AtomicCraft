@@ -571,6 +571,7 @@ namespace fCraft
             {
                 PropHunt.RemoveSolid(this);
             }
+            LastActiveTime = DateTime.UtcNow;
         }
 
 
