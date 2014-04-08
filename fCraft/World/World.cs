@@ -722,7 +722,7 @@ namespace fCraft
                 Map = null;
                 IsPendingMapUnload = false;
             }
-            Server.RequestGC();
+            Server.RequestGc();
         }
 
 

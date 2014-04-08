@@ -72,7 +72,7 @@ namespace fCraft
                 string[] data = new[]
                 {
                     Salt,
-                    Server.InternalIP.ToString(),
+                    Server.InternalIp.ToString(),
                     Server.Port.ToString(),
                     Server.CountPlayers(false).ToString(),
                     ConfigKey.MaxPlayers.GetString(),
@@ -264,7 +264,7 @@ namespace fCraft
             IsPublic = ConfigKey.IsPublic.Enabled();
             MaxPlayers = ConfigKey.MaxPlayers.GetInt();
             PlayerCount = Server.CountPlayers(false);
-            ServerIP = Server.InternalIP;
+            ServerIP = Server.InternalIp;
             Port = Server.Port;
             ProtocolVersion = Config.ProtocolVersion;
             Salt = Heartbeat.Salt;

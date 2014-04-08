@@ -1565,7 +1565,7 @@ namespace fCraft
             }
             if (blocks <= 0) return;
             player.Info.ProcessDrawCommand(blocks);
-            Server.RequestGC();
+            Server.RequestGc();
         }
 
         #endregion

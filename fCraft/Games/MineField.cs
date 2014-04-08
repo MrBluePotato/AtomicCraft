@@ -77,7 +77,7 @@ namespace fCraft
             _world.EnableTNTPhysics(Player.Console, false);
             Server.Message("{0}&S started a game of MineField on world Minefield!", player.ClassyName);
             WorldManager.SaveWorldList();
-            Server.RequestGC();
+            Server.RequestGc();
         }
 
         public static void Stop(Player player, bool Won)
@@ -95,7 +95,7 @@ namespace fCraft
             World world = WorldManager.FindWorldOrPrintMatches(player, "Minefield");
             WorldManager.RemoveWorld(world);
             WorldManager.SaveWorldList();
-            Server.RequestGC();
+            Server.RequestGc();
             instance = null;
             if (Won)
             {

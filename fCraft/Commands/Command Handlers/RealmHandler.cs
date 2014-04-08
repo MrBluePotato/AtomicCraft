@@ -252,7 +252,7 @@ namespace fCraft
                 }
             }
 
-            Server.RequestGC();
+            Server.RequestGc();
         }
 
 

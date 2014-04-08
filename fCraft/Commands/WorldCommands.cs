@@ -1579,7 +1579,7 @@ namespace fCraft
                 playerWorld.MapChangedBy = player.Name;
                 playerWorld.ChangeMap(map);
             }
-            Server.RequestGC();
+            Server.RequestGc();
         }
 
         #endregion
@@ -4373,7 +4373,7 @@ namespace fCraft
                 }
             }
 
-            Server.RequestGC();
+            Server.RequestGc();
         }
 
         #endregion
@@ -4903,7 +4903,7 @@ namespace fCraft
                 "{0} removed \"{1}\" from the world list.",
                 player.Name, worldName);
 
-            Server.RequestGC();
+            Server.RequestGc();
         }
 
         #endregion

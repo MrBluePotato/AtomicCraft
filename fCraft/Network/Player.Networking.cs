@@ -398,6 +398,7 @@ namespace fCraft
             //If the player is a solid block and they moved, the timer will reset
             if (posChanged && IsSolidBlock) ResetIdleTimer();
 
+
             if (Info.IsFrozen)
             {
                 // special handling for frozen players
@@ -843,7 +844,7 @@ namespace fCraft
                 }
                 else
                 {
-                    motd = "&0cfg=" + Server.ExternalIP + ":" + Server.Port + "/" + startingWorld.Name + "~motd";
+                    motd = "&0cfg=" + Server.ExternalIp + ":" + Server.Port + "/" + startingWorld.Name + "~motd";
                 }
             }
             else
@@ -1760,7 +1761,7 @@ namespace fCraft
                 }
                 else
                 {
-                    textLine2 = "cfg=" + Server.ExternalIP + ":" + Server.Port + "/" + newWorld.Name;
+                    textLine2 = "cfg=" + Server.ExternalIp + ":" + Server.Port + "/" + newWorld.Name;
                 }
             }
             else
@@ -1916,7 +1917,7 @@ namespace fCraft
             RaisePlayerJoinedWorldEvent(this, oldWorld, reason);
 
             // Done.
-            Server.RequestGC();
+            Server.RequestGc();
 
             return true;
         }

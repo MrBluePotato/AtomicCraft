@@ -20,6 +20,7 @@ using fCraft.Events;
 using JetBrains.Annotations;
 using ThreadState = System.Threading.ThreadState;
 using fCraft.Portals;
+using Newtonsoft.Json.Linq;
 
 namespace fCraft
 {
@@ -48,17 +49,19 @@ namespace fCraft
 
         public static SchedulerTask TempbanTask;
         // networking
-        private static TcpListener listener;
+        private static TcpListener _listener;
 
         /// <summary> Time when the server started (UTC). Used to check uptime. </summary>
         public static DateTime StartTime { get; private set; }
 
-        public static IPAddress InternalIP { get; private set; }
-        public static IPAddress ExternalIP { get; private set; }
+        public static IPAddress InternalIp { get; private set; }
+        public static IPAddress ExternalIp { get; private set; }
 
         public static int Port { get; private set; }
 
         public static Uri Uri { get; set; }
+
+        public static Dictionary<string, string> GlobalChatBans = new Dictionary<string, string>();
 
         #region Command-line args
 
@@ -124,8 +127,8 @@ namespace fCraft
         #region Initialization and Startup
 
         // flags used to ensure proper initialization order
-        private static bool libraryInitialized,
-            serverInitialized;
+        private static bool _libraryInitialized,
+            _serverInitialized;
 
         public static bool IsRunning { get; private set; }
 
@@ -142,7 +145,7 @@ namespace fCraft
         public static void InitLibrary([NotNull] IEnumerable<string> rawArgs)
         {
             if (rawArgs == null) throw new ArgumentNullException("rawArgs");
-            if (libraryInitialized)
+            if (_libraryInitialized)
             {
                 throw new InvalidOperationException("AtomicCraft library is already initialized");
             }
@@ -270,7 +273,7 @@ namespace fCraft
             Logger.Log(LogType.Debug, "Map path: {0}", Path.GetFullPath(Paths.MapPath));
             Logger.Log(LogType.Debug, "Config path: {0}", Path.GetFullPath(Paths.ConfigFileName));
 
-            libraryInitialized = true;
+            _libraryInitialized = true;
         }
 
 
@@ -283,11 +286,11 @@ namespace fCraft
         /// <exception cref="System.InvalidOperationException"> Library is not initialized, or server is already initialzied. </exception>
         public static void InitServer()
         {
-            if (serverInitialized)
+            if (_serverInitialized)
             {
                 throw new InvalidOperationException("Server is already initialized");
             }
-            if (!libraryInitialized)
+            if (!_libraryInitialized)
             {
                 throw new InvalidOperationException("Server.InitLibrary must be called before Server.InitServer");
             }
@@ -374,7 +377,7 @@ namespace fCraft
 
             RaiseEvent(Initialized);
 
-            serverInitialized = true;
+            _serverInitialized = true;
         }
 
 
@@ -396,7 +399,7 @@ namespace fCraft
             {
                 throw new InvalidOperationException("Server is already running");
             }
-            if (!libraryInitialized || !serverInitialized)
+            if (!_libraryInitialized || !_serverInitialized)
             {
                 throw new InvalidOperationException(
                     "Server.InitLibrary and Server.InitServer must be called before Server.StartServer");
@@ -424,12 +427,12 @@ namespace fCraft
 
             // open the port
             Port = ConfigKey.Port.GetInt();
-            InternalIP = IPAddress.Parse(ConfigKey.IP.GetString());
+            InternalIp = IPAddress.Parse(ConfigKey.IP.GetString());
 
             try
             {
-                listener = new TcpListener(InternalIP, Port);
-                listener.Start();
+                _listener = new TcpListener(InternalIp, Port);
+                _listener.Start();
             }
             catch (Exception ex)
             {
@@ -445,10 +448,10 @@ namespace fCraft
                 return false;
             }
 
-            InternalIP = ((IPEndPoint) listener.LocalEndpoint).Address;
-            ExternalIP = CheckExternalIP();
+            InternalIp = ((IPEndPoint) _listener.LocalEndpoint).Address;
+            ExternalIp = CheckExternalIP();
 
-            if (ExternalIP == null)
+            if (ExternalIp == null)
             {
                 Logger.Log(LogType.SystemActivity,
                     "Server.Run: now accepting connections on port {0}", Port);
@@ -457,7 +460,7 @@ namespace fCraft
             {
                 Logger.Log(LogType.SystemActivity,
                     "Server.Run: now accepting connections at {0}:{1}",
-                    ExternalIP, Port);
+                    ExternalIp, Port);
             }
 
 
@@ -522,6 +525,8 @@ namespace fCraft
             MessageBlockHandler.GetInstance();
             Doors.DoorHandler.GetInstance();
 
+            UpdateGlobalChatBans();
+
             IsRunning = true;
             RaiseEvent(Started);
             if (ConfigKey.GlobalChat.Enabled())
@@ -535,6 +540,7 @@ namespace fCraft
                 PropHunt game = new PropHunt();
                 game.Start();
             }
+
             return true;
         }
 
@@ -566,10 +572,10 @@ namespace fCraft
                 shutdownParams.ReasonString);
 
             // stop accepting new players
-            if (listener != null)
+            if (_listener != null)
             {
-                listener.Stop();
-                listener = null;
+                _listener.Stop();
+                _listener = null;
             }
 
             // kick all players
@@ -848,7 +854,7 @@ namespace fCraft
 
         private static void CheckConnections(SchedulerTask param)
         {
-            TcpListener listenerCache = listener;
+            TcpListener listenerCache = _listener;
             if (listenerCache != null && listenerCache.Pending())
             {
                 try
@@ -885,8 +891,8 @@ namespace fCraft
 
         private static void DoGC(SchedulerTask task)
         {
-            if (!gcRequested) return;
-            gcRequested = false;
+            if (!_gcRequested) return;
+            _gcRequested = false;
 
             Process proc = Process.GetCurrentProcess();
             proc.Refresh();
@@ -933,18 +939,18 @@ namespace fCraft
 
         #region Utilities
 
-        private const int IPCheckTimeout = 30000;
-        private static bool gcRequested;
+        private const int IpCheckTimeout = 30000;
+        private static bool _gcRequested;
 
         private static readonly Regex RegexIP =
             new Regex(@"\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b",
                 RegexOptions.Compiled);
 
-        private static readonly Uri IPCheckUri = new Uri("http://checkip.dyndns.org/");
+        private static readonly Uri IpCheckUri = new Uri("http://checkip.dyndns.org/");
 
-        public static void RequestGC()
+        public static void RequestGc()
         {
-            gcRequested = true;
+            _gcRequested = true;
         }
 
 
@@ -1093,9 +1099,9 @@ namespace fCraft
         [CanBeNull]
         private static IPAddress CheckExternalIP()
         {
-            HttpWebRequest request = (HttpWebRequest) WebRequest.Create(IPCheckUri);
+            HttpWebRequest request = (HttpWebRequest) WebRequest.Create(IpCheckUri);
             request.ServicePoint.BindIPEndPointDelegate = new BindIPEndPoint(BindIPEndPointCallback);
-            request.Timeout = IPCheckTimeout;
+            request.Timeout = IpCheckTimeout;
             request.CachePolicy = new RequestCachePolicy(RequestCacheLevel.NoCacheNoStore);
 
             try
@@ -1133,7 +1139,31 @@ namespace fCraft
         public static IPEndPoint BindIPEndPointCallback(ServicePoint servicePoint, IPEndPoint remoteEndPoint,
             int retryCount)
         {
-            return new IPEndPoint(InternalIP, 0);
+            return new IPEndPoint(InternalIp, 0);
+        }
+
+        public static void UpdateGlobalChatBans()
+        {
+            try
+            {
+                GlobalChatBans.Clear();
+                JArray jason; //jason plz (troll)
+                using (var client = new WebClient())
+                {
+                    jason = JArray.Parse(client.DownloadString("http://error.atomiccraft.net/gcbanned.txt"));
+                }
+                foreach (var ban in jason.Cast<JObject>())
+                {
+                        GlobalChatBans.Add(((string)ban["banned_name"]).ToLower(), "'" + (string)ban["banned_by"] + "', because: %d" + (string)ban["banned_reason"]);
+                }
+                Logger.Log(LogType.SystemActivity, "The global chat ban list has been updated!");
+            }
+            catch (Exception e)
+            {
+                Logger.Log(LogType.Error, e.ToString());
+                Logger.Log(LogType.Error, "Could not update GlobalChat Banlist!");
+                GlobalChatBans.Clear();
+            }
         }
 
         #endregion
