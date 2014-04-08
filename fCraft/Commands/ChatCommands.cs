@@ -71,7 +71,7 @@ namespace fCraft
                 player.Message("&WGlobal Chat is disabled on this server.");
                 return;
             }
-            if (!GlobalChat.GlobalThread.GCReady)
+            if (!GlobalChat.GlobalThread.GcReady)
             {
                 player.Message("&WGlobal Chat is not connected.");
                 return;
@@ -81,12 +81,12 @@ namespace fCraft
                 case "reconnect":
                     if (player.Can(Permission.ManageGlobalChat))
                     {
-                        if (GlobalChat.GlobalThread.GCReady)
+                        if (GlobalChat.GlobalThread.GcReady)
                         {
                             player.Message("&WThis server is currently connected to global chat.");
                             return;
                         }
-                        GlobalChat.GlobalThread.GCReady = true;
+                        GlobalChat.GlobalThread.GcReady = true;
                         Server.Message(
                             "&WAttempting to connect to AtomicCraft Global Chat Network. This may take a few seconds.");
                         GlobalChat.Init();

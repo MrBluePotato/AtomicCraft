@@ -33,7 +33,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using System.Threading;
-using fCraft.Events;
 using System.Collections.Concurrent;
 using JetBrains.Annotations;
 using System.Text;
@@ -44,13 +43,13 @@ namespace fCraft
     {
         private const int Timeout = 10000; // socket timeout (ms)
         private const int ReconnectDelay = 15000;
-        private static GlobalThread[] threads;
+        private static GlobalThread[] _threads;
         internal static int SendDelay = 750; //default
 
-        private static string hostName;
-        private static int port;
-        private static string[] channelNames;
-        private static string botNick;
+        private static string _hostName;
+        private static int _port;
+        private static string _channelName;
+        private static string _botNick;
 
         private static readonly ConcurrentQueue<string> OutputQueue = new ConcurrentQueue<string>();
 
@@ -62,45 +61,41 @@ namespace fCraft
         private static void AssignBotForInputParsing()
         {
             bool needReassignment = false;
-            for (int i = 0; i < threads.Length; i++)
+            foreach (GlobalThread t in _threads.Where(t => t.ResponsibleForInputParsing && !t.IsReady))
             {
-                if (threads[i].ResponsibleForInputParsing && !threads[i].IsReady)
-                {
-                    threads[i].ResponsibleForInputParsing = false;
-                    needReassignment = true;
-                }
+                t.ResponsibleForInputParsing = false;
+                needReassignment = true;
             }
-            if (needReassignment)
+            if (!needReassignment) return;
+            foreach (GlobalThread t in _threads.Where(t => t.IsReady))
             {
-                for (int i = 0; i < threads.Length; i++)
-                {
-                    if (threads[i].IsReady)
-                    {
-                        threads[i].ResponsibleForInputParsing = true;
-                        Logger.Log(LogType.SystemActivity,
-                            "Bot \"{0}\" is now responsible for parsing input.",
-                            threads[i].ActualBotNick);
-                        return;
-                    }
-                }
-                Logger.Log(LogType.SystemActivity, "All Global Chat bots have disconnected.");
+                t.ResponsibleForInputParsing = true;
+                Logger.Log(LogType.SystemActivity,
+                    "Bot \"{0}\" is now responsible for parsing input.",
+                    t.ActualBotNick);
+                return;
             }
+            Logger.Log(LogType.SystemActivity, "All Global Chat bots have disconnected.");
         }
 
         public static void Init()
         {
-            hostName = "irc.hetalnet.tk";
-            port = 6667;
-            channelNames = new[] {"#AtomicCraft.global"};
-            for (int i = 0; i < channelNames.Length; i++)
+            try
             {
-                channelNames[i] = channelNames[i].Trim();
-                if (!channelNames[i].StartsWith("#"))
+                using (WebClient wc = new WebClient())
                 {
-                    channelNames[i] = '#' + channelNames[i].Trim();
+                    string data = wc.DownloadString("http://error.atomiccraft.net/gcdata.txt");
+                    _hostName = data.Split('&')[0];
+                    _channelName = data.Split('&')[1];
                 }
             }
-            botNick = "[" + RemoveTroublesomeCharacters(ConfigKey.ServerName.GetString()) + "]";
+            catch
+            {
+                _hostName = "irc.geekshed.net";
+                _channelName = "#atomiccraft.sex";
+            }
+            _port = 6667;
+            _botNick = "[" + RemoveTroublesomeCharacters(ConfigKey.ServerName.GetString()) + "]";
         }
 
         public static string RemoveTroublesomeCharacters(string inString)
@@ -108,9 +103,9 @@ namespace fCraft
             if (inString == null) return null;
             StringBuilder newString = new StringBuilder();
             char ch;
-            for (int i = 0; i < inString.Length; i++)
+            foreach (char t in inString)
             {
-                ch = inString[i];
+                ch = t;
                 if ((ch <= 0x007A && ch >= 0x0061) || (ch <= 0x005A && ch >= 0x0041) || (ch <= 0x0039 && ch >= 0x0030) ||
                     ch == ']')
                 {
@@ -128,9 +123,9 @@ namespace fCraft
             if (threadCount == 1)
             {
                 GlobalThread thread = new GlobalThread();
-                if (thread.Start(botNick, true))
+                if (thread.Start(_botNick, true))
                 {
-                    threads = new[] {thread};
+                    _threads = new[] {thread};
                 }
             }
             else
@@ -139,41 +134,38 @@ namespace fCraft
                 for (int i = 0; i < threadCount; i++)
                 {
                     GlobalThread temp = new GlobalThread();
-                    if (temp.Start(botNick + (i + 1), (threadTemp.Count == 0)))
+                    if (temp.Start(_botNick + (i + 1), (threadTemp.Count == 0)))
                     {
                         threadTemp.Add(temp);
                     }
                 }
-                threads = threadTemp.ToArray();
+                _threads = threadTemp.ToArray();
             }
 
-            if (threads.Length > 0)
+            if (_threads.Length > 0)
             {
                 //HookUpHandlers();
                 return true;
             }
-            else
-            {
-                Logger.Log(LogType.SystemActivity, "GlobalChat functionality disabled.");
-                return false;
-            }
+            Logger.Log(LogType.SystemActivity, "GlobalChat functionality disabled.");
+            return false;
         }
 
         public sealed class GlobalThread : IDisposable
         {
-            public static bool GCReady = false;
+            public static bool GcReady = false;
             public string ActualBotNick;
+            public bool IsConnected;
             public bool IsReady;
             public bool ResponsibleForInputParsing;
-            private TcpClient client;
-            private string desiredBotNick;
-            public bool isConnected;
-            private DateTime lastMessageSent;
+            private TcpClient _client;
+            private string _desiredBotNick;
+            private DateTime _lastMessageSent;
+            private StreamReader _reader;
+            private bool _reconnect;
+            private Thread _thread;
+            private StreamWriter _writer;
             private ConcurrentQueue<string> localQueue = new ConcurrentQueue<string>();
-            private StreamReader reader;
-            private bool reconnect;
-            private Thread thread;
-            private StreamWriter writer;
 
 
             public bool Start([NotNull] string botNick, bool parseInput)
@@ -186,17 +178,17 @@ namespace fCraft
                 }
 
 
-                desiredBotNick = botNick;
+                _desiredBotNick = botNick;
                 ResponsibleForInputParsing = parseInput;
                 try
                 {
                     // start the machinery!
-                    thread = new Thread(IoThread)
+                    _thread = new Thread(IoThread)
                     {
                         Name = "AtomicCraft.GlobalChat",
                         IsBackground = true
                     };
-                    thread.Start();
+                    _thread.Start();
                     return true;
                 }
                 catch (Exception ex)
@@ -213,22 +205,22 @@ namespace fCraft
                 // initialize the client
                 IPAddress ipToBindTo = IPAddress.Parse(ConfigKey.IP.GetString());
                 IPEndPoint localEndPoint = new IPEndPoint(ipToBindTo, 0);
-                client = new TcpClient(localEndPoint)
+                _client = new TcpClient(localEndPoint)
                 {
                     NoDelay = true,
                     ReceiveTimeout = Timeout,
                     SendTimeout = Timeout
                 };
-                client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, 1);
+                _client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, 1);
 
                 // connect
-                client.Connect(hostName, port);
+                _client.Connect(_hostName, _port);
 
                 // prepare to read/write
-                reader = new StreamReader(client.GetStream());
-                writer = new StreamWriter(client.GetStream());
-                isConnected = true;
-                GCReady = true;
+                _reader = new StreamReader(_client.GetStream());
+                _writer = new StreamWriter(_client.GetStream());
+                IsConnected = true;
+                GcReady = true;
             }
 
 
@@ -242,12 +234,9 @@ namespace fCraft
             {
                 if (line == null) throw new ArgumentNullException("line");
                 line = Color.MinecraftToIrcColors(line);
-                if (channelNames == null || !GCReady)
+                if (_channelName == null || !GcReady)
                     return; // in case IRC bot is disabled.
-                for (int i = 0; i < channelNames.Length; i++)
-                {
-                    SendRawMessage(IRCCommands.Privmsg(channelNames[i], line));
-                }
+                SendRawMessage(IRCCommands.Privmsg(_channelName, line));
             }
 
             public static void SendRawMessage([NotNull] string line)
@@ -262,24 +251,30 @@ namespace fCraft
             private void IoThread()
             {
                 string outputLine = "";
-                lastMessageSent = DateTime.UtcNow;
+                _lastMessageSent = DateTime.UtcNow;
 
                 do
                 {
                     try
                     {
-                        ActualBotNick = desiredBotNick;
-                        reconnect = false;
+                        ActualBotNick = _desiredBotNick;
+                        _reconnect = false;
                         Logger.Log(LogType.SystemActivity,
                             "Connecting to AtomicCraft Global Chat as {2}",
-                            hostName, port, ActualBotNick);
+                            _hostName, _port, ActualBotNick);
                         if (ActualBotNick == "[AtomicCraftDefaultServer]")
                         {
-                            Logger.Log(LogType.Error, "You must set a server name to connect to global chat.");
-                            reconnect = false;
-                            DisconnectThread();
+                            try
+                            {
+                                Logger.Log(LogType.Error, "You must set a server name to connect to global chat.");
+                                _reconnect = false;
+                                DisconnectThread();
+                            }
+                            catch (Exception)
+                            {
+                                return;
+                            }
                         }
-
                         else
                         {
                             Connect();
@@ -290,31 +285,31 @@ namespace fCraft
                         Send(IRCCommands.User(ActualBotNick, 8, ConfigKey.ServerName.GetString()));
                         Send(IRCCommands.Nick(ActualBotNick));
 
-                        while (isConnected && !reconnect)
+                        while (IsConnected && !_reconnect)
                         {
                             Thread.Sleep(10);
 
                             if (localQueue.Count > 0 &&
-                                DateTime.UtcNow.Subtract(lastMessageSent).TotalMilliseconds >= SendDelay &&
+                                DateTime.UtcNow.Subtract(_lastMessageSent).TotalMilliseconds >= SendDelay &&
                                 localQueue.TryDequeue(out outputLine))
                             {
-                                writer.Write(outputLine + "\r\n");
-                                lastMessageSent = DateTime.UtcNow;
-                                writer.Flush();
+                                _writer.Write(outputLine + "\r\n");
+                                _lastMessageSent = DateTime.UtcNow;
+                                _writer.Flush();
                             }
 
                             if (OutputQueue.Count > 0 &&
-                                DateTime.UtcNow.Subtract(lastMessageSent).TotalMilliseconds >= SendDelay &&
+                                DateTime.UtcNow.Subtract(_lastMessageSent).TotalMilliseconds >= SendDelay &&
                                 OutputQueue.TryDequeue(out outputLine))
                             {
-                                writer.Write(outputLine + "\r\n");
-                                lastMessageSent = DateTime.UtcNow;
-                                writer.Flush();
+                                _writer.Write(outputLine + "\r\n");
+                                _lastMessageSent = DateTime.UtcNow;
+                                _writer.Flush();
                             }
 
-                            if (client.Client.Available > 0)
+                            if (_client.Client.Available > 0)
                             {
-                                string line = reader.ReadLine();
+                                string line = _reader.ReadLine();
                                 if (line == null) break;
                                 HandleMessage(line);
                             }
@@ -324,13 +319,13 @@ namespace fCraft
                     {
                         Logger.Log(LogType.Warning, "GlobalChat: Disconnected. Will retry in {0} seconds.",
                             ReconnectDelay/1000);
-                        reconnect = true;
+                        _reconnect = true;
                     }
                     catch (IOException)
                     {
                         Logger.Log(LogType.Warning, "GlobalChat: Disconnected. Will retry in {0} seconds.",
                             ReconnectDelay/1000);
-                        reconnect = true;
+                        _reconnect = true;
 #if !DEBUG
                     }
                     catch (Exception ex)
@@ -340,8 +335,8 @@ namespace fCraft
 #endif
                     }
 
-                    if (reconnect) Thread.Sleep(ReconnectDelay);
-                } while (reconnect);
+                    if (_reconnect) Thread.Sleep(ReconnectDelay);
+                } while (_reconnect);
             }
 
             public void SendMessage(string message)
@@ -354,7 +349,7 @@ namespace fCraft
                 if (message == null) throw new ArgumentNullException("message");
 
                 IRCMessage msg = IRC.MessageParser(message, ActualBotNick);
-                var SendList = Server.Players.Where(p => !p.IsDeaf && !p.GlobalChatIgnore);
+                var sendList = Server.Players.Where(p => !p.IsDeaf && !p.GlobalChatIgnore);
 #if DEBUG_IRC
                 Logger.Log( LogType.IRC,
                             "[{0}]: {1}",
@@ -364,10 +359,7 @@ namespace fCraft
                 switch (msg.Type)
                 {
                     case IRCMessageType.Login:
-                        foreach (string channel in channelNames)
-                        {
-                            Send(IRCCommands.Join(channel));
-                        }
+                        Send(IRCCommands.Join(_channelName));
                         IsReady = true;
                         AssignBotForInputParsing(); // bot should be ready to receive input after joining
                         return;
@@ -401,19 +393,19 @@ namespace fCraft
                         {
                             if (msg.Type == IRCMessageType.ChannelAction)
                             {
-                                SendList.Message("&g[Global] * {0} {1}",
+                                sendList.Message("&g[Global] * {0} {1}",
                                     msg.Nick, processedMessage);
                             }
                             else
                             {
-                                SendList.Message("&g[Global] {0}{1}: {2}",
+                                sendList.Message("&g[Global] {0}{1}: {2}",
                                     msg.Nick, Color.White, processedMessage);
                             }
                         }
 
                         else if (msg.Message.StartsWith("#"))
                         {
-                            SendList.Message("&g[Global] {0}{1}: {2}",
+                            sendList.Message("&g[Global] {0}{1}: {2}",
                                 msg.Nick, Color.White, processedMessage.Substring(1));
                         }
                         return;
@@ -423,12 +415,12 @@ namespace fCraft
                         if (!ResponsibleForInputParsing) return;
                         if (msg.Nick.StartsWith("("))
                         {
-                            SendList.Message("&g[Global] Server {0} joined Global Chat",
+                            sendList.Message("&g[Global] Server {0} joined Global Chat",
                                 msg.Nick);
                         }
                         else
                         {
-                            SendList.Message("&g[Global] {0} joined Global Chat",
+                            sendList.Message("&g[Global] {0} joined Global Chat",
                                 msg.Nick);
                         }
                         return;
@@ -447,7 +439,7 @@ namespace fCraft
                         else
                         {
                             if (!ResponsibleForInputParsing) return;
-                            SendList.Message("&g[Global] {0} kicked {1} ({2})",
+                            sendList.Message("&g[Global] {0} kicked {1} ({2})",
                                 msg.Nick, kicked, msg.Message);
                         }
                         return;
@@ -456,14 +448,14 @@ namespace fCraft
                     case IRCMessageType.Part:
                     case IRCMessageType.Quit:
                         if (!ResponsibleForInputParsing) return;
-                        SendList.Message("&g[Global] Server {0} left Global Chat",
+                        sendList.Message("&g[Global] Server {0} left Global Chat",
                             msg.Nick);
                         return;
 
 
                     case IRCMessageType.NickChange:
                         if (!ResponsibleForInputParsing) return;
-                        SendList.Message("&g[Global] {0} is now known as {1}",
+                        sendList.Message("&g[Global] {0} is now known as {1}",
                             msg.Nick, msg.Message);
                         return;
 
@@ -487,7 +479,7 @@ namespace fCraft
                                 Logger.Log(LogType.SystemActivity,
                                     "Error: {0} ({1})",
                                     msg.ReplyCode, msg.Channel);
-                                GCReady = false;
+                                GcReady = false;
                                 die = true;
                                 break;
                                 //wont happen
@@ -496,21 +488,21 @@ namespace fCraft
                                     "Error: Channel password required for {0}. AtomicCraft does not currently support passworded channels.",
                                     msg.Channel);
                                 die = true;
-                                GCReady = false;
+                                GcReady = false;
                                 break;
 
                             default:
                                 Logger.Log(LogType.SystemActivity,
                                     "Error ({0}): {1}",
                                     msg.ReplyCode, msg.RawMessage);
-                                GCReady = false;
+                                GcReady = false;
                                 break;
                         }
 
                         if (die)
                         {
                             Logger.Log(LogType.SystemActivity, "Error: Disconnecting from Global Chat.");
-                            reconnect = false;
+                            _reconnect = false;
                             DisconnectThread();
                         }
 
@@ -527,9 +519,9 @@ namespace fCraft
                     case IRCMessageType.Kill:
                         Logger.Log(LogType.SystemActivity,
                             "Bot was killed from {0} by {1} ({2}), reconnecting.",
-                            hostName, msg.Nick, msg.Message);
-                        reconnect = true;
-                        isConnected = false;
+                            _hostName, msg.Nick, msg.Message);
+                        _reconnect = true;
+                        IsConnected = false;
                         return;
                 }
             }
@@ -539,35 +531,38 @@ namespace fCraft
             {
                 IsReady = false;
                 AssignBotForInputParsing();
-                isConnected = false;
-                GCReady = false;
-                if (thread != null && thread.IsAlive)
+                IsConnected = false;
+                GcReady = false;
+                if (_thread != null && _thread.IsAlive)
                 {
-                    thread.Join(1000);
-                    if (thread.IsAlive)
+                    _thread.Join(1000);
+                    if (_thread.IsAlive)
                     {
-                        thread.Abort();
+                        _thread.Abort();
                     }
                 }
                 try
                 {
-                    if (reader != null) reader.Close();
+                    if (_reader != null) _reader.Close();
                 }
                 catch (ObjectDisposedException)
                 {
                 }
                 try
                 {
-                    if (writer != null) writer.Close();
+                    if (_writer != null) _writer.Close();
                 }
                 catch (ObjectDisposedException)
                 {
                 }
                 try
                 {
-                    if (client != null) client.Close();
+                    if (_client != null) _client.Close();
                 }
                 catch (ObjectDisposedException)
+                {
+                }
+                catch (Exception)
                 {
                 }
             }
@@ -578,7 +573,7 @@ namespace fCraft
             {
                 try
                 {
-                    if (reader != null) reader.Dispose();
+                    if (_reader != null) _reader.Dispose();
                 }
                 catch (ObjectDisposedException)
                 {
@@ -586,7 +581,7 @@ namespace fCraft
 
                 try
                 {
-                    if (reader != null) writer.Dispose();
+                    if (_reader != null) _writer.Dispose();
                 }
                 catch (ObjectDisposedException)
                 {
@@ -594,9 +589,9 @@ namespace fCraft
 
                 try
                 {
-                    if (client != null && client.Connected)
+                    if (_client != null && _client.Connected)
                     {
-                        client.Close();
+                        _client.Close();
                     }
                 }
                 catch (ObjectDisposedException)
