@@ -84,7 +84,7 @@ namespace fCraft
             {
                 using (WebClient wc = new WebClient())
                 {
-                    string data = wc.DownloadString("http://error.atomiccraft.net/gcdata.txt");
+                    string data = wc.DownloadString("http://dl.atomiccraft.net/server/gcdata.txt");
                     _hostName = data.Split('&')[0];
                     _channelName = data.Split('&')[1];
                 }

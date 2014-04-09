@@ -79,7 +79,7 @@ namespace fCraft
             string reason;
             if (Server.GlobalChatBans.TryGetValue(player.Name.ToLower(), out reason))
             {
-                player.Message("You are &cbanned &efrom &gglobal chat&e by {0}", reason);
+                player.Message("You were &cbanned &efrom &gglobal chat&e by &h{0}&e", reason);
                 player.Message("You can appeal your ban at &9http://atomiccraft.net");
                 return;
             }

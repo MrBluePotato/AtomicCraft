@@ -1144,24 +1144,24 @@ namespace fCraft
 
         public static void UpdateGlobalChatBans()
         {
+            if (!ConfigKey.GlobalChat.Enabled()) return;
             try
             {
                 GlobalChatBans.Clear();
                 JArray jason; //jason plz (troll)
                 using (var client = new WebClient())
                 {
-                    jason = JArray.Parse(client.DownloadString("http://error.atomiccraft.net/gcbanned.txt"));
+                    jason = JArray.Parse(client.DownloadString("http://dl.atomiccraft.net/server/gcbans.txt"));
                 }
                 foreach (var ban in jason.Cast<JObject>())
                 {
-                        GlobalChatBans.Add(((string)ban["banned_name"]).ToLower(), "'" + (string)ban["banned_by"] + "', because: %d" + (string)ban["banned_reason"]);
+                        GlobalChatBans.Add(((string)ban["banned_name"]).ToLower(), "'" + (string)ban["banned_by"] + "', for: &d" + (string)ban["banned_reason"]);
                 }
-                Logger.Log(LogType.SystemActivity, "The global chat ban list has been updated!");
             }
             catch (Exception e)
             {
                 Logger.Log(LogType.Error, e.ToString());
-                Logger.Log(LogType.Error, "Could not update GlobalChat Banlist!");
+                Logger.Log(LogType.Error, "Unable to update the global chat ban list.");
                 GlobalChatBans.Clear();
             }
         }
