@@ -36,13 +36,11 @@ namespace fCraft
     {
         internal static void Init()
         {
-            ReleaseMode mode = ConfigKey.ReleaseMode.GetEnum<ReleaseMode>();
-            if (mode == ReleaseMode.Dev)
-            {
+#if DEBUG
                 CommandManager.RegisterCommand(CdGame);
                 CommandManager.RegisterCommand(CdPropHunt);
                 //CommandManager.RegisterCommand(CdTeam);
-            }
+#endif
         }
 
         #region GameMainHandler

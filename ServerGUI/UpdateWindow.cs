@@ -34,15 +34,7 @@ namespace fCraft.ServerGUI
             xShowDetails.Focus();
             downloader.DownloadProgressChanged += DownloadProgress;
             downloader.DownloadFileCompleted += DownloadComplete;
-            ReleaseMode mode = ConfigKey.ReleaseMode.GetEnum<ReleaseMode>();
-            if (mode == ReleaseMode.Public)
-            {
-                downloader.DownloadFileAsync(new Uri(Updater.PublicUpdaterLocation), updaterFullPath);
-            }
-            else if (mode == ReleaseMode.Dev)
-            {
-                downloader.DownloadFileAsync(new Uri(Updater.DevUpdaterLocation), updaterFullPath);
-            }
+            downloader.DownloadFileAsync(new Uri(Updater.UpdaterLocation), updaterFullPath);
         }
 
 

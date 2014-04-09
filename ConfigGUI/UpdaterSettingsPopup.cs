@@ -83,27 +83,6 @@ namespace fCraft.ConfigGUI
             }
         }
 
-        public ReleaseMode ReleaseMode
-        {
-            get
-            {
-                if (devRelease.Checked) return ReleaseMode.Dev;
-                return ReleaseMode.Public;
-            }
-            set
-            {
-                switch (value)
-                {
-                    case ReleaseMode.Dev:
-                        devRelease.Checked = true;
-                        break;
-                    case ReleaseMode.Public:
-                        publicRelease.Checked = true;
-                        break;
-                }
-            }
-        }
-
         public bool BackupBeforeUpdate
         {
             get { return xBackupBeforeUpdating.Checked; }

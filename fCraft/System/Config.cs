@@ -559,7 +559,8 @@ namespace fCraft
                 keyName != "PriceKey1" &&
                 keyName != "PriceKey2" &&
                 keyName != "PriceKey3" &&
-                keyName != "PriceKey4"
+                keyName != "PriceKey4" &&
+                keyName != "ReleaseMode"
                 )
             {
                 // unknown key

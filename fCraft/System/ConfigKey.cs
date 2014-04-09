@@ -416,10 +416,6 @@ with IRC bots falling behind on messages.",
 
         #region Advanced
 
-        [EnumKey(ConfigSection.Advanced, fCraft.ReleaseMode.Public,
-            @"Allows users to either help find bugs in developer releases of AtomicCraft, or use normal releases to run a public server."
-            )] ReleaseMode,
-
         [BoolKey(ConfigSection.Advanced, true,
             @"Crash reports are created when serious unexpected errors occur.
 Being able to receive crash reports helps identify bugs and improve AtomicCraft!

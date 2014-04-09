@@ -36,13 +36,8 @@
             this.xBackupBeforeUpdating = new System.Windows.Forms.CheckBox();
             this.bOK = new System.Windows.Forms.Button();
             this.bCancel = new System.Windows.Forms.Button();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label6 = new System.Windows.Forms.Label();
-            this.publicRelease = new System.Windows.Forms.RadioButton();
-            this.devRelease = new System.Windows.Forms.RadioButton();
             this.gMode.SuspendLayout();
             this.gOptions.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // gMode
@@ -53,7 +48,7 @@
             this.gMode.Controls.Add(this.rPrompt);
             this.gMode.Controls.Add(this.rNotify);
             this.gMode.Controls.Add(this.rDisabled);
-            this.gMode.Location = new System.Drawing.Point(12, 77);
+            this.gMode.Location = new System.Drawing.Point(13, 12);
             this.gMode.Name = "gMode";
             this.gMode.Size = new System.Drawing.Size(319, 119);
             this.gMode.TabIndex = 0;
@@ -114,7 +109,7 @@
             this.gOptions.Controls.Add(this.tRunBeforeUpdate);
             this.gOptions.Controls.Add(this.xRunBeforeUpdate);
             this.gOptions.Controls.Add(this.xBackupBeforeUpdating);
-            this.gOptions.Location = new System.Drawing.Point(13, 202);
+            this.gOptions.Location = new System.Drawing.Point(14, 137);
             this.gOptions.Name = "gOptions";
             this.gOptions.Size = new System.Drawing.Size(319, 147);
             this.gOptions.TabIndex = 1;
@@ -181,7 +176,7 @@
             // 
             this.bOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.bOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.bOK.Location = new System.Drawing.Point(176, 354);
+            this.bOK.Location = new System.Drawing.Point(176, 291);
             this.bOK.Name = "bOK";
             this.bOK.Size = new System.Drawing.Size(75, 23);
             this.bOK.TabIndex = 2;
@@ -192,58 +187,12 @@
             // 
             this.bCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.bCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.bCancel.Location = new System.Drawing.Point(257, 354);
+            this.bCancel.Location = new System.Drawing.Point(257, 291);
             this.bCancel.Name = "bCancel";
             this.bCancel.Size = new System.Drawing.Size(75, 23);
             this.bCancel.TabIndex = 3;
             this.bCancel.Text = "Cancel";
             this.bCancel.UseVisualStyleBackColor = true;
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.devRelease);
-            this.groupBox1.Controls.Add(this.publicRelease);
-            this.groupBox1.Controls.Add(this.label6);
-            this.groupBox1.Location = new System.Drawing.Point(13, 10);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(319, 61);
-            this.groupBox1.TabIndex = 4;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Build Preference";
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Cursor = System.Windows.Forms.Cursors.Help;
-            this.label6.ForeColor = System.Drawing.Color.Red;
-            this.label6.Location = new System.Drawing.Point(152, 19);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(137, 26);
-            this.label6.TabIndex = 26;
-            this.label6.Text = "Dev builds may not work as\r\nexpected";
-            this.label6.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            // 
-            // publicRelease
-            // 
-            this.publicRelease.AutoSize = true;
-            this.publicRelease.Location = new System.Drawing.Point(6, 17);
-            this.publicRelease.Name = "publicRelease";
-            this.publicRelease.Size = new System.Drawing.Size(96, 17);
-            this.publicRelease.TabIndex = 4;
-            this.publicRelease.TabStop = true;
-            this.publicRelease.Text = "Public Release";
-            this.publicRelease.UseVisualStyleBackColor = true;
-            // 
-            // devRelease
-            // 
-            this.devRelease.AutoSize = true;
-            this.devRelease.Location = new System.Drawing.Point(6, 40);
-            this.devRelease.Name = "devRelease";
-            this.devRelease.Size = new System.Drawing.Size(116, 17);
-            this.devRelease.TabIndex = 27;
-            this.devRelease.TabStop = true;
-            this.devRelease.Text = "Developer Release";
-            this.devRelease.UseVisualStyleBackColor = true;
             // 
             // UpdaterSettingsPopup
             // 
@@ -251,8 +200,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.bCancel;
-            this.ClientSize = new System.Drawing.Size(344, 389);
-            this.Controls.Add(this.groupBox1);
+            this.ClientSize = new System.Drawing.Size(344, 326);
             this.Controls.Add(this.bCancel);
             this.Controls.Add(this.bOK);
             this.Controls.Add(this.gOptions);
@@ -264,8 +212,6 @@
             this.gMode.PerformLayout();
             this.gOptions.ResumeLayout(false);
             this.gOptions.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -285,9 +231,5 @@
         private System.Windows.Forms.CheckBox xBackupBeforeUpdating;
         private System.Windows.Forms.Button bOK;
         private System.Windows.Forms.Button bCancel;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.RadioButton devRelease;
-        private System.Windows.Forms.RadioButton publicRelease;
     }
 }

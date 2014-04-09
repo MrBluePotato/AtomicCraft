@@ -190,7 +190,6 @@ namespace fCraft.ConfigGUI
             updaterWindow.RunBeforeUpdate = ConfigKey.RunBeforeUpdate.GetString();
             updaterWindow.RunAfterUpdate = ConfigKey.RunAfterUpdate.GetString();
             updaterWindow.UpdaterMode = ConfigKey.UpdaterMode.GetEnum<UpdaterMode>();
-            updaterWindow.ReleaseMode = ConfigKey.ReleaseMode.GetEnum<ReleaseMode>();
         }
 
 
@@ -590,7 +589,6 @@ namespace fCraft.ConfigGUI
             ConfigKey.BackupBeforeUpdate.TrySetValue(updaterWindow.BackupBeforeUpdate);
             ConfigKey.RunBeforeUpdate.TrySetValue(updaterWindow.RunBeforeUpdate);
             ConfigKey.RunAfterUpdate.TrySetValue(updaterWindow.RunAfterUpdate);
-            ConfigKey.ReleaseMode.TrySetValue(updaterWindow.ReleaseMode);
 
             //Econ
             ConfigKey.CurrencySl.TrySetValue(tCurrencySl.Text);
